@@ -9,7 +9,8 @@
     CUSTOM_LISTINGS: "rm_custom_listings",
     LISTING_DRAFT: "rm_listing_draft",
     NOTIFICATIONS_READ: "rm_notifications_read",
-    CHAT_HISTORY: "rm_chat_history"
+    CHAT_HISTORY: "rm_chat_history",
+    CHAT_CONTACTS: "rm_chat_contacts"
   };
 
   const FALLBACK_SVG =
@@ -55,6 +56,81 @@
 
   function getSavedRoomIds() {
     return readJSON(STORAGE_KEYS.SAVED_ROOMS, []);
+  }
+
+  function escapeHTML(value) {
+    const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    return String(value == null ? "" : value).replace(/[&<>"']/g, (character) => entities[character]);
+  }
+
+  function saveChatContact(contact) {
+    if (!contact || !contact.name) return;
+
+    const storedContacts = readJSON(STORAGE_KEYS.CHAT_CONTACTS, []);
+    const contacts = Array.isArray(storedContacts) ? storedContacts : [];
+    const existing = contacts.find((item) => item.name === contact.name) || {};
+    const updated = {
+      ...existing,
+      ...contact,
+      meta: contact.meta || existing.meta || "",
+      avatar: contact.avatar || existing.avatar || "",
+      roomId: contact.roomId || existing.roomId || "",
+      lastActivity: Date.now()
+    };
+
+    writeJSON(
+      STORAGE_KEYS.CHAT_CONTACTS,
+      [updated, ...contacts.filter((item) => item.name !== contact.name)]
+    );
+  }
+
+  function getChatContacts() {
+    const storedContacts = readJSON(STORAGE_KEYS.CHAT_CONTACTS, []);
+    const contacts = Array.isArray(storedContacts) ? storedContacts : [];
+    const contactsByName = new Map(
+      contacts.filter((contact) => contact && contact.name).map((contact) => [contact.name, contact])
+    );
+    const storedHistory = readJSON(STORAGE_KEYS.CHAT_HISTORY, {});
+    const historyMap = storedHistory && typeof storedHistory === "object" ? storedHistory : {};
+
+    Object.keys(historyMap).forEach((name) => {
+      if (!contactsByName.has(name)) {
+        contactsByName.set(name, { name, activityType: "messaged", lastActivity: 0 });
+      }
+    });
+
+    return Array.from(contactsByName.values()).sort(
+      (a, b) =>
+        Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) ||
+        Number(b.lastActivity || 0) - Number(a.lastActivity || 0)
+    );
+  }
+
+  function setChatContactPinned(contact, pinned) {
+    const storedContacts = readJSON(STORAGE_KEYS.CHAT_CONTACTS, []);
+    const contacts = Array.isArray(storedContacts) ? storedContacts : [];
+    const updated = { ...contact, pinned };
+    const exists = contacts.some((item) => item.name === contact.name);
+    writeJSON(
+      STORAGE_KEYS.CHAT_CONTACTS,
+      exists
+        ? contacts.map((item) => (item.name === contact.name ? { ...item, pinned } : item))
+        : [updated, ...contacts]
+    );
+  }
+
+  function deleteChatConversation(name) {
+    const storedContacts = readJSON(STORAGE_KEYS.CHAT_CONTACTS, []);
+    const contacts = Array.isArray(storedContacts) ? storedContacts : [];
+    writeJSON(
+      STORAGE_KEYS.CHAT_CONTACTS,
+      contacts.filter((contact) => contact.name !== name)
+    );
+
+    const storedHistory = readJSON(STORAGE_KEYS.CHAT_HISTORY, {});
+    const historyMap = storedHistory && typeof storedHistory === "object" ? storedHistory : {};
+    delete historyMap[name];
+    writeJSON(STORAGE_KEYS.CHAT_HISTORY, historyMap);
   }
 
   function toggleSavedRoom(id) {
@@ -154,6 +230,7 @@
 
   function openChatModal(partnerName = "Hoàng Nam", partnerMeta = "Sinh viên HCMUS • Phản hồi trong 15 phút", presetText = "") {
     const key = partnerName;
+    saveChatContact({ name: partnerName, meta: partnerMeta, activityType: "interested" });
     const historyMap = readJSON(STORAGE_KEYS.CHAT_HISTORY, {});
     const messages = historyMap[key] || [
       {
@@ -220,6 +297,7 @@
       messages.push({ sender: "me", text, time: "Vừa gửi" });
       historyMap[key] = messages;
       writeJSON(STORAGE_KEYS.CHAT_HISTORY, historyMap);
+      saveChatContact({ name: partnerName, meta: partnerMeta, activityType: "messaged" });
       box.innerHTML = renderMessages(messages);
       box.scrollTop = box.scrollHeight;
       input.value = "";
@@ -240,8 +318,165 @@
     });
   }
 
+  function closeMessagesDrawer() {
+    const overlay = document.getElementById("rm-messages-overlay");
+    if (!overlay || overlay.dataset.closing) return;
+
+    overlay.dataset.closing = "true";
+    overlay.classList.add("opacity-0");
+    overlay.querySelector("#rm-messages-drawer")?.classList.add("translate-x-full");
+    document.body.classList.remove("overflow-hidden");
+    document.removeEventListener("keydown", handleMessagesDrawerKeydown);
+    setTimeout(() => overlay.remove(), 300);
+  }
+
+  function handleMessagesDrawerKeydown(event) {
+    if (event.key === "Escape") closeMessagesDrawer();
+  }
+
+  function openMessagesDrawer() {
+    if (document.getElementById("rm-messages-overlay")) return;
+
+    const overlay = document.createElement("div");
+    overlay.id = "rm-messages-overlay";
+    overlay.className = "fixed inset-0 z-[90] bg-inverse-surface/40 opacity-0 transition-opacity duration-300";
+    overlay.innerHTML = `
+      <aside id="rm-messages-drawer" role="dialog" aria-modal="true" aria-labelledby="rm-messages-title" class="absolute inset-y-0 right-0 flex w-full max-w-md translate-x-full flex-col border-l border-surface-container bg-surface-container-lowest shadow-2xl transition-transform duration-300 ease-out">
+        <div class="flex items-center justify-between border-b border-surface-container px-5 py-4">
+          <div>
+            <h2 id="rm-messages-title" class="font-title-md text-title-md font-semibold text-on-surface">Tin nhắn</h2>
+            <p class="mt-0.5 text-xs text-on-surface-variant">Các liên hệ bạn đã nhắn tin hoặc tìm hiểu</p>
+          </div>
+          <div class="flex items-center gap-1">
+            <button type="button" id="rm-messages-edit" aria-label="Chỉnh sửa trò chuyện" aria-pressed="false" class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button type="button" id="rm-messages-close" aria-label="Đóng tin nhắn" class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        </div>
+        <div id="rm-messages-contact-list" class="flex-1 overflow-y-auto divide-y divide-surface-container"></div>
+      </aside>
+    `;
+
+    const drawer = overlay.querySelector("#rm-messages-drawer");
+    const contactList = overlay.querySelector("#rm-messages-contact-list");
+    const editButton = overlay.querySelector("#rm-messages-edit");
+    let isEditing = false;
+
+    const renderContacts = () => {
+      const contacts = getChatContacts();
+      const storedHistory = readJSON(STORAGE_KEYS.CHAT_HISTORY, {});
+      const historyMap = storedHistory && typeof storedHistory === "object" ? storedHistory : {};
+
+      if (!contacts.length) {
+        contactList.innerHTML = `
+          <div class="flex flex-col items-center text-center gap-2 px-6 py-12">
+            <span class="material-symbols-outlined text-4xl text-outline">forum</span>
+            <p class="font-label-md text-label-md font-semibold text-on-surface">Chưa có liên hệ</p>
+            <p class="text-sm text-on-surface-variant">Liên hệ sẽ xuất hiện khi bạn xem tin phòng hoặc bắt đầu trò chuyện.</p>
+          </div>
+        `;
+        return;
+      }
+
+      contactList.innerHTML = contacts
+        .map((contact, index) => {
+          const messages = Array.isArray(historyMap[contact.name]) ? historyMap[contact.name] : [];
+          const lastMessage = messages[messages.length - 1];
+          const preview =
+            (lastMessage && lastMessage.text) ||
+            (contact.activityType === "viewed" ? "Bạn đã xem phòng/hồ sơ này" : "Mở cuộc trò chuyện");
+          const pinTitle = contact.pinned ? "Bỏ ghim cuộc trò chuyện" : "Ghim cuộc trò chuyện";
+          return `
+            <div class="flex items-center gap-2 p-2.5">
+              <button type="button" data-contact-index="${index}" ${isEditing ? "disabled" : ""} class="flex min-w-0 flex-1 items-center gap-3 rounded-lg p-1 text-left transition-colors hover:bg-surface-container-low disabled:cursor-default disabled:hover:bg-transparent">
+                <img src="${escapeHTML(contact.avatar || "/assets/images/common/avatar-profile.jpg")}" alt="" class="w-11 h-11 rounded-full object-cover bg-surface-container shrink-0">
+                <span class="min-w-0 flex-1">
+                  <span class="flex items-center gap-1.5">
+                    <span class="block font-label-md text-label-md font-semibold text-on-surface truncate">${escapeHTML(contact.name)}</span>
+                    ${contact.pinned ? '<span class="material-symbols-outlined text-primary text-[15px]" aria-label="Đã ghim">push_pin</span>' : ""}
+                  </span>
+                  <span class="block text-xs text-on-surface-variant truncate">${escapeHTML(contact.meta || "Liên hệ Roomie")}</span>
+                  <span class="block mt-1 text-xs text-on-surface-variant truncate">${escapeHTML(preview)}</span>
+                </span>
+                <span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
+              </button>
+              <div class="${isEditing ? "flex" : "hidden"} shrink-0 items-center gap-1">
+                <button type="button" data-pin-contact="${index}" aria-label="${pinTitle}" title="${pinTitle}" class="flex h-9 w-9 items-center justify-center rounded-full ${contact.pinned ? "bg-primary/10 text-primary" : "text-on-surface-variant hover:bg-surface-container-low"}">
+                  <span class="material-symbols-outlined text-[19px]">push_pin</span>
+                </button>
+                <button type="button" data-delete-contact="${index}" aria-label="Xóa cuộc trò chuyện với ${escapeHTML(contact.name)}" title="Xóa cuộc trò chuyện" class="flex h-9 w-9 items-center justify-center rounded-full text-error hover:bg-error-container/50">
+                  <span class="material-symbols-outlined text-[19px]">delete</span>
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      contactList.querySelectorAll("[data-contact-index]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const contact = contacts[Number(button.dataset.contactIndex)];
+          if (!contact) return;
+          closeMessagesDrawer();
+          openChatModal(contact.name, contact.meta || "Liên hệ Roomie");
+        });
+      });
+
+      contactList.querySelectorAll("[data-pin-contact]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const contact = contacts[Number(button.dataset.pinContact)];
+          if (!contact) return;
+          setChatContactPinned(contact, !contact.pinned);
+          renderContacts();
+        });
+      });
+
+      contactList.querySelectorAll("[data-delete-contact]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const contact = contacts[Number(button.dataset.deleteContact)];
+          if (!contact || !window.confirm(`Xóa cuộc trò chuyện với ${contact.name}?`)) return;
+          deleteChatConversation(contact.name);
+          renderContacts();
+        });
+      });
+    };
+
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) closeMessagesDrawer();
+    });
+    overlay.querySelector("#rm-messages-close").addEventListener("click", closeMessagesDrawer);
+    editButton.addEventListener("click", () => {
+      isEditing = !isEditing;
+      editButton.setAttribute("aria-pressed", String(isEditing));
+      editButton.setAttribute("aria-label", isEditing ? "Hoàn tất chỉnh sửa" : "Chỉnh sửa trò chuyện");
+      editButton.title = isEditing ? "Hoàn tất chỉnh sửa" : "Chỉnh sửa trò chuyện";
+      editButton.innerHTML = `<span class="material-symbols-outlined">${isEditing ? "edit_off" : "edit"}</span>`;
+      renderContacts();
+    });
+
+    renderContacts();
+    document.body.appendChild(overlay);
+    document.body.classList.add("overflow-hidden");
+    document.addEventListener("keydown", handleMessagesDrawerKeydown);
+    requestAnimationFrame(() => {
+      overlay.classList.remove("opacity-0");
+      drawer.classList.remove("translate-x-full");
+    });
+    overlay.querySelector("#rm-messages-close").focus();
+  }
+
   function openProfileModal(rm) {
     if (!rm) return;
+    saveChatContact({
+      name: rm.shortName || rm.name,
+      meta: `${rm.school} · ${rm.major}`,
+      avatar: rm.avatar,
+      roomId: rm.linkedRoomId,
+      activityType: "viewed"
+    });
     const invited = readJSON(STORAGE_KEYS.INVITED_ROOMMATES, []);
     const isInvited = invited.includes(rm.id);
 
@@ -750,7 +985,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     const chatBtn = document.querySelector('header button[aria-label="Tin nhắn"]');
     if (chatBtn) {
       chatBtn.addEventListener("click", () => {
-        openChatModal("Hoàng Nam", "Sinh viên HCMUS • Đang online");
+        openMessagesDrawer();
       });
     }
 
@@ -1523,6 +1758,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     const pricePills = document.querySelectorAll(".price-pill");
     const priceDisplay = document.getElementById("price-display");
     const areaCheckboxes = document.querySelectorAll(".area-checkbox");
+    const areaList = document.getElementById("area-filter-options");
     const housingBtns = document.querySelectorAll(".housing-type-btn");
     const amenityCheckboxes = document.querySelectorAll(".amenity-checkbox");
     const sortSelect = document.getElementById("rooms-sort");
@@ -1532,6 +1768,18 @@ Chữ ký Bên A                                                    Chữ ký B�
     const resetBtn = document.getElementById("reset-filter-btn");
     const applyBtn = document.getElementById("apply-filter-trigger");
     const toast = document.getElementById("filter-toast");
+
+    if (areaList) {
+      const areaOptions = Array.from(areaList.querySelectorAll(".area-option"));
+      areaOptions.sort((a, b) => {
+        const countA = Number(a.querySelector(".area-option-count")?.textContent.trim()) || 0;
+        const countB = Number(b.querySelector(".area-option-count")?.textContent.trim()) || 0;
+        const nameA = a.querySelector(".area-option-name")?.textContent.trim() || "";
+        const nameB = b.querySelector(".area-option-name")?.textContent.trim() || "";
+        return countB - countA || nameA.localeCompare(nameB, "vi");
+      });
+      areaOptions.forEach((option) => areaList.appendChild(option));
+    }
 
     const state = {
       search: "",
@@ -1829,6 +2077,16 @@ Chữ ký Bên A                                                    Chữ ký B�
     const rooms = getAllRooms();
     const room = rooms.find((r) => String(r.id) === String(id)) || rooms[0];
     if (!room) return;
+
+    if (room.roommate) {
+      saveChatContact({
+        name: room.roommate.name,
+        meta: room.roommate.bioTitle || room.districtLabel,
+        avatar: room.roommate.avatar,
+        roomId: room.id,
+        activityType: "viewed"
+      });
+    }
 
     const setText = (idName, value) => {
       const el = document.getElementById(idName);
@@ -2208,7 +2466,18 @@ Chữ ký Bên A                                                    Chữ ký B�
   // -------------------- Page: Match Results / Find Roommate --------------------
   function initMatchResultsPage() {
     const savedQuiz = readJSON(STORAGE_KEYS.QUIZ_RESULT, null);
-    if (savedQuiz) {
+    const hasQuizResult = Boolean(savedQuiz && savedQuiz.archetype && savedQuiz.pillars);
+    document.getElementById("mr-quiz-complete-status")?.classList.toggle("hidden", !hasQuizResult);
+    document.getElementById("mr-quiz-welcome")?.classList.toggle("hidden", hasQuizResult);
+    document.getElementById("mr-quiz-results")?.classList.toggle("hidden", !hasQuizResult);
+
+    const matchSectionEyebrow = document.getElementById("mr-match-section-eyebrow");
+    const matchSectionTitle = document.getElementById("mr-match-section-title");
+    const matchSectionDescription = document.getElementById("mr-match-section-description");
+    const roomRecommendationsTitle = document.getElementById("mr-room-recommendations-title");
+    const roomRecommendationsDescription = document.getElementById("mr-room-recommendations-description");
+
+    if (hasQuizResult) {
       const archEl = document.getElementById("mr-archetype-title");
       if (archEl && savedQuiz.archetype) archEl.textContent = savedQuiz.archetype;
       if (savedQuiz.pillars) {
@@ -2222,6 +2491,26 @@ Chữ ký Bên A                                                    Chữ ký B�
         setPillar("mr-p2", savedQuiz.pillars.clean);
         setPillar("mr-p3", savedQuiz.pillars.guests);
         setPillar("mr-p4", savedQuiz.pillars.finance);
+      }
+
+      const matchCount = Number(savedQuiz.matchCount);
+      if (Number.isFinite(matchCount)) {
+        const matchCountEl = document.getElementById("mr-match-count");
+        const connectionCountEl = document.getElementById("mr-connection-count");
+        if (matchCountEl) matchCountEl.textContent = `${matchCount} bạn sinh viên`;
+        if (connectionCountEl) connectionCountEl.textContent = String(matchCount);
+      }
+    } else {
+      if (matchSectionEyebrow) matchSectionEyebrow.textContent = "Khám phá cộng đồng";
+      if (matchSectionTitle) matchSectionTitle.textContent = "Các bạn cùng phòng nổi bật";
+      if (matchSectionDescription) {
+        matchSectionDescription.textContent =
+          "Xem hồ sơ và thói quen sinh hoạt của các roommate đang tìm bạn ở ghép.";
+      }
+      if (roomRecommendationsTitle) roomRecommendationsTitle.textContent = "Phòng trọ đang tìm người ở cùng";
+      if (roomRecommendationsDescription) {
+        roomRecommendationsDescription.textContent =
+          "Khám phá các phòng trọ có roommate đang tìm người dọn vào ở ngay.";
       }
     }
 
@@ -2654,7 +2943,7 @@ Chữ ký Bên A                                                    Chữ ký B�
         typeLabel: selectedType,
         matchScore: 96,
         isNewUserPost: true,
-        amenities: ["Máy lạnh", "Giờ tự do"],
+        amenities: ["Máy lạnh", "Giờ linh hoạt"],
         images: [uploadedCover || pvCoverImg?.src || FALLBACK_SVG],
         roommate: {
           id: "minh-thu",
