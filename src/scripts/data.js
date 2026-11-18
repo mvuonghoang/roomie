@@ -181,20 +181,20 @@ window.RoomieData = {
       shortAddress: "Quận 5 · Gần KHTN",
       distanceLabel: "Nguyễn Văn Cừ, Quận 5",
       schoolDistanceBadge: "Đối diện HCMUS CS1 (50m)",
-      price: 2500000,
-      priceFormatted: "2.500.000đ",
+      price: 5000000,
+      priceFormatted: "5.000.000đ",
       totalRoomPrice: "5.000.000đ/tháng",
       areaSqm: 25,
-      capacityLabel: "Tối đa 2 người",
-      spotsLabel: "Còn 1 chỗ",
-      badgeText: "Đối diện HCMUS CS1",
+      capacityLabel: "Nguyên phòng (tối đa 2 người)",
+      spotsLabel: "Nguyên phòng riêng",
+      badgeText: "Nguyên phòng",
       floorLabel: "Tầng 4 (Thang máy)",
       depositLabel: "1 tháng cọc",
       typeKey: "phong-rieng",
       typeLabel: "Phòng riêng",
       matchScore: 95,
       amenities: ["Máy lạnh", "Giờ linh hoạt", "Khu vực để xe"],
-      summarySpecs: "25m² • Camera an ninh, còn 1 chỗ",
+      summarySpecs: "25m² • Nguyên phòng, camera an ninh",
       images: [
         "/assets/images/trang-chu/room-3.jpg",
         "/assets/images/tim-phong/room-3.jpg"
@@ -220,7 +220,7 @@ window.RoomieData = {
         serviceNote: "Đã bao gồm Wifi + vệ sinh hành lang",
         parking: "120.000đ / xe / tháng",
         parkingNote: "Thẻ từ bảo vệ 24/24",
-        estimatedTotal: "~ 2.750.000đ - 2.900.000đ"
+        estimatedTotal: "~ 5.300.000đ - 5.500.000đ"
       },
       description: [
         "Vị trí vàng ngay khu trung tâm Quận 5 — chỉ cần băng qua đường là tới giảng đường ĐH Khoa học Tự nhiên CS1, ĐH Sư phạm TP.HCM và ĐH Sài Gòn.",
@@ -447,7 +447,7 @@ window.RoomieData = {
       areaKey: "quan-10",
       budget: "2.0 - 2.8 tr/tháng",
       avatar:
-        "/assets/images/tim-roommate/avatar-2.jpg",
+        "/assets/images/trang-chu/avatar-1.jpg",
       quote: "“Rất tôn trọng không gian riêng của roommate, thích chia lịch rửa chén và đi siêu thị chung.”",
       criteria: [
         "Ôn thi nghiêm túc, không ồn ào",
@@ -476,7 +476,7 @@ window.RoomieData = {
       areaKey: "thu-duc",
       budget: "1.5 - 2.0 tr/tháng",
       avatar:
-        "/assets/images/tim-roommate/avatar-3.jpg",
+        "/assets/images/trang-chu/avatar-2.jpg",
       quote: "“Học CNTT nên thỉnh thoảng thức khuya làm đồ án, nhưng luôn đeo tai nghe và giữ phòng yên ắng.”",
       criteria: [
         "Ngủ sau 23h30, dậy 07h00",
@@ -505,7 +505,7 @@ window.RoomieData = {
       areaKey: "binh-thanh",
       budget: "2.0 - 2.5 tr/tháng",
       avatar:
-        "/assets/images/tim-roommate/avatar-4.jpg",
+        "/assets/images/trang-chu/avatar-3.jpg",
       quote: "“Hướng nội, thích đọc sách & viết lách, rất tôn trọng đồ cá nhân và giờ giấc văn minh.”",
       criteria: [
         "Hướng nội, thích đọc sách & viết lách",

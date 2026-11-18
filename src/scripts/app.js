@@ -50,6 +50,10 @@
     return [...custom, ...(Data.ROOMS || [])];
   }
 
+  function isPrivateRoom(room) {
+    return room && room.typeKey === "phong-rieng";
+  }
+
   function getSavedRoomIds() {
     return readJSON(STORAGE_KEYS.SAVED_ROOMS, []);
   }
@@ -494,9 +498,19 @@
                 <p class="text-xs font-semibold text-primary mt-0.5">Ngân sách: ${rm.budget}</p>
               </div>
             </div>
-            <div class="text-center px-3.5 py-2 rounded-2xl bg-secondary-container text-on-secondary-container shrink-0">
-              <div class="text-2xl font-bold leading-none">${rm.matchScore}%</div>
-              <div class="text-[11px] font-semibold mt-1">Hợp gu</div>
+            <div class="flex flex-col items-end gap-1.5 shrink-0">
+              <div class="text-center px-3.5 py-2 rounded-2xl bg-secondary-container text-on-secondary-container w-full">
+                <div class="text-2xl font-bold leading-none">${rm.matchScore}%</div>
+                <div class="text-[11px] font-semibold mt-1">Hợp gu</div>
+              </div>
+              <span class="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold w-full ${
+                rm.gender === "Nam"
+                  ? "bg-sky-100 text-sky-700 border border-sky-200"
+                  : "bg-pink-100 text-pink-700 border border-pink-200"
+              }">
+                <span class="material-symbols-outlined text-[13px]">${rm.gender === "Nam" ? "male" : "female"}</span>
+                ${rm.gender || "Sinh viên"}
+              </span>
             </div>
           </div>
 
@@ -1149,8 +1163,468 @@ Chữ ký Bên A                                                    Chữ ký B�
     });
   }
 
+  function initHeroStatCounters() {
+    const counters = Array.from(document.querySelectorAll("[data-count-target]"));
+    if (!counters.length) return;
+
+    const formatStat = (val, el) => {
+      const prefix = el.dataset.countPrefix || "";
+      const suffix = el.dataset.countSuffix || "";
+      const numStr = el.dataset.countLocale === "vi" ? val.toLocaleString("vi-VN") : String(val);
+      return `${prefix}${numStr}${suffix}`;
+    };
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      counters.forEach((el) => {
+        el.textContent = formatStat(Number(el.dataset.countTarget) || 0, el);
+      });
+      return;
+    }
+
+    counters.forEach((el) => {
+      el.textContent = formatStat(0, el);
+    });
+
+    const animateCounter = (el) => {
+      if (el.dataset.countDone === "1") return;
+      el.dataset.countDone = "1";
+
+      const target = Number(el.dataset.countTarget) || 0;
+      const duration = 800;
+      const startTime = performance.now();
+      el.textContent = formatStat(0, el);
+
+      const step = (now) => {
+        const progress = Math.min(1, (now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(target * eased);
+        el.textContent = formatStat(current, el);
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          el.textContent = formatStat(target, el);
+        }
+      };
+
+      window.requestAnimationFrame(step);
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              animateCounter(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+      counters.forEach((el) => observer.observe(el));
+    } else {
+      counters.forEach(animateCounter);
+    }
+  }
+
+  function createGraphemeSplitter() {
+    if (typeof Intl !== "undefined" && typeof Intl.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("vi", { granularity: "grapheme" });
+      return (word) => Array.from(segmenter.segment(word), (s) => s.segment);
+    }
+    return (word) => Array.from(word);
+  }
+
+  function splitElementIntoScrollChars(rootEl, options = {}) {
+    if (!rootEl) return { chars: [], words: [] };
+    if (rootEl.dataset.rmSplit === "1") {
+      return {
+        chars: Array.from(rootEl.querySelectorAll(".rm-scroll-char")),
+        words: Array.from(rootEl.querySelectorAll(".rm-scroll-word")),
+      };
+    }
+
+    const wrapWords = options.wrapWords !== false;
+    const splitGraphemes = createGraphemeSplitter();
+    const chars = [];
+    const words = [];
+
+    const walk = (node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.nodeValue || "";
+        if (!text.trim()) return;
+        const frag = document.createDocumentFragment();
+        const parts = text.split(/(\s+)/);
+        parts.forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) {
+            frag.appendChild(document.createTextNode(part));
+            return;
+          }
+          const targetParent = wrapWords ? document.createElement("span") : frag;
+          if (wrapWords) {
+            targetParent.className = "rm-scroll-word";
+            words.push(targetParent);
+          }
+          splitGraphemes(part).forEach((g) => {
+            const chSpan = document.createElement("span");
+            chSpan.className = "rm-scroll-char";
+            chSpan.textContent = g;
+            chars.push(chSpan);
+            targetParent.appendChild(chSpan);
+          });
+          if (wrapWords) {
+            frag.appendChild(targetParent);
+          }
+        });
+        node.parentNode.replaceChild(frag, node);
+        return;
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.classList.contains("material-symbols-outlined")) return;
+        if (node.getAttribute("aria-hidden") === "true" && node.tagName === "svg") return;
+        Array.from(node.childNodes).forEach(walk);
+      }
+    };
+
+    walk(rootEl);
+    rootEl.dataset.rmSplit = "1";
+    return { chars, words };
+  }
+
+  function applyCharOpacityWave(chars, progress, baseOpacity, windowWidth) {
+    const count = chars.length;
+    if (!count) return;
+    if (progress >= 0.999) {
+      chars.forEach((ch) => {
+        if (ch.style.opacity !== "") ch.style.opacity = "";
+      });
+      return;
+    }
+
+    const spanWin = count <= 1 ? 1 : Math.max(0.18, windowWidth);
+    const travel = Math.max(0.001, 1 - spanWin);
+    for (let i = 0; i < count; i += 1) {
+      const start = count <= 1 ? 0 : (i / (count - 1)) * travel;
+      const local = Math.min(1, Math.max(0, (progress - start) / spanWin));
+      const eased = 1 - Math.pow(1 - local, 2);
+      chars[i].style.opacity = (baseOpacity + (1 - baseOpacity) * eased).toFixed(3);
+    }
+  }
+
+  function applyWordRise(words, progress, startY, windowWidth) {
+    const count = words.length;
+    if (!count) return;
+    if (progress >= 0.999) {
+      words.forEach((w) => {
+        if (w.style.transform !== "") w.style.transform = "";
+      });
+      return;
+    }
+
+    const spanWin = count <= 1 ? 1 : Math.max(0.28, windowWidth);
+    const travel = Math.max(0.001, 1 - spanWin);
+    for (let i = 0; i < count; i += 1) {
+      const start = count <= 1 ? 0 : (i / (count - 1)) * travel;
+      const local = Math.min(1, Math.max(0, (progress - start) / spanWin));
+      const eased = 1 - Math.pow(1 - local, 3);
+      const y = startY * (1 - eased);
+      words[i].style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
+    }
+  }
+
+  function createTextTrack(el, cfg) {
+    if (!el) return null;
+    const { chars, words } = splitElementIntoScrollChars(el, { wrapWords: cfg.wrapWords !== false });
+    if (!chars.length) return null;
+    return {
+      chars,
+      words,
+      riseEl: cfg.riseEl || null,
+      delay: cfg.delay ?? 0,
+      span: cfg.span ?? 0.65,
+      baseOpacity: cfg.baseOpacity ?? 0.14,
+      windowWidth: cfg.windowWidth ?? 0.3,
+      startY: cfg.startY ?? 9,
+    };
+  }
+
+  function buildFeaturedRoomsTracks(section) {
+    const units = [];
+    const header = document.getElementById("featured-rooms-header");
+    if (header) {
+      const h2 = header.querySelector("h2");
+      const ctaText = header.querySelector("a > span:not(.material-symbols-outlined)");
+      const ctaLink = header.querySelector("a[data-path]");
+      units.push({
+        anchorEl: header,
+        startVh: 0.94,
+        endVh: 0.44,
+        delay: 0,
+        tracks: [
+          createTextTrack(h2, { delay: 0, span: 0.72, baseOpacity: 0.14, startY: 11, windowWidth: 0.34 }),
+          createTextTrack(ctaText, { wrapWords: false, riseEl: ctaLink, delay: 0.28, span: 0.62, baseOpacity: 0.18, startY: 7, windowWidth: 0.32 }),
+        ].filter(Boolean),
+        fades: [],
+      });
+    }
+
+    const cards = Array.from(section.querySelectorAll("article"));
+    cards.forEach((card, idx) => {
+      const locSpan = card.querySelector(".text-tertiary > span:not(.material-symbols-outlined)");
+      const h3 = card.querySelector("h3");
+      const specText = card.querySelector("p > span.truncate");
+      const specRow = specText ? specText.parentElement : null;
+      const priceVal = card.querySelector(".font-currency-md");
+      const priceUnit = priceVal ? priceVal.nextElementSibling : null;
+      const priceRow = priceVal ? priceVal.parentElement : null;
+      const pills = Array.from(card.querySelectorAll(".absolute.top-3\\.5.left-3\\.5 > span"));
+
+      units.push({
+        anchorEl: card,
+        cardEl: card,
+        cardIdx: idx,
+        startVh: 0.96,
+        endVh: 0.48,
+        tracks: [
+          createTextTrack(locSpan, { delay: 0.06, span: 0.56, baseOpacity: 0.16, startY: 7, windowWidth: 0.3 }),
+          createTextTrack(h3, { wrapWords: false, riseEl: h3, delay: 0.14, span: 0.62, baseOpacity: 0.14, startY: 8, windowWidth: 0.32 }),
+          createTextTrack(specText, { wrapWords: false, riseEl: specRow, delay: 0.24, span: 0.62, baseOpacity: 0.16, startY: 7, windowWidth: 0.3 }),
+          createTextTrack(priceVal, { wrapWords: false, riseEl: priceRow, delay: 0.34, span: 0.52, baseOpacity: 0.16, startY: 6, windowWidth: 0.28 }),
+          createTextTrack(priceUnit, { wrapWords: false, delay: 0.44, span: 0.46, baseOpacity: 0.18, windowWidth: 0.28 }),
+        ].filter(Boolean),
+        fades: pills.map((p, pIdx) => ({ el: p, delay: 0.1 + pIdx * 0.08, span: 0.48, baseOpacity: 0.35, startY: 5 })),
+      });
+    });
+
+    return units;
+  }
+
+  function buildRoommateMatchesTracks(section) {
+    const units = [];
+    const inner = section.querySelector(":scope > div");
+    const header = inner ? inner.firstElementChild : null;
+    if (header) {
+      const h2 = header.querySelector("h2");
+      const subtitle = header.querySelector("p");
+      const ctaText = header.querySelector("a > span:not(.material-symbols-outlined)");
+      const ctaLink = header.querySelector("a[data-path]");
+      units.push({
+        anchorEl: header,
+        startVh: 0.94,
+        endVh: 0.44,
+        delay: 0,
+        tracks: [
+          createTextTrack(h2, { delay: 0, span: 0.68, baseOpacity: 0.14, startY: 11, windowWidth: 0.34 }),
+          createTextTrack(subtitle, { delay: 0.14, span: 0.72, baseOpacity: 0.16, startY: 8, windowWidth: 0.3 }),
+          createTextTrack(ctaText, { wrapWords: false, riseEl: ctaLink, delay: 0.28, span: 0.62, baseOpacity: 0.18, startY: 7, windowWidth: 0.32 }),
+        ].filter(Boolean),
+        fades: [],
+      });
+    }
+
+    const cardUnits = [];
+    const cards = Array.from(section.querySelectorAll(".grid > div"));
+    cards.forEach((card, idx) => {
+      const nameEl = card.querySelector("h3");
+      const uniEl = card.querySelector("h3 + span");
+      const bioEl = card.querySelector("p");
+      const chips = Array.from(card.querySelectorAll(".flex-wrap > span"));
+      const badgeCol = card.querySelector(".flex.flex-col.items-end.gap-1\\.5");
+      const actionWrap = card.querySelector(".pt-1");
+
+      const tracks = [
+        createTextTrack(nameEl, { wrapWords: false, riseEl: nameEl, delay: 0.08, span: 0.56, baseOpacity: 0.14, startY: 8, windowWidth: 0.34 }),
+        createTextTrack(uniEl, { wrapWords: false, riseEl: uniEl, delay: 0.16, span: 0.56, baseOpacity: 0.16, startY: 6, windowWidth: 0.3 }),
+        createTextTrack(bioEl, { delay: 0.22, span: 0.64, baseOpacity: 0.15, startY: 8, windowWidth: 0.32 }),
+        ...chips.map((chip, cIdx) =>
+          createTextTrack(chip, { wrapWords: false, riseEl: chip, delay: 0.36 + cIdx * 0.08, span: 0.48, baseOpacity: 0.18, startY: 6, windowWidth: 0.3 })
+        ),
+      ].filter(Boolean);
+
+      const fades = [
+        badgeCol ? { el: badgeCol, delay: 0.14, span: 0.5, baseOpacity: 0.32, startY: 6 } : null,
+        actionWrap ? { el: actionWrap, delay: 0.42, span: 0.5, baseOpacity: 0.42, startY: 8 } : null,
+      ].filter(Boolean);
+
+      const unit = {
+        anchorEl: card,
+        cardEl: card,
+        cardIdx: idx,
+        startVh: 0.96,
+        endVh: 0.48,
+        tracks,
+        fades,
+      };
+      cardUnits.push(unit);
+      units.push(unit);
+    });
+
+    const banner = inner ? inner.lastElementChild : null;
+    if (banner && banner.contains(banner.querySelector(".material-symbols-outlined"))) {
+      const bannerText = banner.querySelector("span:not(.material-symbols-outlined)");
+      units.push({
+        anchorEl: banner,
+        startVh: 0.99,
+        endVh: 0.84,
+        companionUnits: cardUnits,
+        tracks: [
+          createTextTrack(bannerText, { delay: 0.05, span: 0.85, baseOpacity: 0.16, startY: 6, windowWidth: 0.32 }),
+        ].filter(Boolean),
+        fades: [],
+      });
+    }
+
+    return units;
+  }
+
+  function initEditorialSectionsScrollReveal() {
+    const featuredSection = document.getElementById("featured-rooms");
+    const roommateSection = document.getElementById("roommate-matches");
+    if (!featuredSection && !roommateSection) return;
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const units = [
+      ...(featuredSection ? buildFeaturedRoomsTracks(featuredSection) : []),
+      ...(roommateSection ? buildRoommateMatchesTracks(roommateSection) : []),
+    ];
+    if (!units.length) return;
+
+    const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    const getColumns = () => {
+      const w = window.innerWidth || 1280;
+      if (w >= 1024) return 4;
+      if (w >= 768) return 2;
+      return 1;
+    };
+
+    const computeRawTarget = (unit, vh, cols) => {
+      const rect = unit.anchorEl.getBoundingClientRect();
+      const startY = vh * unit.startVh;
+      const endY = vh * unit.endVh;
+      const raw = clamp((startY - rect.top) / Math.max(1, startY - endY), 0, 1);
+      const colStagger = typeof unit.cardIdx === "number" && cols > 1 ? (unit.cardIdx % cols) * 0.055 : 0;
+      let progress = colStagger > 0 ? clamp((raw - colStagger) / (1 - colStagger), 0, 1) : raw;
+
+      if (unit.companionUnits && unit.companionUnits.length && rect.top < vh * 0.99) {
+        const lastCardsReady = unit.companionUnits.reduce((acc, cu) => Math.min(acc, cu.target), 1);
+        if (lastCardsReady > progress) {
+          progress = Math.max(progress, clamp((lastCardsReady - 0.6) / 0.4, 0, 1));
+        }
+      }
+      return progress;
+    };
+
+    const vhInit = window.innerHeight || 800;
+    const colsInit = getColumns();
+    units.forEach((u) => {
+      u.target = computeRawTarget(u, vhInit, colsInit);
+      u.current = u.target;
+    });
+    // Re-evaluate companion banners once all cards have initial target
+    units.forEach((u) => {
+      if (u.companionUnits) {
+        u.target = computeRawTarget(u, vhInit, colsInit);
+        u.current = u.target;
+      }
+    });
+
+    const applyUnit = (u) => {
+      const p = u.current;
+      if (u.cardEl) {
+        if (p >= 0.999) {
+          if (u.cardEl.style.opacity !== "") u.cardEl.style.opacity = "";
+          if (u.cardEl.style.transform !== "") u.cardEl.style.transform = "";
+          if (u.cardEl.style.transitionProperty !== "") u.cardEl.style.transitionProperty = "";
+        } else {
+          const cardLift = easeOutCubic(clamp(p / 0.55, 0, 1));
+          const cardOp = 0.58 + 0.42 * easeOutCubic(clamp(p / 0.45, 0, 1));
+          const y = 20 * (1 - cardLift);
+          u.cardEl.style.transitionProperty = "box-shadow";
+          u.cardEl.style.opacity = cardOp.toFixed(3);
+          u.cardEl.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
+        }
+      }
+
+      u.tracks.forEach((t) => {
+        const local = clamp((p - t.delay) / t.span, 0, 1);
+        applyCharOpacityWave(t.chars, local, t.baseOpacity, t.windowWidth);
+        applyWordRise(t.words, local, t.startY, 0.42);
+        if (t.riseEl) {
+          if (local >= 0.999) {
+            if (t.riseEl.style.transform !== "") t.riseEl.style.transform = "";
+          } else {
+            const eased = easeOutCubic(local);
+            const ry = t.startY * (1 - eased);
+            t.riseEl.style.transform = `translate3d(0, ${ry.toFixed(2)}px, 0)`;
+          }
+        }
+      });
+
+      u.fades.forEach((f) => {
+        const local = clamp((p - f.delay) / f.span, 0, 1);
+        if (local >= 0.999) {
+          if (f.el.style.opacity !== "") f.el.style.opacity = "";
+          if (f.el.style.transform !== "") f.el.style.transform = "";
+        } else {
+          const eased = easeOutCubic(local);
+          const y = f.startY * (1 - eased);
+          f.el.style.opacity = (f.baseOpacity + (1 - f.baseOpacity) * eased).toFixed(3);
+          f.el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
+        }
+      });
+    };
+
+    let rafId = null;
+    const tick = () => {
+      let moving = false;
+      units.forEach((u) => {
+        const diff = u.target - u.current;
+        if (Math.abs(diff) < 0.0012) {
+          if (u.current !== u.target) {
+            u.current = u.target;
+            applyUnit(u);
+          }
+        } else {
+          u.current += diff * 0.22;
+          applyUnit(u);
+          moving = true;
+        }
+      });
+
+      if (moving) {
+        rafId = window.requestAnimationFrame(tick);
+      } else {
+        rafId = null;
+      }
+    };
+
+    const scheduleUpdate = () => {
+      const vh = window.innerHeight || 800;
+      const cols = getColumns();
+      units.forEach((u) => {
+        u.target = computeRawTarget(u, vh, cols);
+      });
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    units.forEach(applyUnit);
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate, { passive: true });
+  }
+
   function initHomePage() {
     initHeroCursorMotion();
+    initHeroStatCounters();
+    initEditorialSectionsScrollReveal();
 
     // Quick search form -> redirect to /tim-phong with query params
     const form = document.querySelector("main form");
@@ -1210,7 +1684,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     });
 
     // Roommate preview cards ("Xem hồ sơ" buttons)
-    const homeRoommateMap = ["minh-anh", "quoc-bao", "thao-vy"];
+    const homeRoommateMap = ["minh-anh", "quoc-bao", "thao-vy", "gia-huy"];
     const profileBtns = Array.from(document.querySelectorAll("main button")).filter(
       (b) => b.textContent.trim() === "Xem hồ sơ"
     );
@@ -1221,6 +1695,58 @@ Chữ ký Bên A                                                    Chữ ký B�
         btn.addEventListener("click", () => openProfileModal(rm));
       }
     });
+
+    // Services section billing toggle & plan selection
+    const servicesSection = document.getElementById("services-preview");
+    if (servicesSection) {
+      let billingMode = "standard";
+      const toggleBtns = Array.from(servicesSection.querySelectorAll("#service-billing-toggle button[data-billing]"));
+      const priceEls = Array.from(servicesSection.querySelectorAll(".plan-price"));
+      const activeToggleCls = ["bg-white", "text-on-surface", "shadow-xs", "font-semibold"];
+      const inactiveToggleCls = ["text-on-surface-variant", "hover:text-on-surface", "font-medium"];
+
+      const syncBillingToggle = () => {
+        toggleBtns.forEach((b) => {
+          const isActive = b.dataset.billing === billingMode;
+          activeToggleCls.forEach((c) => b.classList.toggle(c, isActive));
+          inactiveToggleCls.forEach((c) => b.classList.toggle(c, !isActive));
+        });
+        priceEls.forEach((el) => {
+          const nextPrice = billingMode === "student" ? el.dataset.priceSv : el.dataset.priceStd;
+          if (nextPrice) el.textContent = nextPrice;
+        });
+      };
+
+      toggleBtns.forEach((b) => {
+        b.addEventListener("click", () => {
+          const nextMode = b.dataset.billing || "standard";
+          if (nextMode === billingMode) return;
+          billingMode = nextMode;
+          syncBillingToggle();
+        });
+      });
+
+      const planBtns = Array.from(servicesSection.querySelectorAll(".plan-select-btn[data-plan-id]"));
+      planBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const pkgId = btn.dataset.planId;
+          const pkg = (Data.PRICING_PACKAGES || []).find((p) => p.id === pkgId);
+          if (!pkg) return;
+          if (pkg.id === "basic") {
+            showToast("Bạn đang sử dụng Gói Cơ bản (0đ) miễn phí!");
+            return;
+          }
+          const cardPriceEl = btn.closest("div")?.querySelector(".plan-price");
+          const activePrice = billingMode === "student" && cardPriceEl?.dataset.priceSv
+            ? cardPriceEl.dataset.priceSv
+            : pkg.price;
+          const activePeriod = billingMode === "student"
+            ? `${pkg.period} (Ưu đãi Sinh viên -20%)`
+            : pkg.period;
+          openPaymentModal({ ...pkg, price: activePrice, period: activePeriod });
+        });
+      });
+    }
   }
 
   // -------------------- Page: Find Rooms --------------------
@@ -1413,7 +1939,7 @@ Chữ ký Bên A                                                    Chữ ký B�
                     <h2 data-room-nav="${room.id}" class="font-title-md text-title-md text-on-surface font-semibold group-hover:text-primary transition-colors line-clamp-1 cursor-pointer">${room.title}</h2>
                   </div>
                   <div class="pt-2 border-t border-surface-container flex items-center justify-between">
-                    <span class="font-currency-md text-title-md text-primary font-bold">${room.priceFormatted}<span class="text-xs font-normal text-on-surface-variant">/th</span></span>
+                    <span class="font-currency-md text-title-md text-primary font-bold">${room.priceFormatted}<span class="text-xs font-normal text-on-surface-variant">${isPrivateRoom(room) ? "/tháng" : "/tháng/người"}</span></span>
                     <a href="/roomie/phong-chi-tiet?id=${room.id}" class="px-3 py-1 rounded-lg text-primary hover:bg-primary/5 font-label-sm font-semibold transition-colors flex items-center gap-0.5">
                       Xem <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </a>
@@ -1572,8 +2098,11 @@ Chữ ký Bên A                                                    Chữ ký B�
     setText("rd-spots-badge", room.spotsLabel);
     setText("rd-school-badge", room.schoolDistanceBadge || room.distanceLabel);
     setText("rd-title", room.title);
+    const isPrivate = isPrivateRoom(room);
     setText("rd-price-main", room.priceFormatted);
+    setText("rd-price-unit", isPrivate ? "/tháng" : "/người /tháng");
     setText("rd-price-side", room.priceFormatted);
+    setText("rd-price-side-label", isPrivate ? "Giá thuê cả phòng" : "Giá ở ghép / người");
     setText("rd-address", room.address);
     setText("rd-area", `${room.areaSqm} m²`);
     setText("rd-capacity", room.capacityLabel);
@@ -1581,8 +2110,12 @@ Chữ ký Bên A                                                    Chữ ký B�
     setText("rd-deposit", room.depositLabel);
     setText("rd-badge-right", room.badgeText || "Còn chỗ");
     setText("rd-match-score", `${room.matchScore || 94}% Hợp gu`);
+    setText("rd-cost-room-label", isPrivate ? "Tiền thuê nguyên phòng" : "Tiền thuê phòng (Mỗi người)");
     setText("rd-cost-room", room.priceFormatted);
-    setText("rd-cost-room-note", `(Từ ${room.totalRoomPrice || room.priceFormatted})`);
+    setText(
+      "rd-cost-room-note",
+      isPrivate ? "(Giá trọn phòng 1 tháng)" : `(Từ ${room.totalRoomPrice || room.priceFormatted})`
+    );
     if (room.costs) {
       setText("rd-cost-electric", room.costs.electric);
       setText("rd-cost-electric-note", room.costs.electricNote);
@@ -2399,10 +2932,10 @@ Chữ ký Bên A                                                    Chữ ký B�
         schoolDistanceBadge: distanceInput?.value.trim() || "Gần trường ĐH",
         price: priceNum,
         priceFormatted: formatVND(priceNum),
-        totalRoomPrice: formatVND(priceNum * 2) + "/tháng",
+        totalRoomPrice: selectedPurpose === "roommate" ? formatVND(priceNum * 2) + "/tháng" : formatVND(priceNum) + "/tháng",
         areaSqm: 28,
         capacityLabel: "Tối đa 2 người",
-        spotsLabel: selectedPurpose === "roommate" ? "Còn 1 chỗ ở ghép" : "Phòng trống sẵn sàng",
+        spotsLabel: selectedPurpose === "roommate" ? "Còn 1 chỗ ở ghép" : "Nguyên phòng riêng",
         badgeText: isBoosted ? "NỔI BẬT" : "Mới đăng",
         floorLabel: "Tầng 2",
         depositLabel: "1 tháng cọc",

@@ -138,11 +138,11 @@
             <!-- Center: 3 Highlighted Interactive Stat Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md w-full max-w-3xl mx-auto">
               <a href="/roomie/tim-roommate" data-path="tim-roommate" class="group rounded-2xl bg-surface-container-lowest/90 backdrop-blur-sm border border-outline-variant/30 px-space-lg py-3.5 shadow-[0_4px_14px_-4px_rgba(24,28,35,0.05)] hover:-translate-y-1.5 hover:shadow-[0_16px_32px_-10px_rgba(73,62,229,0.18)] hover:border-primary/40 transition-all duration-300 text-center flex flex-col items-center gap-0.5">
-                <span class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors">1.200+</span>
+                <span class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors tabular-nums" data-count-target="1200" data-count-suffix="+" data-count-locale="vi">1.200+</span>
                 <span class="font-body-sm text-body-sm text-on-surface-variant">sinh viên đã ghép thành công</span>
               </a>
               <a href="/roomie/trac-nghiem" data-path="trac-nghiem-tinh-cach" class="group rounded-2xl bg-surface-container-lowest/90 backdrop-blur-sm border border-outline-variant/30 px-space-lg py-3.5 shadow-[0_4px_14px_-4px_rgba(24,28,35,0.05)] hover:-translate-y-1.5 hover:shadow-[0_16px_32px_-10px_rgba(73,62,229,0.20)] hover:border-primary/45 transition-all duration-300 text-center flex flex-col items-center gap-0.5">
-                <span class="font-headline-md text-headline-md text-primary font-bold">&gt;85%</span>
+                <span class="font-headline-md text-headline-md text-primary font-bold tabular-nums" data-count-target="85" data-count-prefix="&gt;" data-count-suffix="%">&gt;85%</span>
                 <span class="font-body-sm text-body-sm text-on-surface-variant">tương hợp thói quen sinh hoạt</span>
               </a>
               <a href="/roomie/dang-tin" data-path="dang-tin" class="group rounded-2xl bg-surface-container-lowest/90 backdrop-blur-sm border border-outline-variant/30 px-space-lg py-3.5 shadow-[0_4px_14px_-4px_rgba(24,28,35,0.05)] hover:-translate-y-1.5 hover:shadow-[0_16px_32px_-10px_rgba(0,104,81,0.18)] hover:border-tertiary/45 transition-all duration-300 text-center flex flex-col items-center gap-0.5">
@@ -165,15 +165,14 @@
         </div>
       </section>
       <!-- SECTION: Bạn đang tìm gì? (3 Crisp Interactive Cards) -->
-      <section id="explore-cards" class="scroll-mt-24 relative overflow-hidden w-full py-16 lg:py-20 bg-primary text-on-primary">
-        <!-- Soft dark-indigo veil over #493ee5 to deepen tone and avoid harsh glare -->
-        <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#161345]/25 via-[#18154d]/35 to-[#121038]/50"></div>
-        <div class="pointer-events-none absolute -top-28 left-1/2 -translate-x-1/2 w-[720px] h-72 rounded-full bg-[#7b73ff]/15 blur-3xl"></div>
+      <section id="explore-cards" class="scroll-mt-24 relative overflow-hidden w-full py-16 lg:py-20 bg-gradient-to-b from-[#0d0f36] via-[#262196] to-[#493ee5] text-on-primary">
+        <!-- Lit-from-bottom radial glow matching Combo Thần Tốc gradient -->
+        <div class="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[820px] h-[340px] rounded-full bg-[#7c75ff]/45 blur-3xl"></div>
 
         <div class="relative z-10 max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
           <div class="flex flex-col items-center text-center gap-space-sm max-w-4xl mx-auto mb-space-xl">
             <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-fixed border border-tertiary-fixed/50 shadow-sm font-label-md text-[13.5px] font-semibold">
-              <span class="w-2 h-2 rounded-full bg-tertiary shrink-0"></span>
+              <span class="material-symbols-outlined text-[15px]">bolt</span>
               Bắt đầu nhanh chóng
             </span>
             <h2 class="font-display-lg text-[34px] sm:text-[40px] lg:text-[44px] leading-tight font-bold text-white tracking-tight">
@@ -201,7 +200,7 @@
                     Tìm phòng trọ
                   </h3>
                   <p class="font-body-md text-[16px] text-on-surface-variant mt-2.5 leading-relaxed">
-                    Phòng trọ an ninh, rõ ràng từng khoản điện nước &amp; dịch vụ quanh các trường đại học.
+                    Phòng trọ rõ ràng từng khoản điện nước &amp; dịch vụ quanh các trường đại học.
                   </p>
                 </div>
               </div>
@@ -272,72 +271,72 @@
         </div>
       </section>
       <!-- SECTION: Phòng trọ nổi bật dành cho sinh viên -->
-      <section class="w-full py-space-2xl bg-surface">
-        <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-xl">
-            <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
-              Phòng trọ nổi bật
+      <section id="featured-rooms" class="w-full py-12 lg:py-16 lg:min-h-[calc(100vh_-_5rem)] lg:flex lg:flex-col lg:justify-center bg-surface overflow-x-clip">
+        <div class="w-full max-w-[1380px] mx-auto px-margin md:px-margin-md lg:px-8 xl:px-10">
+          <div id="featured-rooms-header" class="flex flex-col sm:flex-row sm:items-end justify-between gap-space-sm mb-8 lg:mb-10 will-change-transform">
+            <h2 class="font-headline-lg text-[30px] sm:text-[34px] lg:text-[38px] font-bold leading-tight text-on-surface tracking-tight">
+              <span class="text-primary whitespace-nowrap">Phòng trọ</span> nổi bật
             </h2>
-            <a class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-medium hover:underline" data-path="tim-phong" href="#">
+            <a class="inline-flex items-center gap-1.5 font-label-md text-[15px] lg:text-[15.5px] text-primary font-semibold hover:underline" data-path="tim-phong" href="/roomie/tim-phong">
               <span>
                 Xem tất cả
               </span>
-              <span class="material-symbols-outlined text-body-md">
+              <span class="material-symbols-outlined text-[19px]">
                 arrow_forward
               </span>
             </a>
           </div>
           <!-- 4 Student Listing Cards Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter-md">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 xl:gap-6">
             <!-- Listing 1 -->
-            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col group">
-              <div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-container">
+            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
+              <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Airy studio apartment room with bunk beds, white walls, sunny balcony with potted plants, student study desk with lamp, quiet residential street view, modern Vietnamese college student apartment, warm bright photograph." src="/assets/images/trang-chu/room-1.jpg">
-                <div class="absolute top-space-sm left-space-sm flex items-center gap-space-xs">
-                  <span class="px-space-sm py-0.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-bold tracking-wide shadow-sm">
+                <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
+                  <span class="px-2.5 py-1 rounded-full bg-primary text-on-primary text-[12px] xl:text-[12.5px] leading-none font-bold tracking-wide shadow-sm whitespace-nowrap">
                     NỔI BẬT
                   </span>
-                  <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-medium">
+                  <span class="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-semibold whitespace-nowrap">
                     Còn 1 chỗ
                   </span>
                 </div>
-                <button aria-label="Lưu bài" class="absolute top-space-sm right-space-sm w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center" type="button">
-                  <span class="material-symbols-outlined text-body-md">
+                <button aria-label="Lưu bài" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-surface-container-lowest/85 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center shadow-xs" type="button">
+                  <span class="material-symbols-outlined text-[19px]">
                     bookmark
                   </span>
                 </button>
               </div>
-              <div class="p-space-md flex flex-col flex-1 justify-between gap-space-md">
-                <div class="flex flex-col gap-space-xs">
-                  <div class="flex items-center gap-space-xs text-tertiary">
-                    <span class="material-symbols-outlined text-body-sm">
+              <div class="p-5 xl:p-space-lg flex flex-col flex-1 justify-between gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex items-center gap-1.5 text-tertiary">
+                    <span class="material-symbols-outlined text-[17px]">
                       near_me
                     </span>
-                    <span class="font-label-sm text-label-sm font-semibold">
+                    <span class="text-[13px] xl:text-[13.5px] font-semibold">
                       Cách ĐH KHTN CS2 500m
                     </span>
                   </div>
-                  <h3 class="font-title-md text-title-md text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
+                  <h3 class="font-title-md text-[18px] xl:text-[19px] leading-snug text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
                     KTX &amp; Làng Đại học Thủ Đức
                   </h3>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-space-xs">
-                    <span class="material-symbols-outlined text-body-sm">
+                  <p class="font-body-sm text-[13.5px] xl:text-[14px] text-on-surface-variant flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px] shrink-0">
                       square_foot
                     </span>
-                    28m² • Máy lạnh, ban công, giờ tự do
+                    <span class="truncate">28m² • Máy lạnh, ban công, giờ tự do</span>
                   </p>
                 </div>
-                <div class="pt-space-xs flex items-center justify-between border-none">
-                  <div>
-                    <span class="font-currency-md text-currency-md text-primary font-bold">
+                <div class="pt-3 border-t border-surface-container flex items-center justify-between gap-2">
+                  <div class="flex items-baseline gap-1 whitespace-nowrap min-w-0">
+                    <span class="font-currency-md text-[19px] xl:text-[20px] text-primary font-bold">
                       2.300.000đ
                     </span>
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">
+                    <span class="font-body-sm text-[12px] xl:text-[13px] text-on-surface-variant">
                       /tháng/người
                     </span>
                   </div>
-                  <a class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors" data-path="phong-chi-tiet-1" href="#">
-                    <span class="material-symbols-outlined text-body-md">
+                  <a class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors shrink-0" data-path="phong-chi-tiet-1" href="/roomie/phong-chi-tiet?id=1">
+                    <span class="material-symbols-outlined text-[19px]">
                       arrow_forward
                     </span>
                   </a>
@@ -345,51 +344,51 @@
               </div>
             </article>
             <!-- Listing 2 -->
-            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col group">
-              <div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-container">
+            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
+              <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Modern spacious student shared room in Binh Thanh district Ho Chi Minh City, tiled floor, private clean bathroom visible in background, refrigerator, two wooden beds, bright window light, warm cozy vibes." src="/assets/images/trang-chu/room-2.jpg">
-                <div class="absolute top-space-sm left-space-sm flex items-center gap-space-xs">
-                  <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-medium">
+                <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
+                  <span class="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-semibold whitespace-nowrap">
                     Còn 2 chỗ
                   </span>
                 </div>
-                <button aria-label="Lưu bài" class="absolute top-space-sm right-space-sm w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center" type="button">
-                  <span class="material-symbols-outlined text-body-md">
+                <button aria-label="Lưu bài" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-surface-container-lowest/85 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center shadow-xs" type="button">
+                  <span class="material-symbols-outlined text-[19px]">
                     bookmark
                   </span>
                 </button>
               </div>
-              <div class="p-space-md flex flex-col flex-1 justify-between gap-space-md">
-                <div class="flex flex-col gap-space-xs">
-                  <div class="flex items-center gap-space-xs text-tertiary">
-                    <span class="material-symbols-outlined text-body-sm">
+              <div class="p-5 xl:p-space-lg flex flex-col flex-1 justify-between gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex items-center gap-1.5 text-tertiary">
+                    <span class="material-symbols-outlined text-[17px]">
                       near_me
                     </span>
-                    <span class="font-label-sm text-label-sm font-semibold">
+                    <span class="text-[13px] xl:text-[13.5px] font-semibold">
                       Gần HUTECH &amp; UEF (Bình Thạnh)
                     </span>
                   </div>
-                  <h3 class="font-title-md text-title-md text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
+                  <h3 class="font-title-md text-[18px] xl:text-[19px] leading-snug text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
                     Điện Biên Phủ, P.25 Bình Thạnh
                   </h3>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-space-xs">
-                    <span class="material-symbols-outlined text-body-sm">
+                  <p class="font-body-sm text-[13.5px] xl:text-[14px] text-on-surface-variant flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px] shrink-0">
                       square_foot
                     </span>
-                    35m² • WC riêng, tủ lạnh, máy giặt
+                    <span class="truncate">35m² • WC riêng, tủ lạnh, máy giặt</span>
                   </p>
                 </div>
-                <div class="pt-space-xs flex items-center justify-between border-none">
-                  <div>
-                    <span class="font-currency-md text-currency-md text-primary font-bold">
+                <div class="pt-3 border-t border-surface-container flex items-center justify-between gap-2">
+                  <div class="flex items-baseline gap-1 whitespace-nowrap min-w-0">
+                    <span class="font-currency-md text-[19px] xl:text-[20px] text-primary font-bold">
                       1.800.000đ
                     </span>
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">
+                    <span class="font-body-sm text-[12px] xl:text-[13px] text-on-surface-variant">
                       /tháng/người
                     </span>
                   </div>
-                  <a class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors" data-path="phong-chi-tiet-2" href="#">
-                    <span class="material-symbols-outlined text-body-md">
+                  <a class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors shrink-0" data-path="phong-chi-tiet-2" href="/roomie/phong-chi-tiet?id=2">
+                    <span class="material-symbols-outlined text-[19px]">
                       arrow_forward
                     </span>
                   </a>
@@ -397,51 +396,54 @@
               </div>
             </article>
             <!-- Listing 3 -->
-            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col group">
-              <div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-container">
+            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
+              <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Chic furnished apartment room in District 5 Saigon, view of university avenue, wooden mezzanine, warm spotlighting, study desk with books, neat wardrobe, safe card key lock." src="/assets/images/trang-chu/room-3.jpg">
-                <div class="absolute top-space-sm left-space-sm flex items-center gap-space-xs">
-                  <span class="px-space-sm py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm font-medium">
+                <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
+                  <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">
                     Đối diện HCMUS CS1
                   </span>
+                  <span class="px-2.5 py-1 rounded-full bg-surface-container-lowest/95 text-on-surface text-[11.5px] xl:text-[12px] leading-none font-semibold shadow-xs whitespace-nowrap">
+                    Phòng riêng
+                  </span>
                 </div>
-                <button aria-label="Lưu bài" class="absolute top-space-sm right-space-sm w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center" type="button">
-                  <span class="material-symbols-outlined text-body-md">
+                <button aria-label="Lưu bài" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-surface-container-lowest/85 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center shadow-xs" type="button">
+                  <span class="material-symbols-outlined text-[19px]">
                     bookmark
                   </span>
                 </button>
               </div>
-              <div class="p-space-md flex flex-col flex-1 justify-between gap-space-md">
-                <div class="flex flex-col gap-space-xs">
-                  <div class="flex items-center gap-space-xs text-tertiary">
-                    <span class="material-symbols-outlined text-body-sm">
+              <div class="p-5 xl:p-space-lg flex flex-col flex-1 justify-between gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex items-center gap-1.5 text-tertiary">
+                    <span class="material-symbols-outlined text-[17px]">
                       near_me
                     </span>
-                    <span class="font-label-sm text-label-sm font-semibold">
+                    <span class="text-[13px] xl:text-[13.5px] font-semibold">
                       Nguyễn Văn Cừ, Quận 5
                     </span>
                   </div>
-                  <h3 class="font-title-md text-title-md text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
+                  <h3 class="font-title-md text-[18px] xl:text-[19px] leading-snug text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
                     Phòng trọ cao cấp Full nội thất
                   </h3>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-space-xs">
-                    <span class="material-symbols-outlined text-body-sm">
+                  <p class="font-body-sm text-[13.5px] xl:text-[14px] text-on-surface-variant flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px] shrink-0">
                       square_foot
                     </span>
-                    25m² • Camera an ninh, còn 1 chỗ
+                    <span class="truncate">25m² • Nguyên phòng, camera an ninh</span>
                   </p>
                 </div>
-                <div class="pt-space-xs flex items-center justify-between border-none">
-                  <div>
-                    <span class="font-currency-md text-currency-md text-primary font-bold">
-                      2.500.000đ
+                <div class="pt-3 border-t border-surface-container flex items-center justify-between gap-2">
+                  <div class="flex items-baseline gap-1 whitespace-nowrap min-w-0">
+                    <span class="font-currency-md text-[19px] xl:text-[20px] text-primary font-bold">
+                      5.000.000đ
                     </span>
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">
-                      /tháng/người
+                    <span class="font-body-sm text-[12px] xl:text-[13px] text-on-surface-variant">
+                      /tháng
                     </span>
                   </div>
-                  <a class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors" data-path="phong-chi-tiet-3" href="#">
-                    <span class="material-symbols-outlined text-body-md">
+                  <a class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors shrink-0" data-path="phong-chi-tiet-3" href="/roomie/phong-chi-tiet?id=3">
+                    <span class="material-symbols-outlined text-[19px]">
                       arrow_forward
                     </span>
                   </a>
@@ -449,51 +451,54 @@
               </div>
             </article>
             <!-- Listing 4 -->
-            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col group">
-              <div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-container">
+            <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
+              <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Tidy cozy student rental house in Go Vap Ho Chi Minh City, ground floor garage with scooters parked neatly, modern kitchen counter, airy bedroom with ceiling fan and air conditioning." src="/assets/images/trang-chu/room-4.jpg">
-                <div class="absolute top-space-sm left-space-sm flex items-center gap-space-xs">
-                  <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-medium">
+                <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
+                  <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[12px] xl:text-[12.5px] leading-none font-semibold whitespace-nowrap">
                     Giá tốt
                   </span>
+                  <span class="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-semibold whitespace-nowrap">
+                    Còn 1 chỗ
+                  </span>
                 </div>
-                <button aria-label="Lưu bài" class="absolute top-space-sm right-space-sm w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center" type="button">
-                  <span class="material-symbols-outlined text-body-md">
+                <button aria-label="Lưu bài" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-surface-container-lowest/85 backdrop-blur text-on-surface hover:text-error transition-colors flex items-center justify-center shadow-xs" type="button">
+                  <span class="material-symbols-outlined text-[19px]">
                     bookmark
                   </span>
                 </button>
               </div>
-              <div class="p-space-md flex flex-col flex-1 justify-between gap-space-md">
-                <div class="flex flex-col gap-space-xs">
-                  <div class="flex items-center gap-space-xs text-tertiary">
-                    <span class="material-symbols-outlined text-body-sm">
+              <div class="p-5 xl:p-space-lg flex flex-col flex-1 justify-between gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex items-center gap-1.5 text-tertiary">
+                    <span class="material-symbols-outlined text-[17px]">
                       near_me
                     </span>
-                    <span class="font-label-sm text-label-sm font-semibold">
+                    <span class="text-[13px] xl:text-[13.5px] font-semibold">
                       Quang Trung, Gò Vấp
                     </span>
                   </div>
-                  <h3 class="font-title-md text-title-md text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
+                  <h3 class="font-title-md text-[18px] xl:text-[19px] leading-snug text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1">
                     Nhà nguyên căn share phòng
                   </h3>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-space-xs">
-                    <span class="material-symbols-outlined text-body-sm">
+                  <p class="font-body-sm text-[13.5px] xl:text-[14px] text-on-surface-variant flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px] shrink-0">
                       square_foot
                     </span>
-                    30m² • Nấu ăn thoải mái, xe free
+                    <span class="truncate">30m² • Nấu ăn thoải mái, xe free</span>
                   </p>
                 </div>
-                <div class="pt-space-xs flex items-center justify-between border-none">
-                  <div>
-                    <span class="font-currency-md text-currency-md text-primary font-bold">
+                <div class="pt-3 border-t border-surface-container flex items-center justify-between gap-2">
+                  <div class="flex items-baseline gap-1 whitespace-nowrap min-w-0">
+                    <span class="font-currency-md text-[19px] xl:text-[20px] text-primary font-bold">
                       1.600.000đ
                     </span>
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">
+                    <span class="font-body-sm text-[12px] xl:text-[13px] text-on-surface-variant">
                       /tháng/người
                     </span>
                   </div>
-                  <a class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors" data-path="phong-chi-tiet-4" href="#">
-                    <span class="material-symbols-outlined text-body-md">
+                  <a class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors shrink-0" data-path="phong-chi-tiet-4" href="/roomie/phong-chi-tiet?id=4">
+                    <span class="material-symbols-outlined text-[19px]">
                       arrow_forward
                     </span>
                   </a>
@@ -504,19 +509,19 @@
         </div>
       </section>
       <!-- SECTION: Roommate dành cho bạn (Compatibility Profiles) -->
-      <section class="w-full py-space-2xl bg-surface-container-low">
-        <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
-          <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-sm mb-space-xl">
+      <section id="roommate-matches" class="w-full py-12 lg:py-16 lg:min-h-[calc(100vh_-_5rem)] lg:flex lg:flex-col lg:justify-center bg-surface-container-low">
+        <div class="w-full max-w-[1380px] mx-auto px-margin md:px-margin-md lg:px-8 xl:px-10">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-sm mb-8 lg:mb-10">
             <div>
-              <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
-                Roommate phù hợp
+              <h2 class="font-headline-lg text-[30px] sm:text-[34px] lg:text-[38px] font-bold leading-tight text-on-surface tracking-tight">
+                <span class="text-primary whitespace-nowrap">Roommate</span> phù hợp
               </h2>
-              <p class="font-body-md text-body-md text-on-surface-variant mt-space-xs">
-                Gợi ý dựa trên trắc nghiệm phong cách sống.
+              <p class="font-body-md text-[15px] lg:text-[16px] text-on-surface-variant mt-1.5">
+                Gợi ý dựa trên trắc nghiệm tính cách &amp; phong cách sống
               </p>
             </div>
-            <a class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-medium hover:underline" data-path="trac-nghiem-tinh-cach" href="#">
-              <span class="material-symbols-outlined text-body-md">
+            <a class="inline-flex items-center gap-1.5 font-label-md text-[15px] lg:text-[15.5px] text-primary font-semibold hover:underline" data-path="trac-nghiem-tinh-cach" href="/roomie/trac-nghiem">
+              <span class="material-symbols-outlined text-[19px]">
                 tune
               </span>
               <span>
@@ -524,316 +529,550 @@
               </span>
             </a>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-lg">
-            <div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
-              <div class="flex flex-col gap-space-md">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-space-sm">
-                    <img class="w-14 h-14 rounded-full object-cover" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-1.jpg">
-                    <div>
-                      <h3 class="font-title-md text-title-md text-on-surface font-bold">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 xl:gap-6">
+            <div class="p-5 xl:p-6 rounded-3xl bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-outline-variant/15 flex flex-col justify-between gap-5">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-1.jpg">
+                    <div class="min-w-0">
+                      <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
                         Minh Anh
                       </h3>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">
+                      <span class="font-body-sm text-[13px] xl:text-[13.5px] text-on-surface-variant whitespace-nowrap">
                         HCMUS • 20 tuổi
                       </span>
                     </div>
                   </div>
-                  <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
-                    95% Hợp
-                  </span>
+                  <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-bold whitespace-nowrap shadow-xs">
+                      95% Hợp
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-pink-100 text-pink-700 border border-pink-200 text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">
+                      <span class="material-symbols-outlined text-[14px]">female</span>
+                      Nữ
+                    </span>
+                  </div>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Tìm phòng Q.5 / Q.10 • 2 - 2.5 tr/tháng
+                <p class="font-body-sm text-[14px] xl:text-[14.5px] text-on-surface-variant font-medium leading-snug min-h-[2.75rem]">
+                  <span class="block">Tìm phòng Q.5 / Q.10</span>
+                  <span class="block mt-1">2 - 2.5 tr/tháng</span>
                 </p>
-                <div class="flex flex-wrap gap-space-xs">
-                  <span class="px-space-sm py-0.5 rounded-md bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
                     #ThứcKhuyaHọcBài
                   </span>
-                  <span class="px-space-sm py-0.5 rounded-md bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
                     #YênTĩnh
                   </span>
                 </div>
               </div>
-              <div class="pt-space-md">
-                <button class="w-full py-space-xs rounded-xl bg-surface-container-low text-primary font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-colors" type="button">
+              <div class="pt-1">
+                <button class="w-full py-2.5 xl:py-3 rounded-2xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-[14.5px] xl:text-[15px] font-semibold shadow-sm shadow-primary/20 transition-colors" type="button">
                   Xem hồ sơ
                 </button>
               </div>
             </div>
-            <div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
-              <div class="flex flex-col gap-space-md">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-space-sm">
-                    <img class="w-14 h-14 rounded-full object-cover" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-2.jpg">
-                    <div>
-                      <h3 class="font-title-md text-title-md text-on-surface font-bold">
+            <div class="p-5 xl:p-6 rounded-3xl bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-outline-variant/15 flex flex-col justify-between gap-5">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-2.jpg">
+                    <div class="min-w-0">
+                      <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
                         Quốc Bảo
                       </h3>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">
+                      <span class="font-body-sm text-[13px] xl:text-[13.5px] text-on-surface-variant whitespace-nowrap">
                         HCMUT • 21 tuổi
                       </span>
                     </div>
                   </div>
-                  <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
-                    92% Hợp
-                  </span>
+                  <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-bold whitespace-nowrap shadow-xs">
+                      92% Hợp
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-100 text-sky-700 border border-sky-200 text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">
+                      <span class="material-symbols-outlined text-[14px]">male</span>
+                      Nam
+                    </span>
+                  </div>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Tìm phòng Làng ĐH • 1.5 - 2 tr/tháng
+                <p class="font-body-sm text-[14px] xl:text-[14.5px] text-on-surface-variant font-medium leading-snug min-h-[2.75rem]">
+                  <span class="block">Tìm phòng Làng ĐH</span>
+                  <span class="block mt-1">1.5 - 2 tr/tháng</span>
                 </p>
-                <div class="flex flex-wrap gap-space-xs">
-                  <span class="px-space-sm py-0.5 rounded-md bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
                     #SạchSẽ
                   </span>
-                  <span class="px-space-sm py-0.5 rounded-md bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
                     #DậySớm
                   </span>
                 </div>
               </div>
-              <div class="pt-space-md">
-                <button class="w-full py-space-xs rounded-xl bg-surface-container-low text-primary font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-colors" type="button">
+              <div class="pt-1">
+                <button class="w-full py-2.5 xl:py-3 rounded-2xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-[14.5px] xl:text-[15px] font-semibold shadow-sm shadow-primary/20 transition-colors" type="button">
                   Xem hồ sơ
                 </button>
               </div>
             </div>
-            <div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
-              <div class="flex flex-col gap-space-md">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-space-sm">
-                    <img class="w-14 h-14 rounded-full object-cover" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-3.jpg">
-                    <div>
-                      <h3 class="font-title-md text-title-md text-on-surface font-bold">
+            <div class="p-5 xl:p-6 rounded-3xl bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-outline-variant/15 flex flex-col justify-between gap-5">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-3.jpg">
+                    <div class="min-w-0">
+                      <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
                         Thảo Vy
                       </h3>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">
+                      <span class="font-body-sm text-[13px] xl:text-[13.5px] text-on-surface-variant whitespace-nowrap">
                         USSH • 19 tuổi
                       </span>
                     </div>
                   </div>
-                  <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
-                    88% Hợp
-                  </span>
+                  <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-bold whitespace-nowrap shadow-xs">
+                      88% Hợp
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-pink-100 text-pink-700 border border-pink-200 text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">
+                      <span class="material-symbols-outlined text-[14px]">female</span>
+                      Nữ
+                    </span>
+                  </div>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Tìm phòng Bình Thạnh • ~ 2 tr/tháng
+                <p class="font-body-sm text-[14px] xl:text-[14.5px] text-on-surface-variant font-medium leading-snug min-h-[2.75rem]">
+                  <span class="block">Tìm phòng Bình Thạnh</span>
+                  <span class="block mt-1">~ 2 tr/tháng</span>
                 </p>
-                <div class="flex flex-wrap gap-space-xs">
-                  <span class="px-space-sm py-0.5 rounded-md bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
                     #HướngNội
                   </span>
-                  <span class="px-space-sm py-0.5 rounded-md bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
                     #GọnGàng
                   </span>
                 </div>
               </div>
-              <div class="pt-space-md">
-                <button class="w-full py-space-xs rounded-xl bg-surface-container-low text-primary font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-colors" type="button">
+              <div class="pt-1">
+                <button class="w-full py-2.5 xl:py-3 rounded-2xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-[14.5px] xl:text-[15px] font-semibold shadow-sm shadow-primary/20 transition-colors" type="button">
+                  Xem hồ sơ
+                </button>
+              </div>
+            </div>
+            <div class="p-5 xl:p-6 rounded-3xl bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-outline-variant/15 flex flex-col justify-between gap-5">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-2.jpg">
+                    <div class="min-w-0">
+                      <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
+                        Gia Huy
+                      </h3>
+                      <span class="font-body-sm text-[13px] xl:text-[13.5px] text-on-surface-variant whitespace-nowrap">
+                        UIT • 21 tuổi
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-bold whitespace-nowrap shadow-xs">
+                      87% Hợp
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-100 text-sky-700 border border-sky-200 text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">
+                      <span class="material-symbols-outlined text-[14px]">male</span>
+                      Nam
+                    </span>
+                  </div>
+                </div>
+                <p class="font-body-sm text-[14px] xl:text-[14.5px] text-on-surface-variant font-medium leading-snug min-h-[2.75rem]">
+                  <span class="block">Tìm phòng Thủ Đức</span>
+                  <span class="block mt-1">1.5 - 2.2 tr/tháng</span>
+                </p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
+                    #UIT
+                  </span>
+                  <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
+                    #RạchRòiChiPhí
+                  </span>
+                </div>
+              </div>
+              <div class="pt-1">
+                <button class="w-full py-2.5 xl:py-3 rounded-2xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-[14.5px] xl:text-[15px] font-semibold shadow-sm shadow-primary/20 transition-colors" type="button">
                   Xem hồ sơ
                 </button>
               </div>
             </div>
           </div>
           <!-- Disclaimer Banner -->
-          <div class="mt-space-lg p-space-sm rounded-xl bg-surface-container flex items-center justify-center gap-space-xs text-center">
-            <span class="material-symbols-outlined text-body-sm text-on-surface-variant">
+          <div class="mt-8 lg:mt-10 px-5 py-3.5 rounded-2xl bg-surface-container flex items-center justify-center gap-2 text-center">
+            <span class="material-symbols-outlined text-[18px] text-on-surface-variant shrink-0">
               info
             </span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant">
+            <span class="font-body-sm text-[13.5px] lg:text-[14px] text-on-surface-variant">
               Điểm số tương hợp được tính từ thuật toán đối chiếu 2 lớp: lọc cứng &amp; thói quen sinh hoạt.
             </span>
           </div>
         </div>
       </section>
       <!-- SECTION: Ghép roommate hoạt động như thế nào? (3 Steps) -->
-      <section class="w-full py-space-2xl bg-surface-container-lowest">
-        <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
-          <div class="text-center max-w-xl mx-auto mb-space-2xl flex flex-col gap-space-xs">
-            <span class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">
+      <section id="how-matching-works" class="relative overflow-hidden w-full py-14 lg:py-20 lg:min-h-[calc(100vh_-_5rem)] lg:flex lg:flex-col lg:justify-center bg-gradient-to-b from-[#0d0f36] via-[#262196] to-[#493ee5] text-on-primary">
+        <!-- Lit-from-bottom radial glow matching Combo Thần Tốc & Bạn đang tìm gì? -->
+        <div class="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[820px] h-[340px] rounded-full bg-[#7c75ff]/45 blur-3xl"></div>
+
+        <div class="relative z-10 w-full max-w-[1380px] mx-auto px-margin md:px-margin-md lg:px-8 xl:px-10">
+          <div class="flex flex-col items-center text-center gap-space-sm max-w-4xl mx-auto mb-10 lg:mb-14">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-fixed border border-tertiary-fixed/50 shadow-sm font-label-md text-[13.5px] font-semibold uppercase tracking-wide">
               Đơn giản &amp; Văn minh
             </span>
-            <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+            <h2 class="font-display-lg text-[32px] sm:text-[38px] lg:text-[42px] leading-tight font-bold text-white tracking-tight">
               Ghép roommate hoạt động như thế nào?
             </h2>
-            <p class="font-body-md text-body-md text-on-surface-variant">
-              3 bước đơn giản giúp bạn tìm được người bạn cùng phòng lý tưởng mà không sợ "vỡ mộng" sau tuần đầu tiên.
+            <p class="font-body-lg text-[16px] sm:text-[18.5px] leading-relaxed text-white max-w-3xl">
+              3 bước đơn giản giúp bạn tìm được người bạn cùng phòng lý tưởng mà <br>
+              không sợ "vỡ mộng" sau tuần đầu tiên
             </p>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-lg relative">
-            <div class="flex flex-col items-center text-center gap-space-sm p-space-md">
-              <div class="w-12 h-12 rounded-xl bg-surface-container text-primary flex items-center justify-center font-bold text-headline-sm">
-                1
+          <div class="relative max-w-[1220px] mx-auto">
+            <!-- Horizontal connecting line linking steps 1 - 2 - 3 on desktop -->
+            <div class="pointer-events-none hidden md:block absolute top-12 left-[16.6667%] right-[16.6667%] h-[2px] bg-gradient-to-r from-white/30 via-secondary-container/80 to-white/30"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/20 border-t border-white/20 pt-2 md:pt-0 md:border-t-0">
+              <div class="group py-7 md:py-4 px-6 md:px-8 xl:px-11 flex flex-col items-center text-center gap-4 transition-colors duration-300 hover:bg-white/[0.04] rounded-2xl md:rounded-none">
+                <div class="relative z-10 w-16 h-16 rounded-full bg-white text-primary ring-4 ring-[#635bff]/45 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center font-extrabold text-[24px] shadow-[0_14px_30px_-8px_rgba(12,8,66,0.5)]">
+                  1
+                </div>
+                <div class="flex flex-col items-center gap-2 pt-1">
+                  <span class="font-label-sm text-[12px] tracking-[0.14em] uppercase text-secondary-container font-semibold">
+                    Bước 01
+                  </span>
+                  <h3 class="font-title-md text-[22px] xl:text-[25px] leading-snug text-white font-bold">
+                    Khảo sát nhanh
+                  </h3>
+                  <p class="font-body-md text-[15.5px] xl:text-[16.5px] text-white/90 leading-relaxed max-w-[300px]">
+                    8 câu hỏi ngắn về thói quen sinh hoạt và giờ giấc
+                  </p>
+                </div>
               </div>
-              <h3 class="font-title-md text-title-md text-on-surface font-bold">
-                Khảo sát nhanh
-              </h3>
-              <p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
-                8 câu hỏi ngắn về thói quen sinh hoạt và giờ giấc.
-              </p>
-            </div>
-            <div class="flex flex-col items-center text-center gap-space-sm p-space-md">
-              <div class="w-12 h-12 rounded-xl bg-surface-container text-tertiary flex items-center justify-center font-bold text-headline-sm">
-                2
+
+              <div class="group py-7 md:py-4 px-6 md:px-8 xl:px-11 flex flex-col items-center text-center gap-4 transition-colors duration-300 hover:bg-white/[0.04] rounded-2xl md:rounded-none">
+                <div class="relative z-10 w-16 h-16 rounded-full bg-secondary-container text-on-secondary-fixed ring-4 ring-secondary-container/30 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center font-extrabold text-[24px] shadow-[0_14px_30px_-8px_rgba(12,8,66,0.5)]">
+                  2
+                </div>
+                <div class="flex flex-col items-center gap-2 pt-1">
+                  <span class="font-label-sm text-[12px] tracking-[0.14em] uppercase text-secondary-container font-semibold">
+                    Bước 02
+                  </span>
+                  <h3 class="font-title-md text-[22px] xl:text-[25px] leading-snug text-white font-bold">
+                    Nhận gợi ý
+                  </h3>
+                  <p class="font-body-md text-[15.5px] xl:text-[16.5px] text-white/90 leading-relaxed max-w-[300px]">
+                    Thuật toán ghép đôi dựa trên mức độ đồng điệu thực tế
+                  </p>
+                </div>
               </div>
-              <h3 class="font-title-md text-title-md text-on-surface font-bold">
-                Nhận gợi ý
-              </h3>
-              <p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
-                Thuật toán ghép đôi dựa trên mức độ đồng điệu thực tế.
-              </p>
-            </div>
-            <div class="flex flex-col items-center text-center gap-space-sm p-space-md">
-              <div class="w-12 h-12 rounded-xl bg-surface-container text-on-surface flex items-center justify-center font-bold text-headline-sm">
-                3
+
+              <div class="group py-7 md:py-4 px-6 md:px-8 xl:px-11 flex flex-col items-center text-center gap-4 transition-colors duration-300 hover:bg-white/[0.04] rounded-2xl md:rounded-none">
+                <div class="relative z-10 w-16 h-16 rounded-full bg-white text-primary ring-4 ring-[#635bff]/45 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center font-extrabold text-[24px] shadow-[0_14px_30px_-8px_rgba(12,8,66,0.5)]">
+                  3
+                </div>
+                <div class="flex flex-col items-center gap-2 pt-1">
+                  <span class="font-label-sm text-[12px] tracking-[0.14em] uppercase text-secondary-container font-semibold">
+                    Bước 03
+                  </span>
+                  <h3 class="font-title-md text-[22px] xl:text-[25px] leading-snug text-white font-bold">
+                    Kết nối &amp; ở ghép
+                  </h3>
+                  <p class="font-body-md text-[15.5px] xl:text-[16.5px] text-white/90 leading-relaxed max-w-[300px]">
+                    Nhắn tin tìm hiểu, hẹn gặp trực tiếp trước khi quyết định
+                  </p>
+                </div>
               </div>
-              <h3 class="font-title-md text-title-md text-on-surface font-bold">
-                Kết nối &amp; ở ghép
-              </h3>
-              <p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
-                Nhắn tin tìm hiểu, hẹn gặp trực tiếp trước khi quyết định.
-              </p>
             </div>
           </div>
         </div>
       </section>
-      <!-- SECTION: Dịch vụ giúp bạn nhanh tìm đúng người (Freemium Monetization Preview) -->
-      <section class="w-full py-space-2xl bg-surface">
-        <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
-          <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-sm mb-space-xl">
-            <div class="flex flex-col gap-space-xs">
-              <div class="inline-flex items-center gap-space-xs px-space-md py-0.5 rounded-full bg-secondary-container text-on-secondary-container self-start">
-                <span class="material-symbols-outlined text-body-sm">
-                  bolt
-                </span>
-                <span class="font-label-sm text-label-sm uppercase font-bold">
-                  Tăng tốc tìm phòng &amp; roommate
-                </span>
-              </div>
-              <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
-                Dịch vụ giúp bạn nhanh tìm đúng người
-              </h2>
+      <!-- SECTION: Dịch vụ giúp bạn nhanh tìm đúng người (Glow Tier Plans on White Canvas) -->
+      <section id="services-preview" class="w-full py-12 lg:py-16 bg-white">
+        <div class="w-full max-w-[1380px] mx-auto px-margin md:px-margin-md lg:px-8 xl:px-10">
+          <!-- Centered Header + Segmented Toggle (Glow Tier Plans Style) -->
+          <div class="flex flex-col items-center text-center gap-3 max-w-4xl mx-auto mb-8 lg:mb-10">
+            <h2 class="font-headline-lg text-[28px] sm:text-[32px] lg:text-[36px] xl:text-[38px] font-bold leading-tight text-on-surface tracking-tight lg:whitespace-nowrap">
+              <span class="text-primary whitespace-nowrap">Dịch vụ</span> giúp bạn nhanh <span class="text-primary whitespace-nowrap">tìm đúng người</span>
+            </h2>
+            <div id="service-billing-toggle" class="relative inline-flex items-center p-1 rounded-full bg-surface-container border border-outline-variant/40 mt-1">
+              <span class="absolute -top-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-primary text-on-primary text-[11px] font-bold leading-none shadow-xs pointer-events-none">
+                -20%
+              </span>
+              <button type="button" data-billing="standard" class="px-5 py-1.5 rounded-full text-[13.5px] font-semibold bg-white text-on-surface shadow-xs transition-all">
+                Theo gói lẻ
+              </button>
+              <button type="button" data-billing="student" class="px-5 py-1.5 rounded-full text-[13.5px] font-medium text-on-surface-variant hover:text-on-surface transition-all">
+                Thẻ Sinh viên
+              </button>
             </div>
-            <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">
-              Tiết kiệm hàng tuần tìm kiếm với các tính năng ưu tiên giá siêu tiết kiệm dành riêng cho thẻ sinh viên.
-            </p>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter-lg">
-            <div class="p-space-xl rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col justify-between gap-space-lg">
-              <div class="flex flex-col gap-space-md">
-                <div class="flex items-center justify-between">
-                  <span class="font-label-md text-label-md text-primary font-bold">
-                    ĐẨY TIN NỔI BẬT
-                  </span>
-                  <span class="font-label-sm text-label-sm text-on-surface-variant">
-                    Từ 5.000đ
-                  </span>
+
+          <!-- 6 Plan Cards Grid (3x2): Row 1 Light Palette Glows, Row 2 Lit-From-Within Brand Glows -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 xl:gap-6">
+            <!-- Plan 1: Gói Cơ bản (Matte Slate) -->
+            <div class="relative overflow-hidden p-6 xl:p-7 rounded-[22px] min-h-[345px] xl:min-h-[370px] bg-surface-container-low border border-outline-variant/45 text-on-surface flex flex-col justify-between gap-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div class="relative z-10 flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-[20px] xl:text-[22px] font-bold tracking-tight">Gói Cơ bản</h3>
+                  <span class="px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-[12px] font-semibold">Miễn phí</span>
                 </div>
-                <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-                  Boost Listing
-                </h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Ưu tiên hiển thị tin đăng ở đầu danh mục tìm kiếm, tiếp cận gấp 5 lần sinh viên.
-                </p>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="plan-price text-[30px] xl:text-[34px] font-extrabold tracking-tight" data-price-std="0đ" data-price-sv="0đ">0đ</span>
+                </div>
+                <p class="text-[14px] xl:text-[14.5px] text-on-surface-variant">Trải nghiệm đầy đủ tính năng nền tảng</p>
+                <ul class="mt-2 flex flex-col text-[13.5px] xl:text-[14.5px] text-on-surface-variant">
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-outline-variant/30">
+                    <span class="material-symbols-outlined text-[18px] text-outline shrink-0">check_circle</span>
+                    <span>Đăng 01 tin tìm phòng hoặc ở ghép</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-outline-variant/30">
+                    <span class="material-symbols-outlined text-[18px] text-outline shrink-0">check_circle</span>
+                    <span>Xem tối đa 5 hồ sơ roommate mỗi ngày</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5">
+                    <span class="material-symbols-outlined text-[18px] text-outline shrink-0">check_circle</span>
+                    <span>Nhắn tin trao đổi trực tiếp không mất phí</span>
+                  </li>
+                </ul>
               </div>
-              <a class="font-label-md text-label-md text-primary font-medium hover:underline inline-flex items-center gap-space-xs" data-path="dich-vu" href="#">
-                <span>
-                  Tìm hiểu thêm
-                </span>
-                <span class="material-symbols-outlined text-body-md">
-                  arrow_forward
-                </span>
-              </a>
+              <button type="button" data-plan-id="basic" class="plan-select-btn relative z-10 w-full py-3 rounded-xl bg-surface-container-high text-outline font-semibold text-[14.5px] xl:text-[15px] hover:bg-surface-dim transition-colors">
+                Gói hiện tại
+              </button>
             </div>
-            <div class="p-space-xl rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col justify-between gap-space-lg">
-              <div class="flex flex-col gap-space-md">
-                <div class="flex items-center justify-between">
-                  <span class="font-label-md text-label-md text-tertiary font-bold">
-                    GHÉP NÂNG CAO
-                  </span>
-                  <span class="font-label-sm text-label-sm text-on-surface-variant">
-                    Từ 9.000đ
-                  </span>
+
+            <!-- Plan 2: Boost Listing (Soft Mint Glow) -->
+            <div class="relative overflow-hidden p-6 xl:p-7 rounded-[22px] min-h-[345px] xl:min-h-[370px] bg-gradient-to-b from-white via-[#f3fcf8] to-[#b5efd2]/85 border border-[#77d8b8]/55 text-on-surface flex flex-col justify-between gap-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div class="pointer-events-none absolute -bottom-14 left-1/2 -translate-x-1/2 w-72 h-40 rounded-full bg-[#93f5d3]/65 blur-2xl"></div>
+              <div class="relative z-10 flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-[20px] xl:text-[22px] font-bold tracking-tight">Boost Listing</h3>
+                  <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-fixed text-[12px] font-bold">Đẩy tin nhanh</span>
                 </div>
-                <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-                  Match Plus
-                </h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Phân tích tương thích đa chiều: thói quen, mức sạch sẽ, kèm gợi ý hợp đồng chuẩn.
-                </p>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="plan-price text-[30px] xl:text-[34px] font-extrabold tracking-tight text-tertiary" data-price-std="5.000đ" data-price-sv="4.000đ">5.000đ</span>
+                  <span class="text-[14px] text-on-surface-variant font-medium">/ ngày</span>
+                </div>
+                <p class="text-[14px] xl:text-[14.5px] text-on-surface-variant">Ưu tiên hiển thị ngay đầu trang tìm kiếm</p>
+                <ul class="mt-2 flex flex-col text-[13.5px] xl:text-[14.5px] text-on-surface-variant">
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-tertiary/15">
+                    <span class="material-symbols-outlined text-[18px] text-tertiary shrink-0">check_circle</span>
+                    <span>Tiếp cận gấp 5 lần lượt xem</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-tertiary/15">
+                    <span class="material-symbols-outlined text-[18px] text-tertiary shrink-0">check_circle</span>
+                    <span>Gắn nhãn "Cần gấp" nổi bật trên danh sách</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5">
+                    <span class="material-symbols-outlined text-[18px] text-tertiary shrink-0">check_circle</span>
+                    <span>Báo cáo lượt xem &amp; tin nhắn theo giờ</span>
+                  </li>
+                </ul>
               </div>
-              <a class="font-label-md text-label-md text-tertiary font-medium hover:underline inline-flex items-center gap-space-xs" data-path="dich-vu" href="#">
-                <span>
-                  Tìm hiểu thêm
-                </span>
-                <span class="material-symbols-outlined text-body-md">
-                  arrow_forward
-                </span>
-              </a>
+              <button type="button" data-plan-id="boost" class="plan-select-btn relative z-10 w-full py-3 rounded-xl bg-tertiary hover:bg-on-tertiary-fixed-variant text-on-tertiary font-semibold text-[14.5px] xl:text-[15px] shadow-xs transition-colors">
+                Chọn gói
+              </button>
+            </div>
+
+            <!-- Plan 3: Match Plus (Soft Lavender Glow) -->
+            <div class="relative overflow-hidden p-6 xl:p-7 rounded-[22px] min-h-[345px] xl:min-h-[370px] bg-gradient-to-b from-white via-[#f5f4ff] to-[#e2dfff] border border-primary-fixed-dim/85 text-on-surface flex flex-col justify-between gap-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div class="pointer-events-none absolute -bottom-14 left-1/2 -translate-x-1/2 w-72 h-40 rounded-full bg-primary-container/25 blur-2xl"></div>
+              <div class="relative z-10 flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-[20px] xl:text-[22px] font-bold tracking-tight">Match Plus</h3>
+                  <span class="px-3 py-1 rounded-full bg-primary-fixed text-primary text-[12px] font-bold">Ghép nâng cao</span>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="plan-price text-[30px] xl:text-[34px] font-extrabold tracking-tight text-primary" data-price-std="9.000đ" data-price-sv="7.000đ">9.000đ</span>
+                  <span class="text-[14px] text-on-surface-variant font-medium">/ lượt match</span>
+                </div>
+                <p class="text-[14px] xl:text-[14.5px] text-on-surface-variant">Phân tích độ hợp gu đa chiều chuyên sâu</p>
+                <ul class="mt-2 flex flex-col text-[13.5px] xl:text-[14.5px] text-on-surface-variant">
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-primary/15">
+                    <span class="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span>
+                    <span>Đối chiếu thói quen ngủ, học &amp; mức sạch sẽ</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-primary/15">
+                    <span class="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span>
+                    <span>Bật bộ lọc ưu tiên cùng trường đại học</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5">
+                    <span class="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span>
+                    <span>Tặng kèm mẫu hợp đồng ở ghép chuẩn</span>
+                  </li>
+                </ul>
+              </div>
+              <button type="button" data-plan-id="match-plus" class="plan-select-btn relative z-10 w-full py-3 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-[14.5px] xl:text-[15px] shadow-xs transition-colors">
+                Chọn gói
+              </button>
+            </div>
+
+            <!-- Plan 4: Xác minh Sinh viên Pro (Deep Emerald Glow Tier) -->
+            <div class="relative overflow-hidden p-6 xl:p-7 rounded-[22px] min-h-[345px] xl:min-h-[370px] bg-gradient-to-b from-[#07211a] via-[#054534] to-[#006851] border border-tertiary-fixed-dim/35 text-white flex flex-col justify-between gap-6 shadow-[0_18px_40px_-14px_rgba(0,104,81,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_48px_-12px_rgba(0,104,81,0.5)]">
+              <div class="pointer-events-none absolute -bottom-16 left-1/2 -translate-x-1/2 w-72 h-44 rounded-full bg-tertiary-fixed-dim/45 blur-2xl"></div>
+              <div class="relative z-10 flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-[20px] xl:text-[22px] font-bold tracking-tight">Sinh viên Pro</h3>
+                  <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-fixed text-[12px] font-bold">Uy tín cao</span>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="plan-price text-[30px] xl:text-[34px] font-extrabold tracking-tight" data-price-std="15.000đ" data-price-sv="12.000đ">15.000đ</span>
+                  <span class="text-[14px] text-white/75 font-medium">/ 6 tháng</span>
+                </div>
+                <p class="text-[14px] xl:text-[14.5px] text-white/75">Xác thực thẻ sinh viên tăng tin cậy hồ sơ</p>
+                <ul class="mt-2 flex flex-col text-[13.5px] xl:text-[14.5px] text-white/90">
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-white/15">
+                    <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0">check_circle</span>
+                    <span>Cấp huy hiệu tích xanh Đã xác thực SV</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-white/15">
+                    <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0">check_circle</span>
+                    <span>Tăng đến 90% tỉ lệ phản hồi tin nhắn</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5">
+                    <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0">check_circle</span>
+                    <span>Ưu tiên duyệt tin và hỗ trợ tranh chấp</span>
+                  </li>
+                </ul>
+              </div>
+              <button type="button" data-plan-id="verified-pro" class="plan-select-btn relative z-10 w-full py-3 rounded-xl bg-white hover:bg-secondary-container text-on-tertiary-fixed-variant font-bold text-[14.5px] xl:text-[15px] shadow-sm transition-colors">
+                Chọn gói
+              </button>
+            </div>
+
+            <!-- Plan 5: Combo Thần Tốc (Electric Blue-Purple Primary Glow Tier — Featured) -->
+            <div class="relative overflow-hidden p-6 xl:p-7 rounded-[22px] min-h-[345px] xl:min-h-[370px] bg-gradient-to-b from-[#0d0f36] via-[#262196] to-[#493ee5] border border-primary-fixed-dim/55 text-white flex flex-col justify-between gap-6 shadow-[0_20px_44px_-12px_rgba(73,62,229,0.48)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_54px_-12px_rgba(73,62,229,0.6)]">
+              <div class="pointer-events-none absolute -bottom-16 left-1/2 -translate-x-1/2 w-80 h-44 rounded-full bg-[#7c75ff]/60 blur-2xl"></div>
+              <div class="relative z-10 flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-[20px] xl:text-[22px] font-bold tracking-tight">Combo Thần Tốc</h3>
+                  <span class="px-3 py-1 rounded-full bg-white text-primary text-[12px] font-bold shadow-xs">Phổ biến nhất</span>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="plan-price text-[30px] xl:text-[34px] font-extrabold tracking-tight" data-price-std="29.000đ" data-price-sv="23.000đ">29.000đ</span>
+                  <span class="text-[14px] text-white/75 font-medium">/ tuần</span>
+                </div>
+                <p class="text-[14px] xl:text-[14.5px] text-white/75">Giải pháp trọn gói tìm phòng &amp; bạn ở ghép nhanh</p>
+                <ul class="mt-2 flex flex-col text-[13.5px] xl:text-[14.5px] text-white/95">
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-white/15">
+                    <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0">check_circle</span>
+                    <span>Tặng 3 lượt Boost Listing đầu trang</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-white/15">
+                    <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0">check_circle</span>
+                    <span>Mở khóa không giới hạn Match Plus</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5">
+                    <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0">check_circle</span>
+                    <span>Nhận thông báo phòng mới ngay qua Zalo</span>
+                  </li>
+                </ul>
+              </div>
+              <button type="button" data-plan-id="combo" class="plan-select-btn relative z-10 w-full py-3 rounded-xl bg-white hover:bg-primary-fixed text-on-primary-fixed-variant font-bold text-[14.5px] xl:text-[15px] shadow-sm transition-colors">
+                Chọn gói
+              </button>
+            </div>
+
+            <!-- Plan 6: Chủ trọ & Nhượng phòng (Royal Indigo-Violet Glow Tier) -->
+            <div class="relative overflow-hidden p-6 xl:p-7 rounded-[22px] min-h-[345px] xl:min-h-[370px] bg-gradient-to-b from-[#0f0069] via-[#2b1cb3] to-[#635bff] border border-primary-fixed-dim/45 text-white flex flex-col justify-between gap-6 shadow-[0_18px_40px_-14px_rgba(50,30,210,0.42)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_48px_-12px_rgba(50,30,210,0.55)]">
+              <div class="pointer-events-none absolute -bottom-16 left-1/2 -translate-x-1/2 w-72 h-44 rounded-full bg-primary-fixed-dim/45 blur-2xl"></div>
+              <div class="relative z-10 flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-[20px] xl:text-[22px] font-bold tracking-tight">Chủ trọ &amp; Nhượng</h3>
+                  <span class="px-3 py-1 rounded-full bg-white/15 text-white border border-white/25 text-[12px] font-semibold">Không giới hạn</span>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="plan-price text-[30px] xl:text-[34px] font-extrabold tracking-tight" data-price-std="49.000đ" data-price-sv="39.000đ">49.000đ</span>
+                  <span class="text-[14px] text-white/75 font-medium">/ tháng</span>
+                </div>
+                <p class="text-[14px] xl:text-[14.5px] text-white/75">Dành cho chủ nhà &amp; sinh viên cần sang phòng</p>
+                <ul class="mt-2 flex flex-col text-[13.5px] xl:text-[14.5px] text-white/90">
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-white/15">
+                    <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0">check_circle</span>
+                    <span>Đăng không giới hạn ảnh &amp; video thực tế</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5 border-b border-white/15">
+                    <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0">check_circle</span>
+                    <span>Hiển thị SĐT &amp; Zalo liên hệ trực tiếp</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 py-2.5">
+                    <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0">check_circle</span>
+                    <span>Ghim top đầu chuyên mục khu vực 30 ngày</span>
+                  </li>
+                </ul>
+              </div>
+              <button type="button" data-plan-id="host" class="plan-select-btn relative z-10 w-full py-3 rounded-xl bg-white hover:bg-primary-fixed text-on-primary-fixed font-bold text-[14.5px] xl:text-[15px] shadow-sm transition-colors">
+                Chọn gói
+              </button>
             </div>
           </div>
         </div>
       </section>
       <!-- SECTION: Nguyên tắc an toàn cho sinh viên khi ở ghép -->
-      <section class="w-full py-space-2xl bg-surface-container-low">
-        <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
-          <div class="p-space-xl md:p-space-2xl rounded-3xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-xl">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
-              <div class="flex items-center gap-space-md">
-                <div class="w-12 h-12 rounded-full bg-secondary-container text-tertiary flex items-center justify-center shrink-0">
-                  <span class="material-symbols-outlined text-headline-sm" style="font-variation-settings: 'FILL' 1;">
+      <section id="safety-principles" class="w-full py-12 lg:py-16 bg-surface-container-low">
+        <div class="max-w-[1380px] mx-auto px-margin md:px-margin-md lg:px-8 xl:px-10">
+          <div class="p-7 sm:p-9 lg:p-11 xl:p-12 rounded-3xl bg-surface-container-lowest border border-outline-variant/15 shadow-sm flex flex-col gap-8 lg:gap-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div class="flex items-center gap-4 lg:gap-5">
+                <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-secondary-container text-tertiary flex items-center justify-center shrink-0 shadow-xs">
+                  <span class="material-symbols-outlined text-[28px] lg:text-[32px]" style="font-variation-settings: 'FILL' 1;">
                     shield_with_heart
                   </span>
                 </div>
                 <div>
-                  <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-                    Nguyên tắc an toàn cho sinh viên khi ở ghép
+                  <h2 class="font-headline-sm text-[24px] sm:text-[26px] lg:text-[30px] leading-tight text-on-surface font-bold tracking-tight">
+                    <span class="text-primary whitespace-nowrap">Nguyên tắc an toàn</span> khi ở ghép
                   </h2>
-                  <p class="font-body-md text-body-md text-on-surface-variant">
-                    Bảo vệ quyền lợi và trải nghiệm của bạn luôn là ưu tiên hàng đầu tại Roomie.
+                  <p class="font-body-md text-[15px] lg:text-[16.5px] text-on-surface-variant mt-1 leading-relaxed">
+                    Bảo vệ quyền lợi và trải nghiệm của bạn luôn là ưu tiên hàng đầu tại Roomie
                   </p>
                 </div>
               </div>
-              <a class="font-label-md text-label-md text-primary font-bold hover:underline self-start md:self-auto" data-path="nguyen-tac-an-toan" href="#">
+              <a class="font-label-md text-[14.5px] lg:text-[15.5px] text-primary font-bold hover:underline self-start md:self-auto shrink-0 whitespace-nowrap" data-path="nguyen-tac-an-toan" href="#">
                 Xem cẩm nang an toàn chi tiết →
               </a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-md">
-              <div class="p-space-md rounded-xl bg-surface-container-lowest flex flex-col gap-space-xs">
-                <div class="flex items-center gap-space-xs text-primary font-label-md text-label-md font-bold">
-                  <span class="material-symbols-outlined text-body-md">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 xl:gap-7">
+              <div class="p-6 lg:p-7 rounded-2xl bg-surface-container-low/65 border border-outline-variant/25 flex flex-col gap-2.5">
+                <div class="flex items-center gap-2.5 text-primary font-label-md text-[17px] lg:text-[18.5px] font-bold">
+                  <span class="material-symbols-outlined text-[22px] lg:text-[24px]">
                     schedule
                   </span>
                   <span>
                     Xem phòng ban ngày
                   </span>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                <p class="font-body-sm text-[14.5px] lg:text-[15.5px] text-on-surface-variant leading-relaxed">
                   Đi cùng bạn bè để kiểm tra ánh sáng thực tế và an ninh xung quanh.
                 </p>
               </div>
-              <div class="p-space-md rounded-xl bg-surface-container-lowest flex flex-col gap-space-xs">
-                <div class="flex items-center gap-space-xs text-tertiary font-label-md text-label-md font-bold">
-                  <span class="material-symbols-outlined text-body-md">
+              <div class="p-6 lg:p-7 rounded-2xl bg-surface-container-low/65 border border-outline-variant/25 flex flex-col gap-2.5">
+                <div class="flex items-center gap-2.5 text-tertiary font-label-md text-[17px] lg:text-[18.5px] font-bold">
+                  <span class="material-symbols-outlined text-[22px] lg:text-[24px]">
                     description
                   </span>
                   <span>
                     Hợp đồng minh bạch
                   </span>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                <p class="font-body-sm text-[14.5px] lg:text-[15.5px] text-on-surface-variant leading-relaxed">
                   Xác nhận rõ tiền cọc, chi phí dịch vụ trước khi thanh toán.
                 </p>
               </div>
-              <div class="p-space-md rounded-xl bg-surface-container-lowest flex flex-col gap-space-xs">
-                <div class="flex items-center gap-space-xs text-error font-label-md text-label-md font-bold">
-                  <span class="material-symbols-outlined text-body-md">
+              <div class="p-6 lg:p-7 rounded-2xl bg-surface-container-low/65 border border-outline-variant/25 flex flex-col gap-2.5">
+                <div class="flex items-center gap-2.5 text-error font-label-md text-[17px] lg:text-[18.5px] font-bold">
+                  <span class="material-symbols-outlined text-[22px] lg:text-[24px]">
                     report
                   </span>
                   <span>
                     Báo cáo tin đáng ngờ
                   </span>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                <p class="font-body-sm text-[14.5px] lg:text-[15.5px] text-on-surface-variant leading-relaxed">
                   Thông báo ngay khi phát hiện yêu cầu đặt cọc bất thường.
                 </p>
               </div>
@@ -842,22 +1081,23 @@
         </div>
       </section>
       <!-- SECTION: Final High-Conversion CTA Banner -->
-      <section class="w-full py-space-2xl bg-surface">
-        <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
-          <div class="relative rounded-3xl overflow-hidden bg-primary-container text-on-primary-container p-space-xl md:p-space-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-space-xl">
-            <div class="flex flex-col gap-space-xs max-w-xl text-center md:text-left">
-              <h2 class="font-headline-lg text-headline-lg font-bold leading-tight">
-                Bắt đầu tìm người bạn cùng phòng lý tưởng
+      <section id="cta-banner" class="w-full py-10 lg:py-12 bg-surface">
+        <div class="w-full max-w-[1160px] mx-auto px-margin md:px-margin-md lg:px-8">
+          <div class="relative rounded-2xl lg:rounded-3xl overflow-hidden bg-primary bg-gradient-to-br from-primary via-[#3f35cc] to-[#2f2799] text-white px-6 py-6 md:px-10 md:py-8 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div class="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#7b73ff]/20 blur-3xl"></div>
+            <div class="relative z-10 flex flex-col gap-1.5 min-w-0 text-center lg:text-left">
+              <h2 class="font-headline-lg text-[23px] sm:text-[26px] lg:text-[28px] xl:text-[30px] text-white font-bold leading-tight lg:whitespace-nowrap">
+                Tìm người bạn cùng phòng lý tưởng
               </h2>
-              <p class="font-body-md text-body-md text-on-primary-container/80">
-                Hoàn toàn miễn phí cho sinh viên tại TP.HCM.
+              <p class="font-body-md text-[14.5px] sm:text-[15.5px] text-white/95 leading-relaxed">
+                Hoàn toàn miễn phí cho sinh viên
               </p>
             </div>
-            <div class="flex flex-col sm:flex-row items-center gap-space-sm w-full md:w-auto">
-              <a class="px-space-xl py-space-sm rounded-xl bg-surface-container-lowest text-primary font-label-md text-label-md font-semibold transition-all text-center" data-path="trac-nghiem-tinh-cach" href="#">
+            <div class="relative z-10 flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto shrink-0">
+              <a class="w-full sm:w-auto px-6 py-3 rounded-xl bg-surface-container-lowest hover:bg-primary-fixed border border-transparent text-primary font-label-md text-[14.5px] xl:text-[15px] font-bold shadow-md hover:-translate-y-0.5 transition-all text-center whitespace-nowrap" data-path="trac-nghiem-tinh-cach" href="/roomie/trac-nghiem">
                 Làm trắc nghiệm
               </a>
-              <a class="px-space-xl py-space-sm rounded-xl bg-surface-container-lowest/10 text-on-primary-container font-label-md text-label-md font-medium hover:bg-surface-container-lowest/20 transition-all text-center" data-path="dang-tin" href="#">
+              <a class="w-full sm:w-auto px-6 py-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-label-md text-[14.5px] xl:text-[15px] font-semibold backdrop-blur-sm hover:-translate-y-0.5 transition-all text-center whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
                 Đăng tin ngay
               </a>
             </div>
@@ -872,7 +1112,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-gutter-lg">
         <div class="lg:col-span-2 flex flex-col gap-space-md pr-0 lg:pr-space-xl">
           <div class="flex items-center gap-space-sm">
-            <img alt="Roomie" class="h-8 w-auto object-contain" src="/assets/images/common/logo.png" />
+            <img alt="Roomie" class="h-11 sm:h-12 w-auto object-contain" src="/assets/images/common/logo.png" />
             <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Gen Z Housing</span>
           </div>
           <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
@@ -911,7 +1151,7 @@
       </div>
       <div class="mt-space-2xl pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md bg-surface-container rounded-xl p-space-md">
         <div class="flex flex-col md:flex-row items-center gap-space-xs text-center md:text-left">
-          <span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Roomie</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant">2026 Roomie</span>
           <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Tìm đúng phòng - Ghép đúng người — Sống chung bình yên</span>
         </div>
       </div>
