@@ -68,7 +68,7 @@ window.RoomieData = {
       typeKey: "o-ghep",
       typeLabel: "Ở ghép",
       matchScore: 94,
-      amenities: ["Máy lạnh", "Máy giặt", "Giờ tự do", "Ban công"],
+      amenities: ["Máy lạnh", "Máy giặt", "Giờ linh hoạt", "Ban công"],
       summarySpecs: "32m² • Máy lạnh, ban công, giờ tự do",
       images: [
         "/assets/images/phong-chi-tiet/room-1.jpg",
@@ -135,7 +135,7 @@ window.RoomieData = {
       typeKey: "o-ghep",
       typeLabel: "Ở ghép",
       matchScore: 91,
-      amenities: ["Máy lạnh", "Máy giặt", "Giờ tự do", "Xe trong nhà"],
+      amenities: ["Máy lạnh", "Máy giặt", "Giờ linh hoạt", "Khu vực để xe"],
       summarySpecs: "35m² • WC riêng, tủ lạnh, máy giặt",
       images: [
         "/assets/images/trang-chu/room-2.jpg",
@@ -193,7 +193,7 @@ window.RoomieData = {
       typeKey: "phong-rieng",
       typeLabel: "Phòng riêng",
       matchScore: 95,
-      amenities: ["Máy lạnh", "Giờ tự do", "Xe trong nhà"],
+      amenities: ["Máy lạnh", "Giờ linh hoạt", "Khu vực để xe"],
       summarySpecs: "25m² • Camera an ninh, còn 1 chỗ",
       images: [
         "/assets/images/trang-chu/room-3.jpg",
@@ -250,7 +250,7 @@ window.RoomieData = {
       typeKey: "o-ghep",
       typeLabel: "Ở ghép",
       matchScore: 88,
-      amenities: ["Máy lạnh", "Máy giặt", "Giờ tự do", "Xe trong nhà"],
+      amenities: ["Máy lạnh", "Máy giặt", "Giờ linh hoạt", "Khu vực để xe"],
       summarySpecs: "30m² • Nấu ăn thoải mái, xe free",
       images: [
         "/assets/images/trang-chu/room-4.jpg",
@@ -307,7 +307,7 @@ window.RoomieData = {
       typeKey: "can-ho",
       typeLabel: "Căn hộ mini",
       matchScore: 93,
-      amenities: ["Máy lạnh", "Máy giặt", "Giờ tự do"],
+      amenities: ["Máy lạnh", "Máy giặt", "Giờ linh hoạt"],
       summarySpecs: "28m² • Còn 1 bạn nữ",
       images: [
         "/assets/images/tim-phong/room-2.jpg"
@@ -363,7 +363,7 @@ window.RoomieData = {
       typeKey: "can-ho",
       typeLabel: "Duplex",
       matchScore: 94,
-      amenities: ["Máy lạnh", "Máy giặt", "Giờ tự do", "Xe trong nhà"],
+      amenities: ["Máy lạnh", "Máy giặt", "Giờ linh hoạt", "Khu vực để xe"],
       summarySpecs: "35m² • Còn 1 bạn nữ",
       images: [
         "/assets/images/tim-phong/room-5.jpg"
