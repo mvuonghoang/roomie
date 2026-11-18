@@ -45,3 +45,23 @@
 .rm-animate-in {
   animation: rm-fade-in 0.2s ease-out forwards;
 }
+
+.rm-scroll-word {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.rm-scroll-char {
+  display: inline;
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rm-scroll-word,
+  .rm-scroll-char {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
