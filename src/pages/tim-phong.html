@@ -130,60 +130,60 @@
                 <span class="font-label-md text-label-md text-on-surface font-medium">
                   Khu vực
                 </span>
-                <div class="flex flex-col gap-1">
-                  <label class="flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
+                <div class="flex max-h-32 flex-col gap-1 overflow-y-auto rounded-lg bg-surface-container-low p-1" id="area-filter-options">
+                  <label class="area-option flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
                     <div class="flex items-center gap-2">
                       <input class="area-checkbox w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox" value="thu-duc">
-                      <span>
+                      <span class="area-option-name">
                         Thủ Đức / ĐHQG
                       </span>
                     </div>
-                    <span class="text-xs text-on-surface-variant">
-                      142
+                    <span class="area-option-count text-xs text-on-surface-variant">
+                      1
                     </span>
                   </label>
-                  <label class="flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
+                  <label class="area-option flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
                     <div class="flex items-center gap-2">
                       <input class="area-checkbox w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox" value="binh-thanh">
-                      <span>
+                      <span class="area-option-name">
                         Bình Thạnh
                       </span>
                     </div>
-                    <span class="text-xs text-on-surface-variant">
-                      98
+                    <span class="area-option-count text-xs text-on-surface-variant">
+                      2
                     </span>
                   </label>
-                  <label class="flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
+                  <label class="area-option flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
                     <div class="flex items-center gap-2">
                       <input class="area-checkbox w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox" value="quan-5">
-                      <span>
+                      <span class="area-option-name">
                         Quận 5
                       </span>
                     </div>
-                    <span class="text-xs text-on-surface-variant">
-                      76
+                    <span class="area-option-count text-xs text-on-surface-variant">
+                      1
                     </span>
                   </label>
-                  <label class="flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
+                  <label class="area-option flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
                     <div class="flex items-center gap-2">
                       <input class="area-checkbox w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox" value="quan-10">
-                      <span>
+                      <span class="area-option-name">
                         Quận 10
                       </span>
                     </div>
-                    <span class="text-xs text-on-surface-variant">
-                      64
+                    <span class="area-option-count text-xs text-on-surface-variant">
+                      1
                     </span>
                   </label>
-                  <label class="flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
+                  <label class="area-option flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-low cursor-pointer transition-colors text-body-sm">
                     <div class="flex items-center gap-2">
                       <input class="area-checkbox w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox" value="go-vap">
-                      <span>
+                      <span class="area-option-name">
                         Gò Vấp
                       </span>
                     </div>
-                    <span class="text-xs text-on-surface-variant">
-                      51
+                    <span class="area-option-count text-xs text-on-surface-variant">
+                      1
                     </span>
                   </label>
                 </div>
@@ -213,20 +213,32 @@
                 </span>
                 <div class="flex flex-wrap gap-1.5">
                   <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-body-sm text-on-surface cursor-pointer">
-                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Máy lạnh">
-                    Máy lạnh
+                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Ban công">
+                    Ban công
+                  </label>
+                  <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-body-sm text-on-surface cursor-pointer">
+                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Giờ linh hoạt">
+                    Giờ linh hoạt
+                  </label>
+                  <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-body-sm text-on-surface cursor-pointer">
+                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Khu vực để xe">
+                    Khu vực để xe
                   </label>
                   <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-body-sm text-on-surface cursor-pointer">
                     <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Máy giặt">
                     Máy giặt
                   </label>
                   <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-body-sm text-on-surface cursor-pointer">
-                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Giờ tự do">
-                    Giờ tự do
+                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Máy lạnh">
+                    Máy lạnh
                   </label>
                   <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-body-sm text-on-surface cursor-pointer">
-                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Xe trong nhà">
-                    Xe trong nhà
+                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Máy nước nóng">
+                    Máy nước nóng
+                  </label>
+                  <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-body-sm text-on-surface cursor-pointer">
+                    <input class="amenity-checkbox rounded text-primary accent-primary" type="checkbox" value="Tủ giày">
+                    Tủ giày
                   </label>
                 </div>
               </div>
