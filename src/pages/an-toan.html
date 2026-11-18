@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>An toàn &amp; Hỗ trợ sinh viên - Roomie</title>
+  <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
+  <link rel="shortcut icon" href="/favicon.ico?v=3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/styles/tailwind.config.js"></script>
+</head>
+<body data-page="an-toan" class="bg-surface font-body-md text-on-surface antialiased overflow-x-clip">
+  <!-- HEADER CHUNG -->
+  <header class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
+    <div class="h-20 max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-6 xl:px-margin-lg flex items-center justify-between gap-2 xl:gap-space-sm">
+      <!-- Left: Clean Brand Lockup -->
+      <a id="rm-brand-pill" class="pointer-events-auto flex items-center shrink-0" data-path="trang-chu" href="/roomie">
+        <img alt="Roomie" class="h-8 xl:h-9 w-auto object-contain" src="/assets/images/common/logo.png" />
+      </a>
+
+      <!-- Center: Frosted Floating Pill Navigation -->
+      <nav class="pointer-events-auto hidden lg:flex items-center gap-0.5 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25" data-active-classes="bg-primary text-on-primary rounded-full font-semibold shadow-sm">
+        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="trang-chu" href="/roomie">Trang chủ</a>
+        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="tim-phong" href="/roomie/tim-phong">Tìm phòng</a>
+        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="tim-roommate" href="/roomie/tim-roommate">Tìm roommate</a>
+        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="trac-nghiem-hop-gu" href="/roomie/trac-nghiem">Trắc nghiệm</a>
+        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="dich-vu" href="/roomie/bang-gia">Dịch vụ</a>
+        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="ve-chung-toi" href="/roomie/ve-chung-toi">Về chúng tôi</a>
+      </nav>
+
+      <!-- Right: Frosted Floating Action Pill -->
+      <div class="pointer-events-auto flex items-center gap-0.5 xl:gap-1 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25 shrink-0">
+        <a class="hidden sm:inline-flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full bg-secondary-container/80 text-on-secondary-container hover:bg-primary hover:text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-all whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
+          <span class="material-symbols-outlined text-[15px] xl:text-[16px]">add_circle</span>
+          <span>Đăng tin</span>
+        </a>
+        <button aria-label="Thông báo" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
+          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">notifications</span>
+          <span class="absolute top-1.5 right-1.5 xl:top-2 xl:right-2 w-2 h-2 rounded-full bg-primary"></span>
+        </button>
+        <button aria-label="Tin nhắn" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
+          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">chat_bubble</span>
+        </button>
+        <div class="flex items-center pl-0.5">
+          <div class="relative flex items-center gap-1.5 p-0.5 pr-0.5 xl:pr-2.5 rounded-full hover:bg-surface-container-low/80 transition-colors">
+            <img alt="Profile" class="w-7 h-7 xl:w-8 xl:h-8 rounded-full object-cover ring-2 ring-secondary-container" src="/assets/images/common/avatar-profile.jpg" />
+            <span class="hidden xl:inline-flex items-center text-tertiary font-label-sm text-label-sm font-bold">HCMUS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full pt-20 bg-surface min-h-[calc(100vh-400px)]">
+    <section class="w-full bg-gradient-to-b from-[#ecfdf5] to-surface py-space-2xl">
+      <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm font-bold mb-space-sm">
+          <span class="material-symbols-outlined text-[16px]">shield_with_heart</span>
+          Trung tâm An toàn &amp; Hỗ trợ sinh viên
+        </span>
+        <h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface max-w-3xl">
+          Cẩm nang thuê trọ an toàn &amp; bảo vệ quyền lợi ở ghép
+        </h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-2">
+          Quy trình kiểm duyệt, bảo hành ghép đôi và kênh tiếp nhận phản ánh tin giả dành cho sinh viên TP.HCM.
+        </p>
+        <div class="flex flex-wrap gap-2 mt-space-lg">
+          <a href="#nguyen-tac" class="px-4 py-2 rounded-full bg-surface-container-lowest shadow-sm text-sm font-semibold text-primary hover:bg-primary-fixed">1. Nguyên tắc an toàn</a>
+          <a href="#quy-chuan" class="px-4 py-2 rounded-full bg-surface-container-lowest shadow-sm text-sm font-semibold text-on-surface hover:bg-surface-container-low">2. Quy chuẩn &amp; Bảo hành</a>
+          <a href="#faq" class="px-4 py-2 rounded-full bg-surface-container-lowest shadow-sm text-sm font-semibold text-on-surface hover:bg-surface-container-low">3. FAQ sinh viên</a>
+          <a href="#bao-cao" class="px-4 py-2 rounded-full bg-error-container text-on-error-container shadow-sm text-sm font-semibold">4. Báo cáo tin giả</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nguyên tắc an toàn -->
+    <section id="nguyen-tac" class="py-space-xl">
+      <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
+        <h2 class="font-headline-lg text-headline-lg text-on-surface mb-space-lg">Nguyên tắc vàng khi đi xem phòng &amp; ghép bạn</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-md">
+          <div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-sm">
+            <span class="material-symbols-outlined text-primary text-3xl mb-2">wb_sunny</span>
+            <h3 class="font-title-md font-bold mb-1">Luôn đi xem phòng ban ngày</h3>
+            <p class="text-sm text-on-surface-variant">Đi cùng bạn bè hoặc người thân, kiểm tra khóa cửa, camera, đường thoát hiểm và an ninh khu vực xung quanh.</p>
+          </div>
+          <div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-sm">
+            <span class="material-symbols-outlined text-tertiary text-3xl mb-2">payments</span>
+            <h3 class="font-title-md font-bold mb-1">Không chuyển cọc giữ chỗ trước khi xem</h3>
+            <p class="text-sm text-on-surface-variant">Tuyệt đối không chuyển khoản đặt cọc qua mạng khi chưa đến tận nơi gặp chủ nhà/roommate và đối chiếu giấy tờ.</p>
+          </div>
+          <div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-sm">
+            <span class="material-symbols-outlined text-primary text-3xl mb-2">description</span>
+            <h3 class="font-title-md font-bold mb-1">Ghi rõ mọi phụ phí vào hợp đồng</h3>
+            <p class="text-sm text-on-surface-variant">Xác nhận đơn giá điện, nước, wifi, giữ xe, thời hạn báo trước khi dọn đi và điều kiện hoàn trả tiền cọc.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quy chuẩn cộng đồng & Bảo hành -->
+    <section id="quy-chuan" class="py-space-xl bg-surface-container-low">
+      <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg grid grid-cols-1 lg:grid-cols-2 gap-gutter-lg items-center">
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-md text-tertiary uppercase font-bold">Quy chuẩn cộng đồng Roomie</span>
+          <h2 class="font-headline-md text-headline-md font-bold text-on-surface">Chính sách Bảo hành Ghép đôi 48–72 giờ</h2>
+          <p class="text-sm text-on-surface-variant leading-relaxed">
+            Sau khi bấm xác nhận ghép đôi đủ số lượng roommate, nếu đối phương hủy kèo phút chót trước khi dọn vào ở trong vòng 48–72 giờ, Roomie hỗ trợ hoàn tác trạng thái xác nhận (tối đa 1 lần/vị trí) để bạn tiếp tục chọn ứng viên phù hợp từ danh sách mà không mất thêm phí.
+          </p>
+        </div>
+        <div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col gap-3">
+          <h3 class="font-title-md font-bold text-on-surface">Cam kết ứng xử văn minh khi ở ghép</h3>
+          <ul class="text-sm text-on-surface-variant space-y-2 list-disc pl-5">
+            <li>Trung thực khi khai báo thói quen hút thuốc, thú cưng và giờ giấc sinh hoạt.</li>
+            <li>Tôn trọng riêng tư: không tự ý chia sẻ thông tin cá nhân của bạn cùng phòng lên mạng xã hội.</li>
+            <li>Chủ trọ cập nhật trạng thái Còn trống / Đã lấp đầy khi nhận ping xác nhận định kỳ.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ & Báo cáo tin giả -->
+    <section id="faq" class="py-space-2xl">
+      <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg">
+        <div class="lg:col-span-6 flex flex-col gap-3">
+          <h2 class="font-headline-md font-bold text-on-surface mb-2">Câu hỏi thường gặp sinh viên</h2>
+          <details class="bg-surface-container-lowest rounded-xl p-4 shadow-sm" open>
+            <summary class="font-title-md text-base font-semibold cursor-pointer">Làm sao nhận biết tin đã xác thực trên Roomie?</summary>
+            <p class="text-sm text-on-surface-variant mt-2">Các tài khoản gắn huy hiệu "Đã xác thực HCMUS / VNU" đã đối soát email .edu.vn hoặc thẻ sinh viên. Phòng có nhãn "Đã kiểm định" được rà soát ảnh và giá điện nước rõ ràng.</p>
+          </details>
+          <details class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+            <summary class="font-title-md text-base font-semibold cursor-pointer">Gặp phòng đã cho thuê nhưng vẫn còn tin thì xử lý sao?</summary>
+            <p class="text-sm text-on-surface-variant mt-2">Bạn hãy gửi báo cáo tại biểu mẫu bên cạnh. Hệ thống sẽ gửi cảnh báo xác nhận trong 48h và tự động tạm ẩn "phòng ma" để giữ sạch dữ liệu.</p>
+          </details>
+          <details class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+            <summary class="font-title-md text-base font-semibold cursor-pointer">Tài khoản sinh viên dùng các tính năng nào miễn phí?</summary>
+            <p class="text-sm text-on-surface-variant mt-2">Tìm kiếm phòng trọ minh bạch chi phí, làm bài test 8 câu hỏi tính cách và xem điểm tương thích cơ bản đều hoàn toàn miễn phí.</p>
+          </details>
+        </div>
+
+        <div id="bao-cao" class="lg:col-span-6 bg-surface-container-lowest rounded-3xl p-space-xl shadow-sm border border-surface-container">
+          <div class="flex items-center gap-2 text-error font-bold mb-1">
+            <span class="material-symbols-outlined">report</span>
+            <h2 class="font-headline-sm text-headline-sm">Báo cáo tin giả / Phòng ma / Lừa cọc</h2>
+          </div>
+          <p class="text-sm text-on-surface-variant mb-space-md">Đội ngũ kiểm duyệt HCMUS sẽ rà soát và xử lý trong vòng 30 phút.</p>
+          <form id="safety-report-form" class="flex flex-col gap-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Đường dẫn hoặc tên phòng bị nghi ngờ</label>
+              <input type="text" required placeholder="Ví dụ: Phòng Studio đường Vành Đai hoặc link tin..." class="w-full h-11 px-3 rounded-xl bg-surface-container-low text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Loại vi phạm</label>
+              <select class="w-full h-11 px-3 rounded-xl bg-surface-container-low text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                <option>Yêu cầu chuyển tiền cọc trước khi xem phòng</option>
+                <option>Phòng đã hết nhưng không gỡ tin (Phòng ma)</option>
+                <option>Ẩn phụ phí điện nước / Giá khác xa mô tả</option>
+                <option>Hành vi quấy rối / Sai thông tin sinh viên</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Chi tiết sự việc</label>
+              <textarea rows="3" required placeholder="Mô tả tình huống bạn gặp phải..." class="w-full p-3 rounded-xl bg-surface-container-low text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"></textarea>
+            </div>
+            <button type="submit" class="py-3 rounded-xl bg-error text-on-error font-semibold text-sm hover:opacity-90 transition-opacity">
+              Gửi báo cáo cho Ban An toàn
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER CHUNG -->
+  <footer class="w-full bg-surface-container-low mt-space-2xl">
+    <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg pt-space-2xl pb-space-xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-gutter-lg">
+        <div class="lg:col-span-2 flex flex-col gap-space-md pr-0 lg:pr-space-xl">
+          <div class="flex items-center gap-space-sm">
+            <img alt="Roomie" class="h-8 w-auto object-contain" src="/assets/images/common/logo.png" />
+            <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Gen Z Housing</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Nền tảng tìm phòng trọ và kết nối roommate chuẩn phong cách sống sinh viên
+          </p>
+        </div>
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Khám phá</span>
+          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
+            <li class="hover:text-primary transition-colors"><a data-path="trang-chu" href="/roomie">Trang chủ</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="ve-chung-toi" href="/roomie/ve-chung-toi">Giới thiệu</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="tim-phong" href="/roomie/tim-phong">Tìm phòng trọ</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="tim-roommate" href="/roomie/tim-roommate">Tìm roommate hợp gu</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="trac-nghiem-tinh-cach" href="/roomie/trac-nghiem">Trắc nghiệm tính cách</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Dịch vụ</a></li>
+          </ul>
+        </div>
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Dịch vụ &amp; Gói</span>
+          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
+            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Đẩy tin nổi bật Boost</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Ghép roommate nâng cao</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Xác minh sinh viên Pro</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="bang-gia" href="/roomie/bang-gia">Bảng giá dịch vụ</a></li>
+          </ul>
+        </div>
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Hỗ trợ &amp; An toàn</span>
+          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
+            <li class="hover:text-primary transition-colors"><a data-path="nguyen-tac-an-toan" href="/roomie/an-toan#nguyen-tac">Nguyên tắc an toàn</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="bao-cao-tin-gia" href="/roomie/an-toan#bao-cao">Báo cáo tin giả / lừa đảo</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="lien-he-faq" href="/roomie/an-toan#faq">Liên hệ &amp; FAQ sinh viên</a></li>
+            <li class="hover:text-primary transition-colors"><a data-path="quy-chuan-cong-dong" href="/roomie/an-toan#quy-chuan">Quy chuẩn cộng đồng</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-space-2xl pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md bg-surface-container rounded-xl p-space-md">
+        <div class="flex flex-col md:flex-row items-center gap-space-xs text-center md:text-left">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Roomie</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Tìm đúng phòng - Ghép đúng người — Sống chung bình yên</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="/scripts/data.js"></script>
+  <script src="/scripts/app.js"></script>
+</body>
+</html>
