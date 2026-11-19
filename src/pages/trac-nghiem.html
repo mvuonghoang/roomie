@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trắc nghiệm tìm bạn cùng phòng hợp gu - Roomie</title>
+  <title>Roomie - Trắc nghiệm hợp gu | Ở cùng người hợp gu</title>
   <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
   <link rel="shortcut icon" href="/favicon.ico?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,46 +15,7 @@
   <script src="/styles/tailwind.config.js"></script>
 </head>
 <body data-page="trac-nghiem" class="bg-surface font-body-md text-on-surface antialiased overflow-x-clip">
-  <!-- HEADER CHUNG -->
-  <header class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
-    <div class="h-20 max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-6 xl:px-margin-lg flex items-center justify-between gap-2 xl:gap-space-sm">
-      <!-- Left: Clean Brand Lockup -->
-      <a id="rm-brand-pill" class="pointer-events-auto flex items-center shrink-0" data-path="trang-chu" href="/roomie">
-        <img alt="Roomie" class="h-8 xl:h-9 w-auto object-contain" src="/assets/images/common/logo.png" />
-      </a>
-
-      <!-- Center: Frosted Floating Pill Navigation -->
-      <nav class="pointer-events-auto hidden lg:flex items-center gap-0.5 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25" data-active-classes="bg-primary text-on-primary rounded-full font-semibold shadow-sm">
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="trang-chu" href="/roomie">Trang chủ</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="tim-phong" href="/roomie/tim-phong">Tìm phòng</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="tim-roommate" href="/roomie/tim-roommate">Tìm roommate</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="trac-nghiem-hop-gu" href="/roomie/trac-nghiem">Trắc nghiệm</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="dich-vu" href="/roomie/bang-gia">Dịch vụ</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="ve-chung-toi" href="/roomie/ve-chung-toi">Về chúng tôi</a>
-      </nav>
-
-      <!-- Right: Frosted Floating Action Pill -->
-      <div class="pointer-events-auto flex items-center gap-0.5 xl:gap-1 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25 shrink-0">
-        <a class="hidden sm:inline-flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full bg-secondary-container/80 text-on-secondary-container hover:bg-primary hover:text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-all whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
-          <span class="material-symbols-outlined text-[15px] xl:text-[16px]">add_circle</span>
-          <span>Đăng tin</span>
-        </a>
-        <button aria-label="Thông báo" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
-          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">notifications</span>
-          <span class="absolute top-1.5 right-1.5 xl:top-2 xl:right-2 w-2 h-2 rounded-full bg-primary"></span>
-        </button>
-        <button aria-label="Tin nhắn" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
-          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">chat_bubble</span>
-        </button>
-        <div class="flex items-center pl-0.5">
-          <div class="relative flex items-center gap-1.5 p-0.5 pr-0.5 xl:pr-2.5 rounded-full hover:bg-surface-container-low/80 transition-colors">
-            <img alt="Profile" class="w-7 h-7 xl:w-8 xl:h-8 rounded-full object-cover ring-2 ring-secondary-container" src="/assets/images/common/avatar-profile.jpg" />
-            <span class="hidden xl:inline-flex items-center text-tertiary font-label-sm text-label-sm font-bold">HCMUS</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <div id="rm-header-root"></div>
   <main class="w-full pt-20 bg-surface min-h-[calc(100vh-280px)]">
     <div class="flex flex-col w-full">
       <!-- SECTION 1: HERO & PROGRESS -->
@@ -80,7 +41,7 @@
                 verified_user
               </span>
               <span>
-                Bảo mật dữ liệu chuẩn sinh viên ĐHQG TP.HCM
+                Bảo mật dữ liệu chuẩn sinh viên
               </span>
             </div>
           </div>
@@ -90,7 +51,8 @@
               Khảo sát phong cách sống &amp; Tìm bạn ở ghép hợp gu
             </h1>
             <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-              Trả lời 8 câu hỏi ngắn về thói quen sinh hoạt để hệ thống tự động tính điểm tương thích (%) và kết nối bạn với roommate lý tưởng nhất tại TP.HCM.
+              Trả lời 8 câu hỏi ngắn về thói quen sinh hoạt để hệ thống tự động tính điểm tương thích (%) <br>
+              và kết nối bạn với roommate lý tưởng nhất
             </p>
           </div>
           <!-- Quiz Progress Bar Card -->
@@ -195,10 +157,16 @@
         </div>
       </section>
       <!-- SECTION 2: INTERACTIVE QUIZ CARD CONTAINER -->
-      <section class="w-full bg-surface-container-lowest py-space-xl">
-        <div class="max-w-[1040px] mx-auto px-gutter lg:px-margin-lg">
+      <section id="quiz-interactive-section" class="relative overflow-hidden w-full py-space-xl lg:py-space-2xl bg-gradient-to-b from-[#0d0f36] via-[#262196] to-[#493ee5]">
+        <!-- Halftone dot matrix & ambient brand blue-purple glows -->
+        <div class="rm-halftone-dots-hero pointer-events-none absolute inset-0 opacity-20"></div>
+        <div class="pointer-events-none absolute -top-24 -left-20 w-[420px] h-[420px] rounded-full bg-[#7c75ff]/25 blur-3xl"></div>
+        <div class="pointer-events-none absolute -top-16 -right-16 w-[320px] h-[320px] rounded-full bg-[#b5efd2]/12 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[820px] h-[340px] rounded-full bg-[#7c75ff]/45 blur-3xl"></div>
+
+        <div class="relative z-10 max-w-[1040px] mx-auto px-gutter lg:px-margin-lg">
           <!-- Main Question Card (Interactive Container) -->
-          <div class="w-full bg-surface-container-lowest rounded-3xl p-space-lg sm:p-space-xl lg:p-space-2xl shadow-[0_12px_36px_rgba(99,91,255,0.06)] relative overflow-hidden">
+          <div class="w-full bg-surface-container-lowest rounded-3xl p-space-lg sm:p-space-xl lg:p-space-2xl border border-white/20 shadow-[0_24px_60px_-14px_rgba(10,8,48,0.45)] relative overflow-hidden">
             <!-- Subtle Top Accent Glow -->
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary-fixed-dim via-primary to-secondary-fixed">
             </div>
@@ -362,23 +330,16 @@
         </div>
       </section>
       <!-- SECTION 3: REAL-TIME COMPATIBILITY LIVE PREVIEW -->
-      <section class="w-full bg-[#f4f5fb] py-space-2xl">
+      <section id="quiz-prediction-section" class="w-full bg-[#f4f5fb] py-space-2xl">
         <div class="max-w-[1280px] mx-auto px-gutter lg:px-margin-lg">
           <!-- Section Header -->
           <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
             <div>
-              <div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-bold mb-space-xs">
-                <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse">
-                </span>
-                <span>
-                  Tính toán trực tiếp thời gian thực
-                </span>
-              </div>
               <h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">
-                Dự đoán gợi ý bạn cùng phòng dựa trên câu trả lời hiện tại
+                <span class="text-primary whitespace-nowrap">Dự đoán gợi ý</span> bạn cùng phòng dựa trên câu trả lời hiện tại
               </h2>
               <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-                Độ tương thích biến thiên liên tục theo từng phương án bạn vừa chọn.
+                Độ tương thích biến thiên liên tục theo từng phương án bạn vừa chọn
               </p>
             </div>
             <div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-surface-container-lowest text-primary font-label-md text-label-md shadow-sm">
@@ -390,248 +351,308 @@
               </span>
             </div>
           </div>
-          <!-- 3 Match Preview Cards Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg mb-space-xl">
-            <!-- Match 1: Hoàng Nam -->
-            <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <div class="flex items-start justify-between gap-space-sm mb-space-md">
-                  <div class="relative">
-                    <img class="w-16 h-16 rounded-2xl object-cover ring-2 ring-tertiary-fixed shadow-sm" data-alt="Chân dung bạn nam sinh viên Việt Nam 20 tuổi diện áo sơ mi trắng trẻ trung, khuôn mặt thân thiện đang mỉm cười trong quán cà phê học tập, ánh sáng tự nhiên dịu mát" src="/assets/images/trac-nghiem/avatar-1.jpg" />
-                    <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-[12px]">
-                      <span class="material-symbols-outlined text-[13px]">
-                        school
-                      </span>
-                    </span>
-                  </div>
-                  <div class="text-right">
-                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ecfdf5] text-tertiary font-title-md text-title-md font-bold">
-                      <span class="material-symbols-outlined text-[18px]">
-                        favorite
-                      </span>
-                      <span id="preview-score-0">
-                        94%
+
+          <!-- Prediction Stage (Blurred until user buys a Service Plan) -->
+          <div id="quiz-prediction-stage" class="relative">
+            <!-- Blur-able Prediction Content -->
+            <div id="quiz-prediction-content" class="transition-all duration-500 blur-[8px] opacity-65 select-none pointer-events-none" aria-hidden="true" inert>
+              <!-- 3 Match Preview Cards Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg mb-space-xl">
+                <!-- Match 1: Hoàng Nam -->
+                <article data-preview-card="hoang-nam" class="quiz-preview-card bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between gap-space-sm mb-space-md">
+                      <div class="relative">
+                        <img alt="Chân dung bạn nam sinh viên Việt Nam 20 tuổi diện áo sơ mi trắng trẻ trung, khuôn mặt thân thiện đang mỉm cười trong quán cà phê học tập, ánh sáng tự nhiên dịu mát" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-tertiary-fixed shadow-sm" src="/assets/images/trac-nghiem/avatar-1.jpg" />
+                        <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-[12px]">
+                          <span class="material-symbols-outlined text-[13px]">
+                            school
+                          </span>
+                        </span>
+                      </div>
+                      <div class="text-right">
+                        <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ecfdf5] text-tertiary font-title-md text-title-md font-bold">
+                          <span class="material-symbols-outlined text-[18px]">
+                            favorite
+                          </span>
+                          <span id="preview-score-0">
+                            98%
+                          </span>
+                        </div>
+                        <span class="block font-label-sm text-label-sm text-tertiary font-semibold mt-0.5">
+                          Rất hợp gu bạn
+                        </span>
+                      </div>
+                    </div>
+                    <div class="mb-space-sm">
+                      <div class="flex items-center gap-space-xs">
+                        <h3 class="font-title-md text-title-md text-on-surface font-bold">
+                          Hoàng Nam
+                        </h3>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
+                          20 tuổi
+                        </span>
+                      </div>
+                      <span class="font-body-sm text-body-sm text-primary font-semibold">
+                        ĐH Khoa học Tự nhiên CS1 (Q.5)
                       </span>
                     </div>
-                    <span class="block font-label-sm text-label-sm text-tertiary font-semibold mt-0.5">
-                      Rất hợp gu bạn
-                    </span>
+                    <!-- Lifestyle Tags -->
+                    <div class="flex flex-wrap gap-1.5 mb-space-md">
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-tertiary">
+                          bedtime
+                        </span>
+                        Ngủ trước 23h30
+                      </span>
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-primary">
+                          cleaning_services
+                        </span>
+                        Sạch sẽ ngăn nắp
+                      </span>
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-outline">
+                          volume_off
+                        </span>
+                        Giữ trật tự
+                      </span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant italic mb-space-md">
+                      “Mình thích nấu cơm trưa mang theo học, cuối tuần thường đọc sách hoặc dọn dẹp phòng trọ.”
+                    </p>
                   </div>
-                </div>
-                <div class="mb-space-sm">
-                  <div class="flex items-center gap-space-xs">
-                    <h3 class="font-title-md text-title-md text-on-surface font-bold">
-                      Hoàng Nam
-                    </h3>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-                      20 tuổi
-                    </span>
+                  <div class="pt-space-sm bg-surface-container-lowest flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                      <span class="font-label-sm text-label-sm text-on-surface-variant">
+                        Ngân sách: 2 - 2.5 tr/tháng
+                      </span>
+                      <button type="button" data-preview-profile="hoang-nam" class="quiz-preview-profile-btn font-label-md text-label-md text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5">
+                        Hồ sơ sơ bộ
+                        <span class="material-symbols-outlined text-[16px]">
+                          chevron_right
+                        </span>
+                      </button>
+                    </div>
+                    <button type="button" data-preview-select="hoang-nam" class="quiz-preview-select-btn w-full py-2.5 px-4 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary font-label-md text-label-md font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                      <span class="material-symbols-outlined text-[17px]">handshake</span>
+                      <span>Chọn bạn cùng phòng này</span>
+                    </button>
                   </div>
-                  <span class="font-body-sm text-body-sm text-primary font-semibold">
-                    ĐH Khoa học Tự nhiên CS1 (Q.5)
-                  </span>
-                </div>
-                <!-- Lifestyle Tags -->
-                <div class="flex flex-wrap gap-1.5 mb-space-md">
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-tertiary">
-                      bedtime
-                    </span>
-                    Ngủ trước 23h30
-                  </span>
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-primary">
-                      cleaning_services
-                    </span>
-                    Sạch sẽ ngăn nắp
-                  </span>
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-outline">
-                      volume_off
-                    </span>
-                    Giữ trật tự
-                  </span>
-                </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant italic mb-space-md">
-                  “Mình thích nấu cơm trưa mang theo học, cuối tuần thường đọc sách hoặc dọn dẹp phòng trọ.”
-                </p>
+                </article>
+                <!-- Match 2: Minh Anh -->
+                <article data-preview-card="minh-anh" class="quiz-preview-card bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between gap-space-sm mb-space-md">
+                      <div class="relative">
+                        <img alt="Chân dung bạn nữ sinh viên Việt Nam 20 tuổi đeo kính cận thanh lịch mỉm cười tự tin, không gian phòng ký túc xá sáng sủa phong cách tối giản pastel" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-tertiary-fixed shadow-sm" src="/assets/images/trac-nghiem/avatar-2.jpg" />
+                        <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-[12px]">
+                          <span class="material-symbols-outlined text-[13px]">
+                            school
+                          </span>
+                        </span>
+                      </div>
+                      <div class="text-right">
+                        <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ecfdf5] text-tertiary font-title-md text-title-md font-bold">
+                          <span class="material-symbols-outlined text-[18px]">
+                            favorite
+                          </span>
+                          <span id="preview-score-1">
+                            95%
+                          </span>
+                        </div>
+                        <span class="block font-label-sm text-label-sm text-tertiary font-semibold mt-0.5">
+                          Cực kỳ ăn ý
+                        </span>
+                      </div>
+                    </div>
+                    <div class="mb-space-sm">
+                      <div class="flex items-center gap-space-xs">
+                        <h3 class="font-title-md text-title-md text-on-surface font-bold">
+                          Minh Anh
+                        </h3>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
+                          20 tuổi
+                        </span>
+                      </div>
+                      <span class="font-body-sm text-body-sm text-primary font-semibold">
+                        ĐH Khoa học Tự nhiên (HCMUS) · Q.5
+                      </span>
+                    </div>
+                    <!-- Lifestyle Tags -->
+                    <div class="flex flex-wrap gap-1.5 mb-space-md">
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-tertiary">
+                          restaurant
+                        </span>
+                        Nấu ăn ngon
+                      </span>
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-tertiary">
+                          smoke_free
+                        </span>
+                        Không hút thuốc
+                      </span>
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-primary">
+                          eco
+                        </span>
+                        Lối sống xanh
+                      </span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant italic mb-space-md">
+                      “Rất tôn trọng không gian riêng của roommate, thích chia lịch rửa chén và đi siêu thị chung.”
+                    </p>
+                  </div>
+                  <div class="pt-space-sm bg-surface-container-lowest flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                      <span class="font-label-sm text-label-sm text-on-surface-variant">
+                        Ngân sách: 2.0 - 2.5 tr/tháng
+                      </span>
+                      <button type="button" data-preview-profile="minh-anh" class="quiz-preview-profile-btn font-label-md text-label-md text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5">
+                        Hồ sơ sơ bộ
+                        <span class="material-symbols-outlined text-[16px]">
+                          chevron_right
+                        </span>
+                      </button>
+                    </div>
+                    <button type="button" data-preview-select="minh-anh" class="quiz-preview-select-btn w-full py-2.5 px-4 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary font-label-md text-label-md font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                      <span class="material-symbols-outlined text-[17px]">handshake</span>
+                      <span>Chọn bạn cùng phòng này</span>
+                    </button>
+                  </div>
+                </article>
+                <!-- Match 3: Quốc Bảo -->
+                <article data-preview-card="quoc-bao" class="quiz-preview-card bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between gap-space-sm mb-space-md">
+                      <div class="relative">
+                        <img alt="Chân dung bạn nam sinh viên kỹ thuật 21 tuổi tươi cười năng động, áo hoodie xám nhạt cầm laptop tại thư viện hiện đại rộng mở tràn ngập ánh sáng" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-tertiary-fixed shadow-sm" src="/assets/images/trac-nghiem/avatar-3.jpg" />
+                        <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-[12px]">
+                          <span class="material-symbols-outlined text-[13px]">
+                            school
+                          </span>
+                        </span>
+                      </div>
+                      <div class="text-right">
+                        <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ecfdf5] text-tertiary font-title-md text-title-md font-bold">
+                          <span class="material-symbols-outlined text-[18px]">
+                            favorite
+                          </span>
+                          <span id="preview-score-2">
+                            92%
+                          </span>
+                        </div>
+                        <span class="block font-label-sm text-label-sm text-tertiary font-semibold mt-0.5">
+                          Hợp lối sống
+                        </span>
+                      </div>
+                    </div>
+                    <div class="mb-space-sm">
+                      <div class="flex items-center gap-space-xs">
+                        <h3 class="font-title-md text-title-md text-on-surface font-bold">
+                          Quốc Bảo
+                        </h3>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
+                          21 tuổi
+                        </span>
+                      </div>
+                      <span class="font-body-sm text-body-sm text-primary font-semibold">
+                        ĐH Bách Khoa ĐHQG CS2 (Làng ĐH)
+                      </span>
+                    </div>
+                    <!-- Lifestyle Tags -->
+                    <div class="flex flex-wrap gap-1.5 mb-space-md">
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-primary">
+                          menu_book
+                        </span>
+                        Học nhóm yên tĩnh
+                      </span>
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-tertiary">
+                          lock
+                        </span>
+                        Kín đáo riêng tư
+                      </span>
+                      <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-outline">
+                          fitness_center
+                        </span>
+                        Thể thao
+                      </span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant italic mb-space-md">
+                      “Học CNTT nên thỉnh thoảng thức khuya làm đồ án, nhưng luôn đeo tai nghe và giữ phòng yên ắng.”
+                    </p>
+                  </div>
+                  <div class="pt-space-sm bg-surface-container-lowest flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                      <span class="font-label-sm text-label-sm text-on-surface-variant">
+                        Ngân sách: 1.5 - 2.0 tr/tháng
+                      </span>
+                      <button type="button" data-preview-profile="quoc-bao" class="quiz-preview-profile-btn font-label-md text-label-md text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5">
+                        Hồ sơ sơ bộ
+                        <span class="material-symbols-outlined text-[16px]">
+                          chevron_right
+                        </span>
+                      </button>
+                    </div>
+                    <button type="button" data-preview-select="quoc-bao" class="quiz-preview-select-btn w-full py-2.5 px-4 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary font-label-md text-label-md font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                      <span class="material-symbols-outlined text-[17px]">handshake</span>
+                      <span>Chọn bạn cùng phòng này</span>
+                    </button>
+                  </div>
+                </article>
               </div>
-              <div class="pt-space-sm bg-surface-container-lowest flex items-center justify-between">
-                <span class="font-label-sm text-label-sm text-on-surface-variant">
-                  Ngân sách: 2 - 2.5 tr/tháng
+              <!-- Completion Banner Note -->
+              <div class="flex items-center justify-center p-space-md rounded-2xl bg-surface-container-lowest shadow-sm gap-space-sm text-center">
+                <span class="material-symbols-outlined text-[22px] text-primary">
+                  auto_awesome
                 </span>
-                <span class="quiz-preview-profile-btn font-label-md text-label-md text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5">
-                  Hồ sơ sơ bộ
-                  <span class="material-symbols-outlined text-[16px]">
-                    chevron_right
-                  </span>
+                <span class="font-body-md text-body-md text-on-surface">
+                  <strong>
+                    Kết quả chi tiết &amp; danh sách 100% người hợp gu
+                  </strong>
+                  sẽ mở khóa ngay sau khi hoàn thành đầy đủ 8 câu hỏi.
                 </span>
               </div>
             </div>
-            <!-- Match 2: Minh Anh -->
-            <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <div class="flex items-start justify-between gap-space-sm mb-space-md">
-                  <div class="relative">
-                    <img class="w-16 h-16 rounded-2xl object-cover ring-2 ring-tertiary-fixed shadow-sm" data-alt="Chân dung bạn nữ sinh viên Việt Nam 20 tuổi đeo kính cận thanh lịch mỉm cười tự tin, không gian phòng ký túc xá sáng sủa phong cách tối giản pastel" src="/assets/images/trac-nghiem/avatar-2.jpg" />
-                    <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-[12px]">
-                      <span class="material-symbols-outlined text-[13px]">
-                        school
-                      </span>
-                    </span>
-                  </div>
-                  <div class="text-right">
-                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ecfdf5] text-tertiary font-title-md text-title-md font-bold">
-                      <span class="material-symbols-outlined text-[18px]">
-                        favorite
-                      </span>
-                      <span id="preview-score-1">
-                        91%
-                      </span>
-                    </div>
-                    <span class="block font-label-sm text-label-sm text-tertiary font-semibold mt-0.5">
-                      Cực kỳ ăn ý
-                    </span>
-                  </div>
+
+            <!-- Paywall Lock Overlay (Shown when user has not purchased a service plan) -->
+            <div id="quiz-prediction-lock-overlay" class="absolute inset-0 z-20 flex items-center justify-center p-4 sm:p-6">
+              <div class="w-full max-w-[600px] rounded-3xl bg-surface-container-lowest/95 backdrop-blur-xl border border-primary/20 shadow-[0_24px_60px_-14px_rgba(24,20,90,0.22)] p-6 sm:p-8 text-center flex flex-col items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary flex items-center justify-center shadow-xs">
+                  <span class="material-symbols-outlined text-[26px]">lock</span>
                 </div>
-                <div class="mb-space-sm">
-                  <div class="flex items-center gap-space-xs">
-                    <h3 class="font-title-md text-title-md text-on-surface font-bold">
-                      Minh Anh
-                    </h3>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-                      20 tuổi
-                    </span>
-                  </div>
-                  <span class="font-body-sm text-body-sm text-primary font-semibold">
-                    ĐH Kinh Tế TP.HCM - UEH (Q.10)
-                  </span>
-                </div>
-                <!-- Lifestyle Tags -->
-                <div class="flex flex-wrap gap-1.5 mb-space-md">
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-tertiary">
-                      restaurant
-                    </span>
-                    Nấu ăn ngon
-                  </span>
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-tertiary">
-                      smoke_free
-                    </span>
-                    Không hút thuốc
-                  </span>
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-primary">
-                      eco
-                    </span>
-                    Lối sống xanh
-                  </span>
-                </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant italic mb-space-md">
-                  “Rất tôn trọng không gian riêng của roommate, thích chia lịch rửa chén và đi siêu thị chung.”
-                </p>
-              </div>
-              <div class="pt-space-sm bg-surface-container-lowest flex items-center justify-between">
-                <span class="font-label-sm text-label-sm text-on-surface-variant">
-                  Ngân sách: 2.2 - 3 tr/tháng
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-secondary-container text-on-secondary-fixed font-label-sm text-[12px] font-bold">
+                  <span class="material-symbols-outlined text-[15px]">workspace_premium</span>
+                  Thuộc Gói Dịch Vụ Roomie
                 </span>
-                <span class="quiz-preview-profile-btn font-label-md text-label-md text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5">
-                  Hồ sơ sơ bộ
-                  <span class="material-symbols-outlined text-[16px]">
-                    chevron_right
-                  </span>
-                </span>
+                <div class="flex flex-col gap-1.5">
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-snug">
+                    Mở khóa Dự đoán gợi ý bạn cùng phòng
+                  </h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Phần dự đoán độ tương thích (%) theo từng câu trả lời và hồ sơ gợi ý thuộc các gói dịch vụ của Roomie. Mua gói để mở khóa và trực tiếp lựa chọn bạn ở ghép phù hợp.
+                  </p>
+                </div>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full pt-1">
+                  <button type="button" id="quiz-unlock-match-plus-btn" class="w-full sm:flex-1 py-3 px-4 sm:px-5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-[13.5px] font-bold shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[18px]">bolt</span>
+                    <span>Mở khóa Match Plus • 9.000đ</span>
+                  </button>
+                  <button type="button" id="quiz-unlock-combo-btn" class="w-full sm:flex-1 py-3 px-4 sm:px-5 rounded-xl bg-secondary-container hover:bg-tertiary text-on-secondary-fixed hover:text-on-tertiary font-label-md text-[13.5px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[18px]">local_fire_department</span>
+                    <span>Combo Thần Tốc • 29.000đ</span>
+                  </button>
+                </div>
+                <a href="/roomie/bang-gia?from=trac-nghiem" class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold hover:underline">
+                  <span>Xem &amp; so sánh tất cả gói dịch vụ</span>
+                  <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </a>
               </div>
             </div>
-            <!-- Match 3: Quốc Bảo -->
-            <div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <div class="flex items-start justify-between gap-space-sm mb-space-md">
-                  <div class="relative">
-                    <img class="w-16 h-16 rounded-2xl object-cover ring-2 ring-tertiary-fixed shadow-sm" data-alt="Chân dung bạn nam sinh viên kỹ thuật 21 tuổi tươi cười năng động, áo hoodie xám nhạt cầm laptop tại thư viện hiện đại rộng mở tràn ngập ánh sáng" src="/assets/images/trac-nghiem/avatar-3.jpg" />
-                    <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-[12px]">
-                      <span class="material-symbols-outlined text-[13px]">
-                        school
-                      </span>
-                    </span>
-                  </div>
-                  <div class="text-right">
-                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ecfdf5] text-tertiary font-title-md text-title-md font-bold">
-                      <span class="material-symbols-outlined text-[18px]">
-                        favorite
-                      </span>
-                      <span id="preview-score-2">
-                        89%
-                      </span>
-                    </div>
-                    <span class="block font-label-sm text-label-sm text-tertiary font-semibold mt-0.5">
-                      Hợp lối sống
-                    </span>
-                  </div>
-                </div>
-                <div class="mb-space-sm">
-                  <div class="flex items-center gap-space-xs">
-                    <h3 class="font-title-md text-title-md text-on-surface font-bold">
-                      Quốc Bảo
-                    </h3>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-                      21 tuổi
-                    </span>
-                  </div>
-                  <span class="font-body-sm text-body-sm text-primary font-semibold">
-                    ĐH Bách Khoa TP.HCM CS1
-                  </span>
-                </div>
-                <!-- Lifestyle Tags -->
-                <div class="flex flex-wrap gap-1.5 mb-space-md">
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-primary">
-                      menu_book
-                    </span>
-                    Học nhóm yên tĩnh
-                  </span>
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-tertiary">
-                      lock
-                    </span>
-                    Kín đáo riêng tư
-                  </span>
-                  <span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-outline">
-                      fitness_center
-                    </span>
-                    Thể thao
-                  </span>
-                </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant italic mb-space-md">
-                  “Học CNTT nên thỉnh thoảng thức khuya làm đồ án, nhưng luôn đeo tai nghe và giữ phòng yên ắng.”
-                </p>
-              </div>
-              <div class="pt-space-sm bg-surface-container-lowest flex items-center justify-between">
-                <span class="font-label-sm text-label-sm text-on-surface-variant">
-                  Ngân sách: 1.8 - 2.4 tr/tháng
-                </span>
-                <span class="quiz-preview-profile-btn font-label-md text-label-md text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5">
-                  Hồ sơ sơ bộ
-                  <span class="material-symbols-outlined text-[16px]">
-                    chevron_right
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
-          <!-- Completion Banner Note -->
-          <div class="flex items-center justify-center p-space-md rounded-2xl bg-surface-container-lowest shadow-sm gap-space-sm text-center">
-            <span class="material-symbols-outlined text-[22px] text-primary">
-              auto_awesome
-            </span>
-            <span class="font-body-md text-body-md text-on-surface">
-              <strong>
-                Kết quả chi tiết &amp; danh sách 100% người hợp gu
-              </strong>
-              sẽ mở khóa ngay sau khi hoàn thành đầy đủ 8 câu hỏi.
-            </span>
           </div>
         </div>
       </section>
@@ -643,11 +664,8 @@
               Giá trị thực tế cho sinh viên
             </span>
             <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-              Tại sao sinh viên tin dùng bài trắc nghiệm Roomie?
+              Tại sao sinh viên tin dùng bài trắc nghiệm của <span class="text-primary whitespace-nowrap">Roomie</span>?
             </h2>
-            <p class="font-body-md text-body-md text-on-surface-variant mt-2">
-              Giải quyết bài toán tìm bạn cùng phòng dựa trên dữ liệu thói quen thực tế, loại bỏ rủi ro xích mích sau khi ký hợp đồng.
-            </p>
           </div>
           <!-- 3 Feature Pillars with Inline Chart/Infographic -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
@@ -705,7 +723,7 @@
                       check_circle
                     </span>
                     <span>
-                      Xác minh thẻ sinh viên HCMUS / VNU
+                      Xác minh thẻ sinh viên
                     </span>
                   </div>
                   <div class="flex items-center gap-space-xs text-on-surface">
@@ -721,7 +739,7 @@
                       check_circle
                     </span>
                     <span>
-                      Chat ẩn danh trước khi hẹn gặp xem phòng
+                      Kết nối Double Opt-in (tối đa 3 slot song song) mở Zalo/SĐT
                     </span>
                   </div>
                 </div>
@@ -736,12 +754,12 @@
                   </span>
                 </div>
                 <h3 class="font-title-md text-title-md text-on-surface font-bold mb-space-xs">
-                  Mẫu thỏa thuận nội quy trọ miễn phí
+                  Mẫu thỏa thuận nội quy trọ <br> miễn phí
                 </h3>
                 <p class="font-body-md text-body-md text-on-surface-variant mb-space-md">
                   Cung cấp sẵn bản cam kết sinh hoạt chung phòng (chia tiền điện nước, quy định người lạ ngủ lại, dọn dẹp) có giá trị cam kết rõ ràng.
                 </p>
-                <div id="quiz-download-contract" class="p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors flex items-center justify-between">
+                <a id="quiz-download-contract" href="/assets/docs/Roomie_Thoa_Thuan_Noi_Quy_O_Ghep.pdf" download="Roomie_Thoa_Thuan_Noi_Quy_O_Ghep.pdf" class="p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors flex items-center justify-between">
                   <div class="flex items-center gap-space-xs">
                     <span class="material-symbols-outlined text-[20px] text-primary">
                       download
@@ -751,47 +769,39 @@
                     </span>
                   </div>
                   <span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">
-                    1.2 MB
+                    114 KB
                   </span>
-                </div>
+                </a>
               </div>
             </div>
           </div>
         </div>
       </section>
       <!-- SECTION 5: FINAL CTA BANNER -->
-      <section class="w-full bg-gradient-to-r from-[#4f46e5] to-[#635bff] text-on-primary py-space-2xl relative overflow-hidden">
-        <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none">
-        </div>
+      <section class="relative w-full overflow-hidden bg-gradient-to-r from-[#1e197a] via-primary to-primary-container text-on-primary py-space-xl md:py-space-2xl">
+        <div class="pointer-events-none absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#8a84ff]/30 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-24 left-1/4 w-64 h-64 rounded-full bg-secondary-container/15 blur-3xl"></div>
         <div class="max-w-[1280px] mx-auto px-gutter lg:px-margin-lg relative z-10">
           <div class="flex flex-col lg:flex-row items-center justify-between gap-space-xl">
-            <div class="max-w-2xl text-center lg:text-left">
-              <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/15 text-white font-label-sm text-label-sm font-semibold mb-space-sm backdrop-blur-md">
-                <span class="material-symbols-outlined text-[16px]">
-                  bolt
-                </span>
-                <span>
-                  Kết nối nhanh trong 48 giờ
-                </span>
-              </span>
-              <h2 class="font-display-lg text-display-lg text-white font-extrabold tracking-tight mb-space-xs">
+            <div class="max-w-xl text-center lg:text-left">
+              <h2 class="font-headline-lg text-[24px] sm:text-[28px] lg:text-[30px] leading-snug text-white font-bold tracking-tight mb-space-xs">
                 Bạn muốn tìm người chia sẻ tiền phòng ngay tuần này?
               </h2>
-              <p class="font-body-lg text-body-lg text-white/85 leading-relaxed">
-                Hơn 850 sinh viên tại TP.HCM đã tìm thấy bạn cùng phòng lý tưởng và tiết kiệm đến 50% chi phí sinh hoạt mỗi tháng qua Roomie.
+              <p class="font-body-md text-[14.5px] sm:text-[15.5px] text-white/90 leading-relaxed">
+                Hơn 1.200 sinh viên đã tìm thấy bạn cùng phòng lý tưởng và tiết kiệm đến 50% chi phí sinh hoạt mỗi tháng qua Roomie
               </p>
             </div>
-            <div class="flex flex-col sm:flex-row items-center gap-space-md w-full lg:w-auto">
-              <button id="quiz-finish-now-btn" class="w-full sm:w-auto inline-flex items-center justify-center gap-space-xs bg-white text-primary hover:bg-[#f7f8fd] font-title-md text-title-md font-bold px-space-xl py-space-md rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5" type="button">
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto shrink-0">
+              <button id="quiz-finish-now-btn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-surface-container-lowest text-primary hover:bg-secondary-container hover:text-on-secondary-fixed font-label-md text-[14px] sm:text-[14.5px] leading-none font-bold px-5 sm:px-6 py-3.5 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap" type="button">
                 <span>
                   Hoàn tất bài trắc nghiệm ngay
                 </span>
-                <span class="material-symbols-outlined text-[20px]">
+                <span class="material-symbols-outlined text-[18px]">
                   arrow_forward
                 </span>
               </button>
-              <a class="w-full sm:w-auto inline-flex items-center justify-center gap-space-xs bg-white/10 hover:bg-white/20 text-white font-title-md text-title-md font-semibold px-space-lg py-space-md rounded-xl backdrop-blur-md transition-all" data-path="tim-phong" href="#">
-                <span class="material-symbols-outlined text-[20px]">
+              <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 font-label-md text-[14px] sm:text-[14.5px] leading-none font-semibold px-5 sm:px-6 py-3.5 rounded-xl backdrop-blur-md transition-all hover:-translate-y-0.5 whitespace-nowrap" data-path="tim-phong" href="/roomie/tim-phong">
+                <span class="material-symbols-outlined text-[18px]">
                   search
                 </span>
                 <span>
@@ -804,59 +814,11 @@
       </section>
     </div>
   </main>
-  <!-- FOOTER CHUNG -->
-  <footer class="w-full bg-surface-container-low mt-space-2xl">
-    <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg pt-space-2xl pb-space-xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-gutter-lg">
-        <div class="lg:col-span-2 flex flex-col gap-space-md pr-0 lg:pr-space-xl">
-          <div class="flex items-center gap-space-sm">
-            <img alt="Roomie" class="h-11 sm:h-12 w-auto object-contain" src="/assets/images/common/logo.png" />
-            <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Gen Z Housing</span>
-          </div>
-          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-            Nền tảng tìm phòng trọ và kết nối roommate chuẩn phong cách sống sinh viên
-          </p>
-        </div>
-        <div class="flex flex-col gap-space-sm">
-          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Khám phá</span>
-          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
-            <li class="hover:text-primary transition-colors"><a data-path="trang-chu" href="/roomie">Trang chủ</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="ve-chung-toi" href="/roomie/ve-chung-toi">Giới thiệu</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="tim-phong" href="/roomie/tim-phong">Tìm phòng trọ</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="tim-roommate" href="/roomie/tim-roommate">Tìm roommate hợp gu</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="trac-nghiem-tinh-cach" href="/roomie/trac-nghiem">Trắc nghiệm tính cách</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Dịch vụ</a></li>
-          </ul>
-        </div>
-        <div class="flex flex-col gap-space-sm">
-          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Dịch vụ &amp; Gói</span>
-          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Đẩy tin nổi bật Boost</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Ghép roommate nâng cao</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Xác minh sinh viên Pro</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="bang-gia" href="/roomie/bang-gia">Bảng giá dịch vụ</a></li>
-          </ul>
-        </div>
-        <div class="flex flex-col gap-space-sm">
-          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Hỗ trợ &amp; An toàn</span>
-          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
-            <li class="hover:text-primary transition-colors"><a data-path="nguyen-tac-an-toan" href="/roomie/an-toan#nguyen-tac">Nguyên tắc an toàn</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="bao-cao-tin-gia" href="/roomie/an-toan#bao-cao">Báo cáo tin giả / lừa đảo</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="lien-he-faq" href="/roomie/an-toan#faq">Liên hệ &amp; FAQ sinh viên</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="quy-chuan-cong-dong" href="/roomie/an-toan#quy-chuan">Quy chuẩn cộng đồng</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="mt-space-2xl pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md bg-surface-container rounded-xl p-space-md">
-        <div class="flex flex-col md:flex-row items-center gap-space-xs text-center md:text-left">
-          <span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Roomie</span>
-          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Tìm đúng phòng - Ghép đúng người — Sống chung bình yên</span>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <div id="rm-footer-root"></div>
   <script src="/scripts/data.js"></script>
-  <script src="/scripts/app.js"></script>
+  <script src="/scripts/core.js"></script>
+  <script src="/scripts/layout.js"></script>
+  <script src="/scripts/pages/quiz.js"></script>
 
 </body>
 </html>

@@ -139,7 +139,7 @@ spacing:
 
 ## Brand & Style
 
-The design system establishes a welcoming, dependable, and vibrant consumer marketplace environment tailored to Vietnamese university students navigating shared housing in Ho Chi Minh City. Balancing Airbnb-grade polish with the casual warmth of Gen Z lifestyle platforms, the aesthetic prioritizes trust, emotional reassurance, and social compatibility.
+The design system establishes a welcoming, dependable, and vibrant consumer marketplace environment tailored to Vietnamese university students navigating shared housing. Balancing Airbnb-grade polish with the casual warmth of Gen Z lifestyle platforms, the aesthetic prioritizes trust, emotional reassurance, and social compatibility.
 
 ### Design Principles
 - **Approachable Authenticity:** Grounded in genuine student interactions, prioritizing high-legibility Vietnamese diacritics, clear identity verification, and transparent cost indicators over ornamental clutter.

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roomie - Liên hệ | Ở cùng người hợp gu</title>
+  <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
+  <link rel="shortcut icon" href="/favicon.ico?v=3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/styles/tailwind.config.js"></script>
+</head>
+<body data-page="lien-he" class="bg-surface font-body-md text-on-surface antialiased overflow-x-clip">
+  <div id="rm-header-root"></div>
+
+  <main class="w-full pt-20 bg-surface min-h-[calc(100vh-400px)]">
+    <!-- SECTION 1: HERO (Brand Blue-Purple Gradient + Aurora Glow + Interactive Cursor Spotlight) -->
+    <section id="contact-hero-stage" class="rm-contact-hero relative w-full overflow-hidden pt-12 pb-24 sm:pt-14 sm:pb-32 lg:pt-16 lg:pb-36 text-white">
+      <!-- Halftone dot matrix & animated aurora orbs -->
+      <div class="rm-halftone-dots-hero pointer-events-none absolute inset-0 opacity-45"></div>
+      <div class="rm-aurora-orb pointer-events-none absolute -top-24 -left-20 w-[420px] h-[420px] rounded-full bg-[#7c75ff]/35 blur-3xl"></div>
+      <div class="rm-aurora-orb-delayed pointer-events-none absolute -bottom-28 -right-16 w-[480px] h-[380px] rounded-full bg-[#b5efd2]/18 blur-3xl"></div>
+      <div id="contact-hero-cursor-glow" class="pointer-events-none absolute w-[460px] h-[460px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8e88ff]/22 blur-3xl opacity-0 transition-opacity duration-300"></div>
+
+      <div class="relative z-10 max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
+        <!-- Centered Hero Copy -->
+        <div class="flex flex-col items-center text-center max-w-2xl mx-auto gap-space-md">
+          <h1 class="font-display-lg text-[32px] sm:text-[42px] lg:text-[50px] leading-[1.15] font-extrabold tracking-tight text-white">
+            Kết nối cùng
+            <span class="rm-gradient-text-animated">Roomie</span>
+            <br class="hidden sm:block" />
+            Luôn lắng nghe mọi câu chuyện ở trọ
+          </h1>
+
+          <p class="font-body-lg text-[15.5px] sm:text-[18px] text-[#e2dfff]/90 max-w-2xl leading-relaxed">
+            Cần tìm phòng minh bạch, hỗ trợ ghép roommate hợp gu hay hợp tác đăng tin chính chủ? Gửi lời nhắn hoặc ghé thăm tụi mình ngay.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: 3 INTERACTIVE CONTACT CARDS (Overlapping Hero + Cursor Spotlight + 3D Tilt) -->
+    <section class="relative z-20 -mt-16 sm:-mt-20 lg:-mt-24 pb-space-xl">
+      <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 xl:gap-6">
+          <!-- Card 1: Địa chỉ -->
+          <article class="rm-contact-spotlight-card rm-reveal group overflow-hidden rounded-3xl bg-surface-container-lowest border border-primary/15 p-6 xl:p-7 shadow-[0_20px_48px_-14px_rgba(38,33,150,0.20)] hover:shadow-[0_28px_60px_-14px_rgba(73,62,229,0.34)] hover:border-primary/40 flex flex-col justify-between gap-5">
+            <div class="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#321ed2] via-[#493ee5] to-[#635bff] opacity-80 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative z-10 flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#493ee5] to-[#635bff] text-white flex items-center justify-center shadow-md shadow-primary/25 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                  <span class="material-symbols-outlined text-[26px]">location_on</span>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-primary-fixed/80 text-primary text-[11.5px] font-bold">Văn phòng chính</span>
+              </div>
+              <div>
+                <h2 class="font-label-md text-[12.5px] uppercase tracking-wider text-on-surface-variant font-bold">Địa chỉ Roomie</h2>
+                <p class="font-title-md text-[18.5px] leading-snug font-extrabold text-on-surface mt-1 group-hover:text-primary transition-colors">
+                  227 Nguyễn Văn Cừ, Chợ Quán, TPHCM
+                </p>
+                <p class="font-body-sm text-[13.5px] text-on-surface-variant mt-1.5 leading-relaxed">
+                  Khu vực trung tâm sinh viên ĐH KHTN (HCMUS CS1) • Dễ dàng ghé trao đổi trực tiếp.
+                </p>
+              </div>
+            </div>
+            <div class="relative z-10 pt-3 border-t border-surface-container flex items-center gap-2">
+              <button type="button" data-copy-value="227 Nguyễn Văn Cừ, Chợ Quán, TPHCM" data-copy-label="địa chỉ" class="flex-1 py-2.5 px-3 rounded-xl bg-surface-container-low hover:bg-primary-fixed text-primary font-label-md text-[13px] font-semibold transition-colors flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                <span>Sao chép</span>
+              </button>
+              <a href="#roomie-map-card" id="jump-to-map-btn" class="py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-[#493ee5] to-[#635bff] text-white font-label-md text-[13px] font-semibold shadow-sm hover:opacity-95 transition-opacity flex items-center gap-1">
+                <span>Bản đồ</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 2: Số điện thoại -->
+          <article class="rm-contact-spotlight-card rm-reveal group overflow-hidden rounded-3xl bg-surface-container-lowest border border-primary/15 p-6 xl:p-7 shadow-[0_20px_48px_-14px_rgba(38,33,150,0.20)] hover:shadow-[0_28px_60px_-14px_rgba(73,62,229,0.34)] hover:border-primary/40 flex flex-col justify-between gap-5" style="transition-delay: 80ms;">
+            <div class="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#493ee5] via-[#635bff] to-[#0f8367] opacity-80 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative z-10 flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#321ed2] to-[#493ee5] text-white flex items-center justify-center shadow-md shadow-primary/25 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                  <span class="material-symbols-outlined text-[26px]">call</span>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-fixed text-[11.5px] font-bold">Hotline / Zalo</span>
+              </div>
+              <div>
+                <h2 class="font-label-md text-[12.5px] uppercase tracking-wider text-on-surface-variant font-bold">Số điện thoại</h2>
+                <a href="tel:+84777639593" class="block font-title-md text-[21px] leading-snug font-extrabold text-primary hover:text-on-primary-fixed-variant mt-1 tabular-nums transition-colors">
+                  +84 777 639 593
+                </a>
+                <p class="font-body-sm text-[13.5px] text-on-surface-variant mt-1.5 leading-relaxed">
+                  Hỗ trợ khẩn cấp tin thuê trọ, xác minh sinh viên &amp; tư vấn gói dịch vụ (08:00 – 18:00).
+                </p>
+              </div>
+            </div>
+            <div class="relative z-10 pt-3 border-t border-surface-container flex items-center gap-2">
+              <button type="button" data-copy-value="+84 777 639 593" data-copy-label="số điện thoại" class="flex-1 py-2.5 px-3 rounded-xl bg-surface-container-low hover:bg-primary-fixed text-primary font-label-md text-[13px] font-semibold transition-colors flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                <span>Sao chép</span>
+              </button>
+              <a href="tel:+84777639593" class="py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-[#321ed2] to-[#635bff] text-white font-label-md text-[13px] font-semibold shadow-sm hover:opacity-95 transition-opacity flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">phone_in_talk</span>
+                <span>Gọi ngay</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 3: Email -->
+          <article class="rm-contact-spotlight-card rm-reveal group overflow-hidden rounded-3xl bg-surface-container-lowest border border-primary/15 p-6 xl:p-7 shadow-[0_20px_48px_-14px_rgba(38,33,150,0.20)] hover:shadow-[0_28px_60px_-14px_rgba(73,62,229,0.34)] hover:border-primary/40 flex flex-col justify-between gap-5" style="transition-delay: 160ms;">
+            <div class="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#635bff] via-[#7c75ff] to-[#493ee5] opacity-80 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative z-10 flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#635bff] to-[#321ed2] text-white flex items-center justify-center shadow-md shadow-primary/25 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                  <span class="material-symbols-outlined text-[26px]">mail</span>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11.5px] font-bold">Phản hồi &lt; 2h</span>
+              </div>
+              <div>
+                <h2 class="font-label-md text-[12.5px] uppercase tracking-wider text-on-surface-variant font-bold">Email hỗ trợ</h2>
+                <a href="mailto:roomie2026@gmail.com" class="block font-title-md text-[19px] leading-snug font-extrabold text-on-surface hover:text-primary mt-1 break-all transition-colors">
+                  roomie2026@gmail.com
+                </a>
+                <p class="font-body-sm text-[13.5px] text-on-surface-variant mt-1.5 leading-relaxed">
+                  Gửi hồ sơ hợp tác chủ trọ, góp ý sản phẩm, bảo hành ghép đôi hoặc phản ánh tin ảo.
+                </p>
+              </div>
+            </div>
+            <div class="relative z-10 pt-3 border-t border-surface-container flex items-center gap-2">
+              <button type="button" data-copy-value="roomie2026@gmail.com" data-copy-label="email" class="flex-1 py-2.5 px-3 rounded-xl bg-surface-container-low hover:bg-primary-fixed text-primary font-label-md text-[13px] font-semibold transition-colors flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                <span>Sao chép</span>
+              </button>
+              <a href="mailto:roomie2026@gmail.com?subject=Li%C3%AAn%20h%E1%BB%87%20h%E1%BB%97%20tr%E1%BB%A3%20t%E1%BB%AB%20Roomie" class="py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-[#493ee5] to-[#635bff] text-white font-label-md text-[13px] font-semibold shadow-sm hover:opacity-95 transition-opacity flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">send</span>
+                <span>Gửi mail</span>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: INTERACTIVE FORM & CAMPUS RADAR MAP -->
+    <section id="contact-form-section" class="scroll-mt-24 py-space-xl lg:py-space-2xl bg-gradient-to-b from-surface via-[#f1f3fd]/70 to-surface">
+      <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+          <!-- LEFT COLUMN: Gradient-bordered Interactive Contact Form (7 cols) -->
+          <div class="lg:col-span-7 rm-reveal">
+            <div id="contact-form-card" class="rm-contact-gradient-border rounded-[28px] p-[1.5px] shadow-[0_24px_54px_-16px_rgba(73,62,229,0.22)]">
+              <div class="rounded-[26.5px] bg-surface-container-lowest p-6 sm:p-8 lg:p-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                  <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-bold uppercase tracking-wider">
+                      <span class="material-symbols-outlined text-[14px]">forum</span>
+                      Hộp thư trực tuyến
+                    </span>
+                    <h2 class="font-headline-md text-[24px] sm:text-headline-md font-bold text-on-surface mt-2">
+                      Gửi lời nhắn cho đội ngũ <span class="text-primary">Roomie</span>
+                    </h2>
+                  </div>
+                </div>
+
+                <form id="contact-main-form" class="flex flex-col gap-5">
+                  <!-- Interactive Topic Selector -->
+                  <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2.5">
+                      Bạn cần hỗ trợ về chủ đề nào?
+                    </label>
+                    <div class="flex flex-wrap gap-2" id="contact-topic-group">
+                      <button type="button" data-contact-topic="Tìm phòng &amp; Ghép Roommate" data-placeholder="Mình đang cần tư vấn tìm phòng hoặc ghép roommate hợp gu khu vực Quận 5 / Thủ Đức..." class="px-3.5 py-2 rounded-full text-xs sm:text-[13px] font-semibold bg-gradient-to-r from-[#493ee5] to-[#635bff] text-white shadow-sm transition-all cursor-pointer">
+                        Tìm phòng &amp; Ở ghép
+                      </button>
+                      <button type="button" data-contact-topic="Hợp tác Chủ trọ" data-placeholder="Mình là chủ nhà trọ muốn đăng bài minh bạch chi phí và xác thực phòng trống trên Roomie..." class="px-3.5 py-2 rounded-full text-xs sm:text-[13px] font-semibold bg-surface-container-low text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all cursor-pointer">
+                        Hợp tác Chủ trọ
+                      </button>
+                      <button type="button" data-contact-topic="Báo cáo tin giả / An toàn" data-placeholder="Mình muốn báo cáo tin đăng có dấu hiệu mập mờ phụ phí hoặc yêu cầu đặt cọc trước..." class="px-3.5 py-2 rounded-full text-xs sm:text-[13px] font-semibold bg-surface-container-low text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all cursor-pointer">
+                        Báo cáo / An toàn
+                      </button>
+                      <button type="button" data-contact-topic="Góp ý &amp; Đối tác sinh viên" data-placeholder="Mình muốn góp ý tính năng hoặc đề xuất hợp tác câu lạc bộ sinh viên cùng Roomie..." class="px-3.5 py-2 rounded-full text-xs sm:text-[13px] font-semibold bg-surface-container-low text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-all cursor-pointer">
+                        Góp ý &amp; Khác
+                      </button>
+                    </div>
+                    <input type="hidden" id="contact-topic-input" value="Tìm phòng &amp; Ghép Roommate" />
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label for="contact-name" class="block text-xs font-semibold text-on-surface mb-1.5">Họ và tên <span class="text-error">*</span></label>
+                      <input id="contact-name" type="text" required placeholder="VD: Nguyễn Văn A" class="w-full h-12 px-4 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-outline focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" />
+                    </div>
+                    <div>
+                      <label for="contact-phone-email" class="block text-xs font-semibold text-on-surface mb-1.5">Email hoặc SĐT / Zalo <span class="text-error">*</span></label>
+                      <input id="contact-phone-email" type="text" required placeholder="VD: 09xx xxx xxx hoặc email@..." class="w-full h-12 px-4 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-outline focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" />
+                    </div>
+                  </div>
+
+                  <!-- Khu vực quan tâm (đồng bộ TP.HCM / Hà Nội & danh sách quận từ Tìm phòng / Tìm roommate) -->
+                  <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                    <div class="sm:col-span-5">
+                      <span class="block text-xs font-semibold text-on-surface mb-1.5">Thành phố quan tâm</span>
+                      <div aria-label="Chọn thành phố" class="h-12 grid grid-cols-2 gap-1 p-1 rounded-xl bg-surface-container-low border border-outline-variant/30" id="contact-area-city-toggle" role="tablist">
+                        <button aria-selected="true" class="contact-area-city-btn rounded-lg text-xs font-semibold bg-primary text-on-primary shadow-xs transition-all cursor-pointer" data-area-city="TP.HCM" role="tab" type="button">
+                          TP.HCM
+                        </button>
+                        <button aria-selected="false" class="contact-area-city-btn rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-all cursor-pointer" data-area-city="Hà Nội" role="tab" type="button">
+                          Hà Nội
+                        </button>
+                      </div>
+                    </div>
+                    <div class="sm:col-span-7">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <label for="contact-district" class="text-xs font-semibold text-on-surface">Quận / Khu vực</label>
+                        <span id="contact-area-city-count" class="text-[11px] font-medium text-on-surface-variant">17 quận / TP</span>
+                      </div>
+                      <select id="contact-district" class="w-full h-12 px-4 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                        <option value="">Tất cả khu vực tại TP.HCM</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Trường đại học quan tâm (tìm kiếm thông minh đồng bộ với Tìm phòng / Tìm roommate) -->
+                  <div class="flex flex-col gap-1.5" id="contact-uni-wrapper">
+                    <label for="contact-uni-search" class="text-xs font-semibold text-on-surface">Trường đại học quan tâm (TP.HCM &amp; Hà Nội)</label>
+                    <div class="relative">
+                      <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[19px] pointer-events-none">search</span>
+                        <input
+                          id="contact-uni-search"
+                          type="text"
+                          autocomplete="off"
+                          aria-autocomplete="list"
+                          aria-controls="contact-uni-suggestions"
+                          aria-expanded="false"
+                          role="combobox"
+                          placeholder="Nhập tên trường (TP.HCM, Hà Nội), mã trường (HCMUS, HUST, UEH...)..."
+                          class="w-full h-12 pl-10 pr-10 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-outline focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                        />
+                        <button aria-label="Xóa tìm kiếm trường" class="hidden absolute right-2.5 w-7 h-7 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors cursor-pointer" id="contact-uni-clear" type="button">
+                          <span class="material-symbols-outlined text-[16px]">close</span>
+                        </button>
+                      </div>
+                      <div class="hidden absolute left-0 right-0 top-[calc(100%+6px)] z-40 bg-surface-container-lowest rounded-2xl shadow-[0_16px_32px_-8px_rgba(24,28,35,0.18)] border border-outline-variant/40 overflow-hidden" id="contact-uni-suggestions" role="listbox">
+                        <div class="flex items-center justify-between gap-2 px-3 py-2 bg-surface-container-low/80 border-b border-surface-container">
+                          <span class="text-[11px] font-semibold text-on-surface-variant truncate" id="contact-uni-count">Trường ĐH tại TP.HCM &amp; Hà Nội</span>
+                          <div class="flex items-center gap-1 shrink-0" id="contact-uni-city-tabs">
+                            <button class="contact-uni-city-tab px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary text-on-primary transition-colors cursor-pointer" data-city="all" type="button">Tất cả</button>
+                            <button class="contact-uni-city-tab px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" data-city="TP.HCM" type="button">TP.HCM</button>
+                            <button class="contact-uni-city-tab px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" data-city="Hà Nội" type="button">Hà Nội</button>
+                          </div>
+                        </div>
+                        <div class="max-h-60 overflow-y-auto divide-y divide-surface-container/60" id="contact-uni-suggestions-list"></div>
+                      </div>
+                    </div>
+                    <div class="hidden items-center justify-between gap-2 px-3 py-2 rounded-xl bg-primary-fixed/60 border border-primary/20 text-on-primary-fixed text-xs" id="contact-selected-uni-chip">
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="material-symbols-outlined text-[15px] text-primary shrink-0">school</span>
+                        <span class="font-medium truncate" id="contact-selected-uni-label"></span>
+                      </div>
+                      <button aria-label="Bỏ chọn trường" class="shrink-0 w-5 h-5 rounded-full hover:bg-primary/15 flex items-center justify-center text-on-primary-fixed-variant transition-colors cursor-pointer" id="contact-selected-uni-remove" type="button">
+                        <span class="material-symbols-outlined text-[14px]">close</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                      <label for="contact-message" class="text-xs font-semibold text-on-surface">Nội dung lời nhắn <span class="text-error">*</span></label>
+                      <span id="contact-char-count" class="text-[11.5px] font-medium text-on-surface-variant tabular-nums">0 / 500</span>
+                    </div>
+                    <textarea id="contact-message" rows="4" maxlength="500" required placeholder="Mình đang cần tư vấn tìm phòng hoặc ghép roommate hợp gu khu vực Quận 5 / Thủ Đức..." class="w-full p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-outline focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none leading-relaxed"></textarea>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                    <p class="text-xs text-on-surface-variant flex items-center gap-1.5">
+                      <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+                      <span>Thông tin của bạn được bảo mật tuyệt đối.</span>
+                    </p>
+                    <button type="submit" class="rm-shimmer-btn py-3.5 px-7 rounded-2xl text-white font-label-md text-[15px] font-bold shadow-[0_14px_30px_-8px_rgba(73,62,229,0.5)] flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+                      <span>Gửi lời nhắn ngay</span>
+                      <span class="material-symbols-outlined text-[19px]">send</span>
+                    </button>
+                  </div>
+                </form>
+
+                <!-- Animated Success State (hidden initially) -->
+                <div id="contact-success-panel" class="hidden py-6 text-center flex-col items-center gap-4">
+                  <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#493ee5] to-[#0f8367] text-white flex items-center justify-center shadow-lg shadow-primary/25">
+                    <span class="material-symbols-outlined text-[36px]">mark_email_read</span>
+                  </div>
+                  <div>
+                    <span id="contact-ticket-badge" class="inline-block px-3 py-1 rounded-full bg-primary-fixed text-primary text-xs font-bold mb-2">Mã tiếp nhận #RM-2026</span>
+                    <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">
+                      Đã nhận lời nhắn từ <span id="contact-success-name" class="text-primary">bạn</span>!
+                    </h3>
+                    <p class="text-sm text-on-surface-variant mt-1.5 max-w-md mx-auto leading-relaxed">
+                      Yêu cầu chủ đề <strong id="contact-success-topic" class="text-on-surface"></strong><span id="contact-success-location"></span> đã được chuyển đến đội ngũ Roomie tại <strong>227 Nguyễn Văn Cừ, Chợ Quán, TPHCM</strong>. Tụi mình sẽ phản hồi qua SĐT/Email của bạn sớm nhất!
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+                    <button type="button" id="contact-send-another" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-on-primary-fixed-variant transition-colors cursor-pointer">
+                      Gửi thêm lời nhắn khác
+                    </button>
+                    <a href="/roomie/tim-phong" data-path="tim-phong" class="px-5 py-2.5 rounded-xl bg-surface-container-low text-on-surface text-sm font-semibold hover:bg-surface-container transition-colors">
+                      Xem phòng trọ ngay
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: Interactive Brand Map Radar + Support Schedule (5 cols) -->
+          <div class="lg:col-span-5 flex flex-col gap-5 rm-reveal" style="transition-delay: 120ms;">
+            <!-- Interactive Radar Map Card -->
+            <div id="roomie-map-card" class="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0d0f36] via-[#221d85] to-[#493ee5] text-white p-6 shadow-[0_24px_52px_-16px_rgba(38,33,150,0.42)] border border-white/15">
+              <div class="pointer-events-none absolute -top-20 -right-16 w-60 h-60 rounded-full bg-[#7c75ff]/35 blur-3xl"></div>
+              <div class="relative z-10 flex items-center justify-between gap-2 mb-4">
+                <div>
+                  <span class="text-[11.5px] uppercase tracking-wider text-secondary-container font-bold">Vị trí trực quan</span>
+                  <h3 class="font-title-md text-[19px] font-bold text-white mt-0.5">Trụ sở Roomie</h3>
+                </div>
+                <span class="px-2.5 py-1 rounded-full bg-white/12 border border-white/20 text-[11.5px] font-semibold text-[#e2dfff]">
+                  Chợ Quán • Q.5
+                </span>
+              </div>
+
+              <!-- Stylized Interactive Street Radar -->
+              <div class="relative h-56 rounded-2xl bg-[#0a0826]/75 border border-white/15 overflow-hidden mb-4">
+                <!-- Grid & Stylized Roads -->
+                <svg class="absolute inset-0 w-full h-full opacity-35 pointer-events-none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M0 55 H400 M0 110 H400 M0 165 H400 M80 0 V220 M200 0 V220 M315 0 V220" stroke="#7c75ff" stroke-opacity="0.32" stroke-width="1" stroke-dasharray="4 4"/>
+                  <!-- Nguyễn Văn Cừ axis -->
+                  <path d="M185 0 L215 220" stroke="#c3c0ff" stroke-width="5" stroke-opacity="0.75"/>
+                  <!-- An Dương Vương / Trần Phú -->
+                  <path d="M0 78 L400 94" stroke="#93f5d3" stroke-width="3" stroke-opacity="0.45"/>
+                  <path d="M0 154 L400 138" stroke="#c3c0ff" stroke-width="3" stroke-opacity="0.55"/>
+                </svg>
+
+                <!-- Street labels -->
+                <span class="absolute top-2.5 left-3 px-2 py-0.5 rounded bg-white/10 text-[10px] font-semibold text-[#c7c4d8] backdrop-blur-sm">Đ. An Dương Vương</span>
+                <span class="absolute bottom-2.5 right-3 px-2 py-0.5 rounded bg-white/10 text-[10px] font-semibold text-[#c7c4d8] backdrop-blur-sm">Đ. Nguyễn Văn Cừ</span>
+
+                <!-- Center Pulsing Roomie Pin -->
+                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                  <span class="rm-radar-pulse absolute w-12 h-12 rounded-full border-2 border-secondary-container/70"></span>
+                  <span class="rm-radar-pulse-delay absolute w-12 h-12 rounded-full border-2 border-[#a59eff]/70"></span>
+                  <div class="relative z-10 w-10 h-10 rounded-full bg-gradient-to-br from-[#635bff] to-[#321ed2] ring-4 ring-white/25 flex items-center justify-center shadow-lg">
+                    <span class="material-symbols-outlined text-[20px] text-white" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                  </div>
+                  <span class="relative z-10 mt-1.5 px-2.5 py-0.5 rounded-full bg-white text-on-primary-fixed text-[11px] font-extrabold shadow-md whitespace-nowrap">
+                    Roomie · 227 Nguyễn Văn Cừ
+                  </span>
+                </div>
+              </div>
+
+              <!-- Clickable Landmark Selectors -->
+              <div class="relative z-10 flex flex-col gap-2.5">
+                <div class="text-[11.5px] font-semibold text-[#e2dfff]/85">Chọn điểm mốc lân cận để xem khoảng cách:</div>
+                <div class="flex flex-wrap gap-1.5" id="map-landmark-buttons">
+                  <button type="button" data-map-landmark="ĐH KHTN (HCMUS CS1)" data-map-dist="Ngay tại cổng 227 Nguyễn Văn Cừ (0 phút đi bộ)" class="px-2.5 py-1.5 rounded-lg bg-white text-primary text-[11.5px] font-bold transition-all cursor-pointer">
+                    ĐH KHTN CS1
+                  </button>
+                  <button type="button" data-map-landmark="ĐH Sư Phạm TP.HCM" data-map-dist="Cách ~200m trên trục An Dương Vương / Nguyễn Văn Cừ (3 phút đi bộ)" class="px-2.5 py-1.5 rounded-lg bg-white/12 hover:bg-white/22 text-white text-[11.5px] font-semibold transition-all cursor-pointer">
+                    ĐH Sư Phạm
+                  </button>
+                  <button type="button" data-map-landmark="Trạm Buýt Nguyễn Văn Cừ" data-map-dist="Cách ~150m • Tuyến 06, 45, 53, 56 đi Q.1 &amp; Thủ Đức" class="px-2.5 py-1.5 rounded-lg bg-white/12 hover:bg-white/22 text-white text-[11.5px] font-semibold transition-all cursor-pointer">
+                    Trạm xe buýt
+                  </button>
+                  <button type="button" data-map-landmark="ĐH Sài Gòn (SGU)" data-map-dist="Cách ~450m theo hướng An Dương Vương (5 phút đi bộ)" class="px-2.5 py-1.5 rounded-lg bg-white/12 hover:bg-white/22 text-white text-[11.5px] font-semibold transition-all cursor-pointer">
+                    ĐH Sài Gòn
+                  </button>
+                </div>
+
+                <div id="map-landmark-detail" class="p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 text-xs text-white/95 leading-relaxed">
+                  <strong class="text-secondary-container">ĐH KHTN (HCMUS CS1):</strong> Ngay tại cổng 227 Nguyễn Văn Cừ (0 phút đi bộ)
+                </div>
+
+                <div class="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div class="text-xs text-[#e2dfff]">
+                    <span class="block font-bold text-white">227 Nguyễn Văn Cừ, Chợ Quán, TPHCM</span>
+                  </div>
+                  <a href="https://www.google.com/maps/search/?api=1&query=227+Nguyen+Van+Cu,+Cho+Quan,+TPHCM" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-secondary-container hover:bg-white text-on-secondary-fixed font-label-md text-xs font-bold shadow-sm transition-colors shrink-0">
+                    <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                    <span>Mở Google Maps</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Support Schedule & Direct Summary Card -->
+            <div class="rounded-3xl bg-surface-container-lowest border border-outline-variant/25 p-6 shadow-sm flex flex-col gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[24px]">schedule</span>
+                </div>
+                <div>
+                  <h3 class="font-title-md text-[17px] font-bold text-on-surface">Khung giờ hỗ trợ sinh viên</h3>
+                  <p class="text-xs text-on-surface-variant">Trực tuyến 7 ngày/tuần • Kể cả cuối tuần</p>
+                </div>
+              </div>
+
+              <div class="divide-y divide-surface-container text-sm">
+                <div class="py-2.5 flex items-center justify-between gap-2">
+                  <span class="text-on-surface-variant">Thứ 2 – Thứ 6</span>
+                  <span class="font-bold text-on-surface">08:00 – 18:00</span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between gap-2">
+                  <span class="text-on-surface-variant">Thứ 7 – Chủ nhật</span>
+                  <span class="font-bold text-on-surface">08:00 – 18:00</span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between gap-2">
+                  <span class="text-on-surface-variant">Báo cáo lừa đảo / Khẩn cấp</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed text-xs font-bold">Xử lý trong 30p</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: BRAND BLUE-PURPLE GRADIENT FAQ & CTA BAND -->
+    <section class="relative overflow-hidden w-full py-16 lg:py-20 bg-gradient-to-b from-[#0d0f36] via-[#262196] to-[#493ee5] text-white">
+      <div class="rm-halftone-dots-hero pointer-events-none absolute inset-0 opacity-25"></div>
+      <div class="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[820px] h-[340px] rounded-full bg-[#7c75ff]/45 blur-3xl"></div>
+
+      <div class="relative z-10 max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+          <div class="lg:col-span-5 rm-reveal">
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-secondary-container text-on-secondary-fixed font-label-sm text-xs font-bold uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[15px]">quiz</span>
+              Giải đáp nhanh
+            </span>
+            <h2 class="font-headline-lg text-[28px] sm:text-[34px] font-bold text-white mt-3 leading-tight">
+              Câu hỏi thường gặp khi liên hệ Roomie
+            </h2>
+            <p class="font-body-md text-[15.5px] text-[#e2dfff]/90 mt-3 leading-relaxed">
+              Nếu bạn cần giải đáp gấp, có thể xem nhanh các câu hỏi phổ biến hoặc gọi trực tiếp số <strong class="text-white">+84 777 639 593</strong> / gửi thư về <strong class="text-secondary-container">roomie2026@gmail.com</strong>.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a href="/roomie/tim-phong" data-path="tim-phong" class="px-5 py-3 rounded-xl bg-white text-primary font-label-md text-sm font-bold hover:bg-secondary-container hover:text-on-secondary-fixed transition-colors shadow-md">
+                Khám phá phòng trọ
+              </a>
+              <a href="/roomie/trac-nghiem" data-path="trac-nghiem-tinh-cach" class="px-5 py-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-label-md text-sm font-semibold backdrop-blur-sm transition-colors">
+                Làm trắc nghiệm hợp gu
+              </a>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 flex flex-col gap-3 rm-reveal" style="transition-delay: 100ms;">
+            <details class="rm-faq-item group rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 open:bg-white/16 open:border-secondary-container/60 transition-all" open>
+              <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden font-title-md text-[16px] sm:text-[17px] font-bold text-white">
+                <span>Mình có thể đến trực tiếp 227 Nguyễn Văn Cừ, Chợ Quán, TPHCM không?</span>
+                <span class="rm-faq-chevron material-symbols-outlined text-[22px] text-secondary-container transition-transform duration-300 shrink-0">expand_more</span>
+              </summary>
+              <div class="px-5 pb-5 text-sm text-[#e2dfff] leading-relaxed border-t border-white/10 pt-3">
+                Có nhé! Nếu bạn cần hỗ trợ xác thực sinh viên trực tiếp, tư vấn tin chủ trọ hoặc góp ý hợp tác CLB sinh viên, hãy nhắn tin hoặc gọi trước qua số <strong>+84 777 639 593</strong> để đội ngũ hẹn khung giờ tiếp đón chu đáo nhất tại 227 Nguyễn Văn Cừ, Chợ Quán, TPHCM.
+              </div>
+            </details>
+
+            <details class="rm-faq-item group rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 open:bg-white/16 open:border-secondary-container/60 transition-all">
+              <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden font-title-md text-[16px] sm:text-[17px] font-bold text-white">
+                <span>Sau khi gửi biểu mẫu liên hệ thì bao lâu Roomie phản hồi?</span>
+                <span class="rm-faq-chevron material-symbols-outlined text-[22px] text-secondary-container transition-transform duration-300 shrink-0">expand_more</span>
+              </summary>
+              <div class="px-5 pb-5 text-sm text-[#e2dfff] leading-relaxed border-t border-white/10 pt-3">
+                Với các yêu cầu thông thường, đội ngũ sẽ phản hồi qua Email hoặc Zalo trong vòng <strong>15 phút – 2 giờ</strong>. Riêng các báo cáo tin giả, đòi cọc trước hoặc bảo hành ghép đôi 48–72 giờ sẽ được ưu tiên xử lý trong vòng <strong>30 phút</strong>.
+              </div>
+            </details>
+
+            <details class="rm-faq-item group rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 open:bg-white/16 open:border-secondary-container/60 transition-all">
+              <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden font-title-md text-[16px] sm:text-[17px] font-bold text-white">
+                <span>Chủ trọ muốn đăng nhiều phòng minh bạch chi phí liên hệ qua kênh nào?</span>
+                <span class="rm-faq-chevron material-symbols-outlined text-[22px] text-secondary-container transition-transform duration-300 shrink-0">expand_more</span>
+              </summary>
+              <div class="px-5 pb-5 text-sm text-[#e2dfff] leading-relaxed border-t border-white/10 pt-3">
+                Quý chủ trọ có thể gửi danh sách phòng và bảng giá điện/nước về email <strong>roomie2026@gmail.com</strong> hoặc gọi <strong>+84 777 639 593</strong> để được hỗ trợ khởi tạo tin xác thực nhanh chóng mà không qua môi giới.
+              </div>
+            </details>
+
+            <details class="rm-faq-item group rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 open:bg-white/16 open:border-secondary-container/60 transition-all">
+              <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden font-title-md text-[16px] sm:text-[17px] font-bold text-white">
+                <span>Roomie có thu phí trung gian hay phí ẩn khi liên hệ tư vấn không?</span>
+                <span class="rm-faq-chevron material-symbols-outlined text-[22px] text-secondary-container transition-transform duration-300 shrink-0">expand_more</span>
+              </summary>
+              <div class="px-5 pb-5 text-sm text-[#e2dfff] leading-relaxed border-t border-white/10 pt-3">
+                Hoàn toàn không! Mọi tư vấn hỗ trợ sinh viên, xử lý báo cáo an toàn và làm bài trắc nghiệm hợp gu trên Roomie đều miễn phí 100%.
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="rm-footer-root"></div>
+  <script src="/scripts/data.js"></script>
+  <script src="/scripts/core.js"></script>
+  <script src="/scripts/layout.js"></script>
+  <script src="/scripts/universities-vn.js"></script>
+  <script src="/scripts/location-picker.js"></script>
+  <script src="/scripts/pages/contact.js"></script>
+</body>
+</html>
