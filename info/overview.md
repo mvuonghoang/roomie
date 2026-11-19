@@ -1,6 +1,6 @@
 # Roomie Match — Startup Overview
 
-![Logo Roomie Match](info/logo.png)
+![Logo Roomie](roomie-logo-light-bg.png)
 
 > **Tuyên ngôn định vị:** *"Tìm đúng phòng, ghép đúng người — Sống chung bình yên."*  
 > Nếu các nền tảng bất động sản truyền thống chỉ giúp người dùng tìm **mặt bằng**, **Roomie Match** giải quyết trọn vẹn cả hai bài toán: **minh bạch chi phí phòng trọ** và **ghép đôi bạn cùng phòng tương hợp lối sống (>85%)**.
@@ -52,6 +52,9 @@ flowchart LR
   * **Hiển thị trực quan:** Trả về % tương hợp kèm lý do cụ thể cho từng tiêu chí thay vì chỉ gắn nhãn tính cách chung chung.
 * **Bảng dự toán "Tổng chi phí thực tế / người / tháng":**
   * Form đăng tin chuẩn hóa buộc người đăng nhập tách bạch: tiền phòng + điện + nước + internet + giữ xe + phí dịch vụ $\rightarrow$ Hệ thống tự cộng ra tổng số tiền thực đóng hàng tháng để người xem so sánh công bằng ngay lập tức.
+* **Kiến trúc Không Chat — Kết nối 2 chiều (Double Opt-in) & Hồ sơ chuẩn hóa:**
+  * Không xây dựng hệ thống chat nội bộ cồng kềnh; mọi thông tin hay hỏi vặt (giá điện nước, nội quy, giờ giấc, khung giờ rảnh xem phòng) được chuẩn hóa ngay trên hồ sơ để cắt giảm 80% nhu cầu hỏi đáp lòng vòng.
+  * Khi tìm thấy người phù hợp, hai bên kết nối theo cơ chế **Double Opt-in** (gửi lời mời $\rightarrow$ đối phương đồng ý $\rightarrow$ mới trao đổi Zalo / SĐT / link Facebook của nhau), bảo vệ tuyệt đối quyền riêng tư.
 * **Hệ thống Tin cậy & An toàn (Trust & Safety):**
   * Huy hiệu **Sinh viên xác thực** (qua email `.edu.vn` hoặc thẻ sinh viên) giúp tăng độ an tâm khi ở ghép.
   * Huy hiệu **Tin Xác Thực** cho chủ trọ (kiểm duyệt thông tin, hình ảnh thực tế) và cơ chế báo cáo tin ảo/phòng đã cho thuê.
@@ -68,7 +71,7 @@ flowchart LR
 | :--- | :--- | :--- | :--- |
 | **1. Đăng tin phòng trống** | **Chỉ Chủ sở hữu (Chủ trọ)** | • **Miễn phí:** 1 tin đầu tiên (hiển thị **7 ngày**).<br>• **Gói Tin Xác Thực:** **100.000đ / 1 phòng** (1 bài đăng = 1 phòng, không giới hạn thời hạn hiển thị). | Thu **1 lần duy nhất** cho phòng đó. |
 | **2. Đẩy tin ưu tiên** | **Chỉ Người tìm Roommate** | • **7.000đ / lượt đẩy tin** lên đầu danh sách *Tìm Roommate* trong **24 giờ**. | Micro-payment theo từng lượt đẩy (có thể kèm combo 3 ngày / 7 ngày). |
-| **3. Ghép Roommate nâng cao (> 85%)** | **Người tìm Roommate** | • Làm bài test tính cách **miễn phí**.<br>• **Tìm 1 roommate:** **39.000đ**<br>• **Tìm 2 roommate:** **49.000đ**<br>• **Từ 2 roommate trở lên:** **+10.000đ / roommate thêm** *(3 người: 59.000đ, 4 người: 69.000đ...)*<br>• Mở khóa danh sách đề xuất >85%, xem hồ sơ chi tiết và nhắn tin lựa chọn. | **Pay-per-Match-Session:** Không giới hạn số ngày trong phiên đang tìm; **kết thúc khi đã chọn đủ số roommate của phiên** (lần tìm khác sau này đóng lượt phí mới). |
+| **3. Ghép Roommate nâng cao (> 85%)** | **Người tìm Roommate** | • Làm bài test tính cách **miễn phí**.<br>• **Tìm 1 roommate:** **39.000đ**<br>• **Tìm 2 roommate:** **49.000đ**<br>• **Từ 2 roommate trở lên:** **+10.000đ / roommate thêm** *(3 người: 59.000đ, 4 người: 69.000đ...)*<br>• Mở khóa danh sách đề xuất >85%, xem hồ sơ chi tiết và gửi **lời mời kết nối 2 chiều (Double Opt-in)** để mở Zalo / SĐT trao đổi trực tiếp. | **Pay-per-Match-Session:** Không giới hạn số ngày trong phiên đang tìm; **kết thúc khi đã chọn đủ số roommate của phiên** (lần tìm khác sau này đóng lượt phí mới). |
 
 ### 4.2. Luồng xử lý các tình huống & Lỗ hổng vận hành
 
@@ -82,27 +85,29 @@ flowchart LR
 * **Rủi ro — Loãng tin đẩy vào giờ cao điểm:** Nếu quá nhiều người cùng đẩy tin một lúc, tin vừa đẩy đã bị trôi ngay.
   * *Cách xử lý:* Giới hạn số lượng **slot tin đẩy ưu tiên** hiển thị cố định trên đầu trang *Tìm Roommate* (luân phiên công bằng trong các tin đang active 24h) và tách biệt hoàn toàn khỏi tab *Thuê Phòng Trọ*.
 
-#### C. Xử lý lỗ hổng cho Nguồn thu 3 (Pay-per-Match-Session theo số lượng Roommate)
+#### C. Xử lý lỗ hổng cho Nguồn thu 3 (Pay-per-Match-Session & Không Chat trên nền tảng)
 
 ```mermaid
 flowchart TD
     S1["Làm bài Test tính cách (Miễn phí) & Khai báo số lượng cần tìm (N)"] --> S2["Hiện số lượng ứng viên hợp >85% (Ẩn danh tính)"]
     S2 --> S3["Đóng phí 1 lần: 39.000đ (N=1), 49.000đ (N=2), +10.000đ cho mỗi người thêm"]
-    S3 --> S4["Xem hồ sơ chi tiết, nhắn tin & hẹn gặp ứng viên (Không giới hạn ngày)"]
-    S4 --> S5{"Đã chọn đủ N Roommate?"}
-    S5 -- "Chưa" --> S4
-    S5 -- "Đã chọn đủ (Xác nhận)" --> S6["Kết thúc phiên & Ẩn tin làm phiền"]
-    S6 --> S7{"Đối phương hủy kèo trong 48-72h?"}
-    S7 -- "Có (Tối đa 1 lần/chỗ)" --> S4
-    S7 -- "Không" --> S8["Hoàn tất (Lần tìm mới sau này mở phiên mới)"]
+    S3 --> S4["Gửi lời mời kết nối 2 chiều (Tối đa 3-5 slot song song)"]
+    S4 --> S5{"Đối phương đồng ý kết nối?"}
+    S5 -- "Từ chối / Chờ" --> S4
+    S5 -- "Đồng ý (Double Opt-in)" --> S6["Mở Zalo / SĐT / Facebook trao đổi ngoài nền tảng"]
+    S6 --> S7{"Cập nhật kết quả trên web"}
+    S7 -- "Không phù hợp (giải phóng slot)" --> S4
+    S7 -- "Đã chốt đủ N Roommate" --> S8["Kết thúc phiên & Ẩn tin làm phiền"]
+    S8 --> S9{"Đối phương hủy kèo trong 48-72h?"}
+    S9 -- "Có (Tối đa 1 lần/chỗ)" --> S4
+    S9 -- "Không" --> S10["Hoàn tất (Lần tìm mới sau này mở phiên mới)"]
 ```
 
-* **Rủi ro 1 — Gian lận số lượng roommate cần tìm:** User đóng gói 1 người (39.000đ) nhưng thực tế tìm nhiều người cùng lúc hoặc kéo dài vô thời hạn.
-  * *Cách xử lý:* User phải **khai báo số lượng roommate ($N$) ngay lúc mở phiên** (khớp với số chỗ trống trên bài đăng nếu đã có phòng). Hệ thống chỉ cho xác nhận tối đa $N$ ghép đôi trong phiên đó; khi đủ $N$ người, phiên tự động đóng.
-* **Rủi ro 2 — User chốt roommate ngoài đời (qua Zalo) rồi "quên/cố tình không bấm" kết thúc phiên:**
-  * *Cách xử lý:* Tạo quyền lợi trực tiếp cho nút **"Xác nhận ghép đôi thành công"**: khi cả 2 cùng bấm xác nhận, hệ thống tự động ẩn bài đăng/hồ sơ để tránh bị người lạ nhắn tin làm phiền tiếp, đồng thời tặng kèm tài liệu hữu ích (*Mẫu thỏa thuận ở ghép / Bảng mẫu chia chi phí phòng*). Kết hợp **Ping kiểm tra mỗi 30 ngày** nếu phiên mở quá lâu không có tương tác.
-* **Rủi ro 3 — Vừa bấm chọn roommate xong thì đối phương hủy kèo phút chót:**
-  * *Cách xử lý:* Áp dụng **Chính sách Bảo hành 48–72 giờ** — cho phép hoàn tác trạng thái xác nhận (tối đa 1 lần cho mỗi vị trí) nếu đối phương hủy kèo trước khi dọn vào ở, giúp user quay lại danh sách cũ chọn người tiếp theo mà không bị thu phí lại oan.
+* **Cơ chế kết nối Không Chat — Double Opt-in (bảo vệ riêng tư & tối ưu chi phí vận hành):** Thay vì xây hệ thống chat nội bộ, user chỉ gửi **lời mời kết nối kèm lời chào/lý do mẫu** $\rightarrow$ đối phương nhận thông báo qua Email/Zalo $\rightarrow$ **chỉ khi đối phương bấm "Đồng ý kết nối"**, hệ thống mới trao đổi Zalo / SĐT / link Facebook của nhau để ra ngoài nói chuyện. Cách này giúp bảo mật SĐT/Zalo (đặc biệt với sinh viên nữ) và loại bỏ hoàn toàn rủi ro spam hay gánh nặng server chat.
+* **Chống "bùng" đóng phiên bằng "Slot liên hệ song song" (Active Contact Slots):** Tại một thời điểm trong phiên, user chỉ được mở trao đổi song song tối đa **3–5 ứng viên**. Muốn gửi kết nối/mở Zalo với người tiếp theo, user phải quay lại web cập nhật trạng thái của liên hệ cũ (*"Không phù hợp"* kèm lý do nhanh để giải phóng slot, hoặc *"Đã chốt Roommate"*). Nhờ đó vừa giữ đúng cam kết **không giới hạn ngày**, vừa thu thập dữ liệu cải thiện thuật toán Match mà không cần đọc tin nhắn.
+* **Khóa theo số lượng roommate ($N$) khai báo ban đầu:** User khai báo số lượng $N$ ngay lúc mở phiên (khớp với số chỗ trống trên bài đăng nếu đã có phòng). Hệ thống chỉ cho xác nhận tối đa $N$ ghép đôi trong phiên đó; khi đủ $N$ người, phiên tự động đóng.
+* **Động lực bấm "Đã chọn được Roommate" & Ping 30 ngày:** Khi cả 2 cùng bấm xác nhận ghép đôi thành công, hồ sơ/bài đăng tự động ẩn để tránh bị người lạ gửi lời mời tiếp và được tặng kèm tài liệu hữu ích (*Mẫu thỏa thuận ở ghép / Bảng mẫu chia chi phí phòng*). Kết hợp **Ping kiểm tra mỗi 30 ngày** nếu phiên treo quá lâu không có cập nhật.
+* **Bảo hành 48–72 giờ nếu hủy kèo phút chót:** Cho phép hoàn tác trạng thái xác nhận (tối đa 1 lần cho mỗi vị trí) nếu đối phương hủy kèo trước khi dọn vào ở, giúp user quay lại danh sách cũ chọn người tiếp theo mà không bị thu phí lại oan.
 
 ---
 
@@ -129,7 +134,7 @@ flowchart TD
    * Tập trung vào cao điểm mùa nhập học (tháng 8–10) và sau Tết (tháng 2–3).
    * Đóng gói kết quả test miễn phí thành **Thẻ cá tính ở trọ (Shareable Card)** mang phong cách ấm cúng của nhận diện thương hiệu (ví dụ: *"Hệ Cú Đêm Sạch Sẽ — Cần bạn cùng phòng thích yên tĩnh"*) để sinh viên chia sẻ lên Story/Threads/Group trường, kéo lượng truy cập tự nhiên với chi phí marketing tối thiểu.
 3. **Giai đoạn 3 — Kích hoạt chuyển đổi & Nhân bản (Từ Tháng 4 trở đi):**
-   * Khi chủ trọ đã nhận thấy khách thật nhắn tin từ gói dùng thử 7 ngày, tỷ lệ chuyển đổi sang gói **100.000đ xác thực** tăng mạnh.
+   * Khi chủ trọ đã nhận thấy khách thật liên hệ qua Zalo/SĐT từ gói dùng thử 7 ngày, tỷ lệ chuyển đổi sang gói **100.000đ xác thực** tăng mạnh.
    * Khi mật độ hồ sơ tại cụm đầu tiên đủ dày, kích hoạt tự nhiên nhu cầu đẩy tin **7.000đ** và mở khóa **Match > 85%** (39.000đ / 49.000đ+), sau đó nhân bản mô hình sang các quận/cụm trường tiếp theo.
 
 ---
@@ -148,5 +153,5 @@ flowchart TD
 ## 8. Lộ trình Triển khai Tiếp theo (Next Steps)
 
 1. **Chốt thiết kế Bài test Tính cách & Công thức chấm điểm > 85%:** Xác định bộ 10–15 câu hỏi trọng số cao, không gây chán cho người dùng.
-2. **Xây dựng User Flow & Wireframe UI/UX:** Thiết kế giao diện Mobile-first áp dụng hệ thống thiết kế trong [`info/DESIGN.md`](info/DESIGN.md) (bảng màu `#635BFF` / `#B8F2D5` / `#16866A`, font `Be Vietnam Pro`) kết hợp logo [`info/logo.png`](info/logo.png) cho 2 tab *Thuê Phòng Trọ* và *Tìm Roommate*.
-3. **Phát triển MVP (Minimum Viable Product):** Tập trung đúng 4 luồng cốt lõi: Đăng tin phòng (tính tổng chi phí) – Đăng tin tìm roommate – Làm test & tính % Match – Tích hợp thanh toán VietQR cho 3 nguồn thu.
+2. **Xây dựng User Flow & Wireframe UI/UX:** Thiết kế giao diện Mobile-first áp dụng hệ thống thiết kế trong [`DESIGN.md`](DESIGN.md) (bảng màu `#635BFF` / `#B8F2D5` / `#16866A`, font `Be Vietnam Pro`) kết hợp logo [`roomie-logo-light-bg.png`](roomie-logo-light-bg.png) cho 2 tab *Thuê Phòng Trọ* và *Tìm Roommate*.
+3. **Phát triển MVP (Minimum Viable Product):** Tập trung đúng 4 luồng cốt lõi (không cần hệ thống chat nội bộ): Đăng tin phòng (tính tổng chi phí) – Đăng tin tìm roommate – Làm test & Match >85% kèm luồng kết nối **Double Opt-in** sang Zalo/SĐT – Tích hợp thanh toán VietQR cho 3 nguồn thu.

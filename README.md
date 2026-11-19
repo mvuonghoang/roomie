@@ -2,7 +2,7 @@
 
 > *"Tìm đúng phòng, ghép đúng người — Sống chung bình yên."*
 
-Nền tảng tìm phòng trọ minh bạch chi phí và ghép đôi bạn cùng phòng tương hợp lối sống dành cho sinh viên tại TP.HCM (Đồ án học phần CNTT — Trường ĐH Khoa học Tự nhiên, ĐHQG-HCM).
+Nền tảng tìm phòng trọ minh bạch chi phí và ghép đôi bạn cùng phòng tương hợp lối sống dành cho sinh viên (Đồ án học phần CNTT — Trường ĐH Khoa học Tự nhiên, ĐHQG-HCM).
 
 ---
 
@@ -37,6 +37,7 @@ Sau đó mở trình duyệt tại:
 ```text
 .
 ├── server.js                  # Node.js static & route server (cổng mặc định 3000)
+├── vercel.json                # Cấu hình static deploy & rewrite/redirect cho Vercel
 ├── package.json               # Script khởi chạy (npm start / npm run dev)
 ├── info/                      # Tài liệu định hướng sản phẩm & hệ thống thiết kế
 │   ├── DESIGN.md              # Bảng màu, typography (Be Vietnam Pro), spacing, components
@@ -52,14 +53,22 @@ Sau đó mở trình duyệt tại:
     │   ├── dang-tin.html          # Đăng tin tìm bạn ghép / cho thuê (/roomie/dang-tin)
     │   ├── bang-gia.html          # Bảng giá & dịch vụ (/roomie/bang-gia)
     │   ├── ve-chung-toi.html      # Về chúng tôi (/roomie/ve-chung-toi)
+    │   ├── lien-he.html           # Liên hệ & FAQ (/roomie/lien-he)
     │   └── an-toan.html           # An toàn & hỗ trợ sinh viên (/roomie/an-toan)
     ├── scripts/
-    │   ├── data.js            # Dữ liệu mẫu phòng, roommate, câu hỏi quiz, bảng giá, routes
-    │   └── app.js             # Logic điều hướng, bộ lọc, modal chat/profile/thanh toán & state
+    │   ├── data.js                # Dữ liệu mẫu phòng, roommate, câu hỏi quiz, bảng giá, liên hệ, điều hướng
+    │   ├── core.js                # State localStorage, modal dùng chung, Double Opt-in, formatters
+    │   ├── layout.js              # Component Header & Footer dùng chung toàn site
+    │   ├── location-picker.js     # Bộ lọc quận/huyện TP.HCM & Hà Nội, autocomplete trường ĐH
+    │   ├── pricing-widget.js      # Widget chuyển đổi chu kỳ & trạng thái gói dịch vụ
+    │   ├── universities-vn.js     # Danh sách trường ĐH & quận/huyện TP.HCM, Hà Nội
+    │   └── pages/                 # Module JS riêng cho từng trang (home, find-rooms, room-detail, quiz, match-results, post-listing, pricing, safety, contact)
     ├── styles/
-    │   ├── main.css           # Base styles & animation
-    │   └── tailwind.config.js # Token màu sắc, font chữ, spacing theo DESIGN.md
-    └── assets/images/         # Hình ảnh & logo giao diện theo từng trang
+    │   ├── main.css               # Base styles & animation
+    │   └── tailwind.config.js     # Token màu sắc, font chữ, spacing theo DESIGN.md
+    └── assets/
+        ├── docs/                  # Biểu mẫu nội quy PDF tải trực tiếp
+        └── images/                # Hình ảnh & logo giao diện theo từng trang
 ```
 
 ---
@@ -67,7 +76,8 @@ Sau đó mở trình duyệt tại:
 ## 4. Hướng dẫn nhanh cho thành viên cùng thiết kế UI
 
 - **Sửa bố cục / nội dung từng trang:** Mở file tương ứng trong `src/index.html` hoặc `src/pages/*.html`.
+- **Sửa Header / Footer dùng chung toàn website:** Chỉnh trong `src/scripts/layout.js` và cấu trúc link trong `src/scripts/data.js`.
 - **Sửa màu sắc / font / kích thước chữ toàn site:** Chỉnh trong `src/styles/tailwind.config.js` và `src/styles/main.css` (tham chiếu chuẩn thiết kế tại `info/DESIGN.md`).
-- **Sửa dữ liệu hiển thị (phòng trọ, hồ sơ roommate, câu hỏi trắc nghiệm, gói dịch vụ):** Chỉnh trong `src/scripts/data.js`.
-- **Sửa tương tác, bộ lọc, modal:** Chỉnh trong `src/scripts/app.js`.
+- **Sửa dữ liệu hiển thị (phòng trọ, hồ sơ roommate, câu hỏi trắc nghiệm, gói dịch vụ, thông tin liên hệ):** Chỉnh trong `src/scripts/data.js`.
+- **Sửa tương tác chung (modal, Double Opt-in, state) hoặc từng trang:** Chỉnh trong `src/scripts/core.js` hoặc module tương ứng trong `src/scripts/pages/*.js`.
 - **Gợi ý làm việc nhóm:** Mỗi thành viên nên tạo nhánh riêng (ví dụ `feat/ui-trang-chu`, `feat/ui-tim-phong`) và pull code từ `main` trước khi chỉnh sửa để tránh xung đột file.

@@ -2,7 +2,7 @@
   "name": "roomiematch-frontend",
   "version": "1.0.0",
   "private": true,
-  "description": "RoomieMatch - Nen tang tim phong tro va ghep doi roommate cho sinh vien TP.HCM",
+  "description": "RoomieMatch - Nen tang tim phong tro va ghep doi roommate cho sinh vien",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

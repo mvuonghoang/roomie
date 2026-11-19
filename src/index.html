@@ -15,46 +15,7 @@
   <script src="/styles/tailwind.config.js"></script>
 </head>
 <body data-page="home" class="bg-surface font-body-md text-on-surface antialiased overflow-x-clip">
-  <!-- HEADER CHUNG -->
-  <header class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
-    <div class="h-20 max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-6 xl:px-margin-lg flex items-center justify-between gap-2 xl:gap-space-sm">
-      <!-- Left: Clean Brand Lockup -->
-      <a id="rm-brand-pill" class="pointer-events-auto flex items-center shrink-0" data-path="trang-chu" href="/roomie">
-        <img alt="Roomie" class="h-8 xl:h-9 w-auto object-contain" src="/assets/images/common/logo.png" />
-      </a>
-
-      <!-- Center: Frosted Floating Pill Navigation -->
-      <nav class="pointer-events-auto hidden lg:flex items-center gap-0.5 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25" data-active-classes="bg-primary text-on-primary rounded-full font-semibold shadow-sm">
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="trang-chu" href="/roomie">Trang chủ</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="tim-phong" href="/roomie/tim-phong">Tìm phòng</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="tim-roommate" href="/roomie/tim-roommate">Tìm roommate</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="trac-nghiem-hop-gu" href="/roomie/trac-nghiem">Trắc nghiệm</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="dich-vu" href="/roomie/bang-gia">Dịch vụ</a>
-        <a class="px-2.5 xl:px-3.5 py-1.5 rounded-full font-label-md text-[12.5px] xl:text-[13px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/70 transition-all whitespace-nowrap" data-path="ve-chung-toi" href="/roomie/ve-chung-toi">Về chúng tôi</a>
-      </nav>
-
-      <!-- Right: Frosted Floating Action Pill -->
-      <div class="pointer-events-auto flex items-center gap-0.5 xl:gap-1 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25 shrink-0">
-        <a class="hidden sm:inline-flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full bg-secondary-container/80 text-on-secondary-container hover:bg-primary hover:text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-all whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
-          <span class="material-symbols-outlined text-[15px] xl:text-[16px]">add_circle</span>
-          <span>Đăng tin</span>
-        </a>
-        <button aria-label="Thông báo" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
-          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">notifications</span>
-          <span class="absolute top-1.5 right-1.5 xl:top-2 xl:right-2 w-2 h-2 rounded-full bg-primary"></span>
-        </button>
-        <button aria-label="Tin nhắn" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
-          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">chat_bubble</span>
-        </button>
-        <div class="flex items-center pl-0.5">
-          <div class="relative flex items-center gap-1.5 p-0.5 pr-0.5 xl:pr-2.5 rounded-full hover:bg-surface-container-low/80 transition-colors">
-            <img alt="Profile" class="w-7 h-7 xl:w-8 xl:h-8 rounded-full object-cover ring-2 ring-secondary-container" src="/assets/images/common/avatar-profile.jpg" />
-            <span class="hidden xl:inline-flex items-center text-tertiary font-label-sm text-label-sm font-bold">HCMUS</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <div id="rm-header-root"></div>
   <main class="w-full pt-20 bg-surface min-h-[calc(100vh-400px)]">
     <div class="flex flex-col w-full">
       <!-- HERO SECTION: Architectural Editorial Style -->
@@ -291,7 +252,7 @@
             <!-- Listing 1 -->
             <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
               <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
-                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Airy studio apartment room with bunk beds, white walls, sunny balcony with potted plants, student study desk with lamp, quiet residential street view, modern Vietnamese college student apartment, warm bright photograph." src="/assets/images/trang-chu/room-1.jpg">
+                <img alt="Phòng studio ở ghép có ban công thoáng mát, bàn học gọn gàng và giường tầng sáng sủa gần KTX Khu B ĐHQG" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/trang-chu/room-1.jpg">
                 <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
                   <span class="px-2.5 py-1 rounded-full bg-primary text-on-primary text-[12px] xl:text-[12.5px] leading-none font-bold tracking-wide shadow-sm whitespace-nowrap">
                     NỔI BẬT
@@ -346,7 +307,7 @@
             <!-- Listing 2 -->
             <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
               <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
-                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Modern spacious student shared room in Binh Thanh district Ho Chi Minh City, tiled floor, private clean bathroom visible in background, refrigerator, two wooden beds, bright window light, warm cozy vibes." src="/assets/images/trang-chu/room-2.jpg">
+                <img alt="Phòng trọ share rộng rãi tại Bình Thạnh gần HUTECH và UEF, sàn gạch sạch sẽ, có tủ lạnh và ánh sáng tự nhiên" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/trang-chu/room-2.jpg">
                 <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
                   <span class="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-semibold whitespace-nowrap">
                     Còn 2 chỗ
@@ -398,7 +359,7 @@
             <!-- Listing 3 -->
             <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
               <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
-                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Chic furnished apartment room in District 5 Saigon, view of university avenue, wooden mezzanine, warm spotlighting, study desk with books, neat wardrobe, safe card key lock." src="/assets/images/trang-chu/room-3.jpg">
+                <img alt="Phòng trọ đầy đủ nội thất tại Quận 5 đối diện ĐH Khoa học Tự nhiên CS1, có gác gỗ, bàn học và khóa thẻ từ an toàn" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/trang-chu/room-3.jpg">
                 <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
                   <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">
                     Đối diện HCMUS CS1
@@ -453,7 +414,7 @@
             <!-- Listing 4 -->
             <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
               <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
-                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Tidy cozy student rental house in Go Vap Ho Chi Minh City, ground floor garage with scooters parked neatly, modern kitchen counter, airy bedroom with ceiling fan and air conditioning." src="/assets/images/trang-chu/room-4.jpg">
+                <img alt="Nhà nguyên căn cho thuê ở ghép tại Gò Vấp với khu vực để xe rộng, bếp gọn gàng và phòng ngủ máy lạnh" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/trang-chu/room-4.jpg">
                 <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
                   <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[12px] xl:text-[12.5px] leading-none font-semibold whitespace-nowrap">
                     Giá tốt
@@ -534,7 +495,7 @@
               <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex items-center gap-3 min-w-0">
-                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-1.jpg">
+                    <img alt="Ảnh đại diện ẩn danh của Minh Anh trên Roomie" class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" src="/assets/images/trang-chu/avatar-1.jpg">
                     <div class="min-w-0">
                       <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
                         Minh Anh
@@ -577,7 +538,7 @@
               <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex items-center gap-3 min-w-0">
-                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-2.jpg">
+                    <img alt="Ảnh đại diện ẩn danh nam sinh viên trên Roomie" class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" src="/assets/images/trang-chu/avatar-2.jpg">
                     <div class="min-w-0">
                       <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
                         Quốc Bảo
@@ -620,7 +581,7 @@
               <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex items-center gap-3 min-w-0">
-                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-3.jpg">
+                    <img alt="Ảnh đại diện ẩn danh của Thảo Vy trên Roomie" class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" src="/assets/images/trang-chu/avatar-3.jpg">
                     <div class="min-w-0">
                       <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
                         Thảo Vy
@@ -642,7 +603,7 @@
                 </div>
                 <p class="font-body-sm text-[14px] xl:text-[14.5px] text-on-surface-variant font-medium leading-snug min-h-[2.75rem]">
                   <span class="block">Tìm phòng Bình Thạnh</span>
-                  <span class="block mt-1">~ 2 tr/tháng</span>
+                  <span class="block mt-1">1.5 - 2 tr/tháng</span>
                 </p>
                 <div class="flex flex-wrap gap-1.5">
                   <span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">
@@ -663,7 +624,7 @@
               <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex items-center gap-3 min-w-0">
-                    <img class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" data-alt="Student portrait" src="/assets/images/trang-chu/avatar-2.jpg">
+                    <img alt="Ảnh đại diện ẩn danh nam sinh viên trên Roomie" class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" src="/assets/images/trang-chu/avatar-2.jpg">
                     <div class="min-w-0">
                       <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">
                         Gia Huy
@@ -783,7 +744,7 @@
                     Kết nối &amp; ở ghép
                   </h3>
                   <p class="font-body-md text-[15.5px] xl:text-[16.5px] text-white/90 leading-relaxed max-w-[300px]">
-                    Nhắn tin tìm hiểu, hẹn gặp trực tiếp trước khi quyết định
+                    Gửi lời mời kết nối 2 chiều, mở Zalo / SĐT và hẹn gặp trực tiếp
                   </p>
                 </div>
               </div>
@@ -836,7 +797,7 @@
                   </li>
                   <li class="flex items-center gap-2.5 py-2.5">
                     <span class="material-symbols-outlined text-[18px] text-outline shrink-0">check_circle</span>
-                    <span>Nhắn tin trao đổi trực tiếp không mất phí</span>
+                    <span>Gửi lời mời kết nối 2 chiều miễn phí</span>
                   </li>
                 </ul>
               </div>
@@ -866,10 +827,6 @@
                   <li class="flex items-center gap-2.5 py-2.5 border-b border-tertiary/15">
                     <span class="material-symbols-outlined text-[18px] text-tertiary shrink-0">check_circle</span>
                     <span>Gắn nhãn "Cần gấp" nổi bật trên danh sách</span>
-                  </li>
-                  <li class="flex items-center gap-2.5 py-2.5">
-                    <span class="material-symbols-outlined text-[18px] text-tertiary shrink-0">check_circle</span>
-                    <span>Báo cáo lượt xem &amp; tin nhắn theo giờ</span>
                   </li>
                 </ul>
               </div>
@@ -902,7 +859,7 @@
                   </li>
                   <li class="flex items-center gap-2.5 py-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span>
-                    <span>Tặng kèm mẫu hợp đồng ở ghép chuẩn</span>
+                    <span>Mở khóa Dự đoán gợi ý roommate real-time</span>
                   </li>
                 </ul>
               </div>
@@ -931,7 +888,7 @@
                   </li>
                   <li class="flex items-center gap-2.5 py-2.5 border-b border-white/15">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0">check_circle</span>
-                    <span>Tăng đến 90% tỉ lệ phản hồi tin nhắn</span>
+                    <span>Tăng đến 90% tỉ lệ đồng ý kết nối 2 chiều</span>
                   </li>
                   <li class="flex items-center gap-2.5 py-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0">check_circle</span>
@@ -968,7 +925,7 @@
                   </li>
                   <li class="flex items-center gap-2.5 py-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0">check_circle</span>
-                    <span>Nhận thông báo phòng mới ngay qua Zalo</span>
+                    <span>Mở khóa Dự đoán gợi ý bạn cùng phòng</span>
                   </li>
                 </ul>
               </div>
@@ -1032,7 +989,7 @@
                   </p>
                 </div>
               </div>
-              <a class="font-label-md text-[14.5px] lg:text-[15.5px] text-primary font-bold hover:underline self-start md:self-auto shrink-0 whitespace-nowrap" data-path="nguyen-tac-an-toan" href="#">
+              <a class="font-label-md text-[14.5px] lg:text-[15.5px] text-primary font-bold hover:underline self-start md:self-auto shrink-0 whitespace-nowrap" data-path="nguyen-tac-an-toan" href="/roomie/an-toan#nguyen-tac">
                 Xem cẩm nang an toàn chi tiết →
               </a>
             </div>
@@ -1106,59 +1063,12 @@
       </section>
     </div>
   </main>
-  <!-- FOOTER CHUNG -->
-  <footer class="w-full bg-surface-container-low mt-space-2xl">
-    <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg pt-space-2xl pb-space-xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-gutter-lg">
-        <div class="lg:col-span-2 flex flex-col gap-space-md pr-0 lg:pr-space-xl">
-          <div class="flex items-center gap-space-sm">
-            <img alt="Roomie" class="h-11 sm:h-12 w-auto object-contain" src="/assets/images/common/logo.png" />
-            <span class="px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Gen Z Housing</span>
-          </div>
-          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-            Nền tảng tìm phòng trọ và kết nối roommate chuẩn phong cách sống sinh viên
-          </p>
-        </div>
-        <div class="flex flex-col gap-space-sm">
-          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Khám phá</span>
-          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
-            <li class="hover:text-primary transition-colors"><a data-path="trang-chu" href="/roomie">Trang chủ</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="ve-chung-toi" href="/roomie/ve-chung-toi">Giới thiệu</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="tim-phong" href="/roomie/tim-phong">Tìm phòng trọ</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="tim-roommate" href="/roomie/tim-roommate">Tìm roommate hợp gu</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="trac-nghiem-tinh-cach" href="/roomie/trac-nghiem">Trắc nghiệm tính cách</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Dịch vụ</a></li>
-          </ul>
-        </div>
-        <div class="flex flex-col gap-space-sm">
-          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Dịch vụ &amp; Gói</span>
-          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Đẩy tin nổi bật Boost</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Ghép roommate nâng cao</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="dich-vu" href="/roomie/bang-gia">Xác minh sinh viên Pro</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="bang-gia" href="/roomie/bang-gia">Bảng giá dịch vụ</a></li>
-          </ul>
-        </div>
-        <div class="flex flex-col gap-space-sm">
-          <span class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Hỗ trợ &amp; An toàn</span>
-          <ul class="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
-            <li class="hover:text-primary transition-colors"><a data-path="nguyen-tac-an-toan" href="/roomie/an-toan#nguyen-tac">Nguyên tắc an toàn</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="bao-cao-tin-gia" href="/roomie/an-toan#bao-cao">Báo cáo tin giả / lừa đảo</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="lien-he-faq" href="/roomie/an-toan#faq">Liên hệ &amp; FAQ sinh viên</a></li>
-            <li class="hover:text-primary transition-colors"><a data-path="quy-chuan-cong-dong" href="/roomie/an-toan#quy-chuan">Quy chuẩn cộng đồng</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="mt-space-2xl pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md bg-surface-container rounded-xl p-space-md">
-        <div class="flex flex-col md:flex-row items-center gap-space-xs text-center md:text-left">
-          <span class="font-body-sm text-body-sm text-on-surface-variant">2026 Roomie</span>
-          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Tìm đúng phòng - Ghép đúng người — Sống chung bình yên</span>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <div id="rm-footer-root"></div>
   <script src="/scripts/data.js"></script>
-  <script src="/scripts/app.js"></script>
+  <script src="/scripts/core.js"></script>
+  <script src="/scripts/layout.js"></script>
+  <script src="/scripts/pricing-widget.js"></script>
+  <script src="/scripts/pages/home.js"></script>
 
 </body>
 </html>

@@ -1,9 +1,67 @@
 // Roomie Shared Dataset
-// Ban co the chinh sua thong tin phong tro, ho so roommate, cau hoi trac nghiem va bang gia tai day.
+// Nguồn dữ liệu chuẩn dùng chung toàn website (liên hệ, điều hướng, phòng trọ, roommate, trắc nghiệm, gói dịch vụ).
 
-window.RoomieData = {
+window.RoomieData = Object.assign(window.RoomieData || {}, {
   LOGO_URL: "/assets/images/common/logo.png",
   FOOTER_LOGO_URL: "/assets/images/common/logo.png",
+  CONTRACT_DOC_URL: "/assets/docs/Roomie_Thoa_Thuan_Noi_Quy_O_Ghep.pdf",
+
+  CONTACT_INFO: {
+    brandName: "Roomie",
+    slogan: "Tìm đúng phòng - Ghép đúng người — Sống chung bình yên",
+    badge: "Gen Z Housing",
+    copyrightYear: "2026",
+    phone: "+84 777 639 593",
+    tel: "+84777639593",
+    zalo: "0777639593",
+    email: "roomie2026@gmail.com",
+    address: "227 Nguyễn Văn Cừ, Chợ Quán, TPHCM",
+    supportHours: "08:00 – 18:00"
+  },
+
+  NAV_ITEMS: [
+    { key: "trang-chu", label: "Trang chủ", mobileLabel: "Trang chủ", href: "/roomie" },
+    { key: "tim-phong", label: "Tìm phòng", mobileLabel: "Tìm phòng trọ", href: "/roomie/tim-phong" },
+    { key: "tim-roommate", label: "Tìm roommate", mobileLabel: "Tìm roommate", href: "/roomie/tim-roommate" },
+    { key: "trac-nghiem-hop-gu", label: "Trắc nghiệm", mobileLabel: "Trắc nghiệm hợp gu", href: "/roomie/trac-nghiem" },
+    { key: "dich-vu", label: "Dịch vụ", mobileLabel: "Bảng giá dịch vụ", href: "/roomie/bang-gia" },
+    { key: "ve-chung-toi", label: "Về chúng tôi", mobileLabel: "Về chúng tôi", href: "/roomie/ve-chung-toi" },
+    { key: "lien-he", label: "Liên hệ", mobileLabel: "Liên hệ", href: "/roomie/lien-he" }
+  ],
+
+  FOOTER_COLUMNS: [
+    {
+      title: "Khám phá",
+      links: [
+        { key: "trang-chu", label: "Trang chủ", href: "/roomie" },
+        { key: "ve-chung-toi", label: "Giới thiệu", href: "/roomie/ve-chung-toi" },
+        { key: "tim-phong", label: "Tìm phòng trọ", href: "/roomie/tim-phong" },
+        { key: "tim-roommate", label: "Tìm roommate hợp gu", href: "/roomie/tim-roommate" },
+        { key: "trac-nghiem-tinh-cach", label: "Trắc nghiệm tính cách", href: "/roomie/trac-nghiem" },
+        { key: "dich-vu", label: "Dịch vụ", href: "/roomie/bang-gia" },
+        { key: "lien-he", label: "Liên hệ", href: "/roomie/lien-he" }
+      ]
+    },
+    {
+      title: "Dịch vụ & Gói",
+      links: [
+        { key: "dich-vu", label: "Đẩy tin nổi bật Boost", href: "/roomie/bang-gia" },
+        { key: "dich-vu", label: "Ghép roommate nâng cao", href: "/roomie/bang-gia" },
+        { key: "dich-vu", label: "Xác minh sinh viên Pro", href: "/roomie/bang-gia" },
+        { key: "bang-gia", label: "Bảng giá dịch vụ", href: "/roomie/bang-gia" }
+      ]
+    },
+    {
+      title: "Hỗ trợ & An toàn",
+      links: [
+        { key: "nguyen-tac-an-toan", label: "Nguyên tắc an toàn", href: "/roomie/an-toan#nguyen-tac" },
+        { key: "bao-cao-tin-gia", label: "Báo cáo tin giả / lừa đảo", href: "/roomie/an-toan#bao-cao" },
+        { key: "lien-he-faq", label: "Liên hệ & FAQ sinh viên", href: "/roomie/an-toan#faq" },
+        { key: "quy-chuan-cong-dong", label: "Quy chuẩn cộng đồng", href: "/roomie/an-toan#quy-chuan" }
+      ]
+    }
+  ],
+
   USER_PROFILE: {
     name: "Minh Thư",
     shortSchool: "HCMUS",
@@ -38,6 +96,7 @@ window.RoomieData = {
     "dich-vu": "/roomie/bang-gia",
     "bang-gia": "/roomie/bang-gia",
     "ve-chung-toi": "/roomie/ve-chung-toi",
+    "lien-he": "/roomie/lien-he",
     "nguyen-tac-an-toan": "/roomie/an-toan#nguyen-tac",
     "bao-cao-tin-gia": "/roomie/an-toan#bao-cao",
     "lien-he-faq": "/roomie/an-toan#faq",
@@ -55,11 +114,11 @@ window.RoomieData = {
       address: "Đường Vành Đai, Phường Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh (Cạnh trạm buýt KTX Khu B)",
       shortAddress: "Thủ Đức · KTX B",
       distanceLabel: "Cách ĐH KHTN CS2 500m",
-      schoolDistanceBadge: "Cách ĐH Bách Khoa CS2 500m",
+      schoolDistanceBadge: "Cách ĐH KHTN CS2 500m",
       price: 2300000,
       priceFormatted: "2.300.000đ",
       totalRoomPrice: "4.600.000đ/tháng",
-      areaSqm: 32,
+      areaSqm: 28,
       capacityLabel: "Tối đa 2 Nam",
       spotsLabel: "Còn 1 chỗ ở ghép nam",
       badgeText: "Trống 1 giường",
@@ -69,7 +128,7 @@ window.RoomieData = {
       typeLabel: "Ở ghép",
       matchScore: 94,
       amenities: ["Máy lạnh", "Máy giặt", "Giờ linh hoạt", "Ban công"],
-      summarySpecs: "32m² • Máy lạnh, ban công, giờ tự do",
+      summarySpecs: "28m² • Máy lạnh, ban công, giờ tự do",
       images: [
         "/assets/images/phong-chi-tiet/room-1.jpg",
         "/assets/images/phong-chi-tiet/room-2.jpg",
@@ -86,6 +145,11 @@ window.RoomieData = {
         note: "Tìm bạn cùng phòng tính tình hòa nhã, tôn trọng giờ giấc",
         avatar:
           "/assets/images/phong-chi-tiet/avatar-1.jpg",
+        contact: {
+          phone: "0901 234 512",
+          zalo: "0901234512",
+          facebook: "fb.com/hoangnam.hcmus"
+        },
         habits: [
           "Ngủ trước 23h30",
           "Không hút thuốc",
@@ -107,7 +171,7 @@ window.RoomieData = {
         estimatedTotal: "~ 2.500.000đ - 2.650.000đ"
       },
       description: [
-        "Phòng nằm ở tầng 3 tòa nhà 5 tầng mới xây, cách KTX Khu B ĐHQG chỉ 100m. Có thang máy hiện đại, camera an ninh 24/7 và hệ thống khóa vân tay riêng từng tầng nên cực kỳ an tâm cho sinh viên.",
+        "Phòng nằm ở tầng 3 tòa nhà 5 tầng mới xây, cách ĐH KHTN CS2 và KTX Khu B ĐHQG chỉ 500m. Có thang máy hiện đại, camera an ninh 24/7 và hệ thống khóa vân tay riêng từng tầng nên cực kỳ an tâm cho sinh viên.",
         "Phòng có ban công riêng cực thoáng mát đón gió tự nhiên, view nhìn ra hàng cây xanh của khuôn viên Làng Đại học, không bị khuất nắng. Đã trang bị sẵn giường đôi tầng trên/dưới loại cao cấp chịu lực, 2 bàn học gỗ có giá sách, tủ quần áo riêng 2 buồng, máy lạnh Inverter tiết kiệm điện.",
         "Hiện bạn Nam (SV KHTN) đang ở giường dưới, cần tìm thêm 1 bạn nam gọn gàng vào ở giường trên để san sẻ chi phí tiền phòng. Chủ nhà thân thiện, không ở chung, giờ giấc hoàn toàn tự do."
       ]
@@ -151,6 +215,11 @@ window.RoomieData = {
         note: "Tìm bạn nữ sạch sẽ, ưu tiên học tập yên tĩnh, nấu ăn nhẹ",
         avatar:
           "/assets/images/trang-chu/avatar-3.jpg",
+        contact: {
+          phone: "0903 456 781",
+          zalo: "0903456781",
+          facebook: "fb.com/thaovy.ussh"
+        },
         habits: ["Ngủ trước 23h30", "Không hút thuốc", "Sạch sẽ gọn gàng", "Tôn trọng riêng tư"]
       },
       costs: {
@@ -205,10 +274,15 @@ window.RoomieData = {
         id: "minh-anh",
         name: "Lê Minh Anh",
         age: "20 tuổi",
-        bioTitle: "Sinh viên Năm 2 • ĐH Khoa học Tự nhiên & UEH",
+        bioTitle: "Sinh viên Năm 2 • ĐH Khoa học Tự nhiên (HCMUS)",
         note: "Thích thức khuya học bài đeo tai nghe, cần phòng cực kỳ yên tĩnh",
         avatar:
           "/assets/images/trang-chu/avatar-1.jpg",
+        contact: {
+          phone: "0902 345 674",
+          zalo: "0902345674",
+          facebook: "fb.com/minhanh.ueh"
+        },
         habits: ["Thức khuya học bài", "Không hút thuốc", "Yên tĩnh tuyệt đối", "Sạch sẽ"]
       },
       costs: {
@@ -266,6 +340,11 @@ window.RoomieData = {
         note: "Thoải mái nấu ăn chung, giữ nhà để xe gọn gàng",
         avatar:
           "/assets/images/trang-chu/avatar-2.jpg",
+        contact: {
+          phone: "0908 112 345",
+          zalo: "0908112345",
+          facebook: "fb.com/quocbao.hcmut"
+        },
         habits: ["Sạch sẽ", "Dậy sớm", "Nấu ăn chung", "Không hút thuốc"]
       },
       costs: {
@@ -318,10 +397,15 @@ window.RoomieData = {
         id: "minh-anh",
         name: "Minh Anh",
         age: "20 tuổi",
-        bioTitle: "Sinh viên Năm 2 • Ngoại Thương (FTU2)",
+        bioTitle: "Sinh viên Năm 2 • ĐH Khoa học Tự nhiên (HCMUS)",
         note: "Ưu tiên bạn nữ gọn gàng, không dắt người lạ qua đêm",
         avatar:
-          "/assets/images/tim-roommate/avatar-2.jpg",
+          "/assets/images/trang-chu/avatar-1.jpg",
+        contact: {
+          phone: "0902 345 674",
+          zalo: "0902345674",
+          facebook: "fb.com/minhanh.ftu2"
+        },
         habits: ["Sạch sẽ", "Thích nấu ăn", "Không hút thuốc", "Giữ trật tự"]
       },
       costs: {
@@ -374,10 +458,15 @@ window.RoomieData = {
         id: "minh-anh",
         name: "Lê Minh Anh",
         age: "20 tuổi",
-        bioTitle: "Sinh viên Năm 2 • ĐH Kinh Tế UEH (Q.10)",
+        bioTitle: "Sinh viên Năm 2 • ĐH Khoa học Tự nhiên (HCMUS)",
         note: "Ở sạch sẽ, phân chia lịch vệ sinh rõ ràng",
         avatar:
-          "/assets/images/tim-roommate/avatar-2.jpg",
+          "/assets/images/trang-chu/avatar-1.jpg",
+        contact: {
+          phone: "0902 345 674",
+          zalo: "0902345674",
+          facebook: "fb.com/minhanh.ueh"
+        },
         habits: ["Ngủ sau 23h", "Yên tĩnh ôn thi", "Không thú cưng", "Rạch ròi hóa đơn"]
       },
       costs: {
@@ -418,7 +507,7 @@ window.RoomieData = {
       areaKey: "thu-duc",
       budget: "2.0 - 2.5 tr/tháng",
       avatar:
-        "/assets/images/tim-roommate/avatar-1.jpg",
+        "/assets/images/trang-chu/avatar-2.jpg",
       quote: "“Mình thích nấu cơm trưa mang theo học, cuối tuần thường đọc sách hoặc dọn dẹp phòng trọ.”",
       criteria: [
         "Ngủ 00h00, học đêm đeo tai nghe",
@@ -426,7 +515,12 @@ window.RoomieData = {
         "Không hút thuốc",
         "Điện nước chia đều mùng 5"
       ],
-      tags: ["#HọcĐêm", "#KhôngHútThuốc", "#NấuĂnTiếtKiệm"]
+      tags: ["#HọcĐêm", "#KhôngHútThuốc", "#NấuĂnTiếtKiệm"],
+      contact: {
+        phone: "0901 234 512",
+        zalo: "0901234512",
+        facebook: "fb.com/hoangnam.hcmus"
+      }
     },
     {
       id: "minh-anh",
@@ -434,18 +528,18 @@ window.RoomieData = {
       shortName: "Minh Anh",
       age: 20,
       gender: "Nữ",
-      school: "ĐH Kinh tế TP.HCM - UEH (Q.10)",
-      shortSchool: "UEH",
-      major: "Năm 2 · Marketing & Truyền thông số",
-      matchScore: 94,
-      matchLabel: "94% Hòa hợp",
-      vnuMember: false,
+      school: "ĐH Khoa học Tự nhiên (HCMUS) · Q.5",
+      shortSchool: "HCMUS",
+      major: "Năm 2 · Công nghệ Sinh học & Truyền thông",
+      matchScore: 95,
+      matchLabel: "95% Rất hợp gu",
+      vnuMember: true,
       hasRoom: false,
       roomStatusTitle: "Đang tìm bạn:",
-      roomStatusDetail: "Cùng thuê phòng Q.10 hoặc Bình Thạnh (2.0 - 2.8tr)",
+      roomStatusDetail: "Cùng thuê phòng Q.5 hoặc Q.10 (2.0 - 2.5tr)",
       linkedRoomId: "6",
-      areaKey: "quan-10",
-      budget: "2.0 - 2.8 tr/tháng",
+      areaKey: "quan-5",
+      budget: "2.0 - 2.5 tr/tháng",
       avatar:
         "/assets/images/trang-chu/avatar-1.jpg",
       quote: "“Rất tôn trọng không gian riêng của roommate, thích chia lịch rửa chén và đi siêu thị chung.”",
@@ -455,7 +549,12 @@ window.RoomieData = {
         "Không nuôi thú cưng",
         "Hóa đơn chia rạch ròi"
       ],
-      tags: ["#ThứcKhuyaHọcBài", "#YênTĩnh", "#NấuĂnNgon"]
+      tags: ["#ThứcKhuyaHọcBài", "#YênTĩnh", "#NấuĂnNgon"],
+      contact: {
+        phone: "0902 345 674",
+        zalo: "0902345674",
+        facebook: "fb.com/minhanh.hcmus"
+      }
     },
     {
       id: "quoc-bao",
@@ -463,11 +562,11 @@ window.RoomieData = {
       shortName: "Quốc Bảo",
       age: 21,
       gender: "Nam",
-      school: "ĐH Bách Khoa ĐHQG CS2 (Thủ Đức)",
+      school: "ĐH Bách Khoa ĐHQG CS2 (Làng ĐH)",
       shortSchool: "HCMUT",
       major: "Năm 3 · Khoa Kỹ thuật Máy tính",
-      matchScore: 91,
-      matchLabel: "91% Hòa hợp",
+      matchScore: 92,
+      matchLabel: "92% Hòa hợp",
       vnuMember: true,
       hasRoom: true,
       roomStatusTitle: "Đang có phòng sẵn:",
@@ -484,7 +583,12 @@ window.RoomieData = {
         "Tự giác lau dọn nhà cửa",
         "Không hút thuốc"
       ],
-      tags: ["#SạchSẽ", "#DậySớm", "#ĐeoTaiNghe"]
+      tags: ["#SạchSẽ", "#DậySớm", "#ĐeoTaiNghe"],
+      contact: {
+        phone: "0908 112 345",
+        zalo: "0908112345",
+        facebook: "fb.com/quocbao.hcmut"
+      }
     },
     {
       id: "thao-vy",
@@ -495,15 +599,15 @@ window.RoomieData = {
       school: "ĐH KHXH&NV TP.HCM (Q.1)",
       shortSchool: "USSH",
       major: "Năm 1 · Báo chí & Truyền thông",
-      matchScore: 89,
-      matchLabel: "89% Hòa hợp",
+      matchScore: 88,
+      matchLabel: "88% Hòa hợp",
       vnuMember: true,
       hasRoom: false,
       roomStatusTitle: "Đang tìm phòng:",
-      roomStatusDetail: "Khu vực trung tâm hoặc gần xe buýt ĐHQG (2.0 - 2.5tr)",
+      roomStatusDetail: "Khu vực Bình Thạnh hoặc gần xe buýt ĐHQG (1.5 - 2.0tr)",
       linkedRoomId: "2",
       areaKey: "binh-thanh",
-      budget: "2.0 - 2.5 tr/tháng",
+      budget: "1.5 - 2.0 tr/tháng",
       avatar:
         "/assets/images/trang-chu/avatar-3.jpg",
       quote: "“Hướng nội, thích đọc sách & viết lách, rất tôn trọng đồ cá nhân và giờ giấc văn minh.”",
@@ -513,7 +617,12 @@ window.RoomieData = {
         "Giờ giấc sinh hoạt tự do, văn minh",
         "Không dẫn bạn qua đêm"
       ],
-      tags: ["#HướngNội", "#GọnGàng", "#TônTrọngRiêngTư"]
+      tags: ["#HướngNội", "#GọnGàng", "#TônTrọngRiêngTư"],
+      contact: {
+        phone: "0903 456 781",
+        zalo: "0903456781",
+        facebook: "fb.com/thaovy.ussh"
+      }
     },
     {
       id: "gia-huy",
@@ -542,7 +651,12 @@ window.RoomieData = {
         "Thoải mái nấu ăn cơ bản",
         "Báo trước khi có bạn ghé"
       ],
-      tags: ["#UIT", "#ThểThao", "#RạchRòiChiPhí"]
+      tags: ["#UIT", "#ThểThao", "#RạchRòiChiPhí"],
+      contact: {
+        phone: "0909 554 218",
+        zalo: "0909554218",
+        facebook: "fb.com/giahuy.uit"
+      }
     },
     {
       id: "ngoc-han",
@@ -571,7 +685,12 @@ window.RoomieData = {
         "Không nuôi thú cưng",
         "Tôn trọng giờ nghỉ ngơi"
       ],
-      tags: ["#HCMUS", "#SạchSẽ", "#ỞLâuDài"]
+      tags: ["#HCMUS", "#SạchSẽ", "#ỞLâuDài"],
+      contact: {
+        phone: "0906 778 902",
+        zalo: "0906778902",
+        facebook: "fb.com/ngochan.hcmus"
+      }
     }
   ],
 
@@ -782,7 +901,7 @@ window.RoomieData = {
         {
           key: "C",
           title: "Thoải mái miễn tôn trọng giờ nghỉ",
-          desc: "Chỉ cần báo trước qua tin nhắn và không gây ảnh hưởng sinh hoạt chung.",
+          desc: "Chỉ cần báo trước qua Zalo và không gây ảnh hưởng sinh hoạt chung.",
           icon: "handshake"
         },
         {
@@ -872,43 +991,49 @@ window.RoomieData = {
       id: "basic",
       name: "Gói Cơ bản",
       price: "0đ",
+      studentPrice: "0đ",
       period: "/ vĩnh viễn",
-      desc: "Đăng 01 tin cơ bản, xem tối đa 5 hồ sơ roommate/ngày và nhắn tin trực tiếp."
+      desc: "Đăng 01 tin tìm phòng hoặc ở ghép, xem tối đa 5 hồ sơ/ngày và gửi lời mời kết nối 2 chiều miễn phí."
     },
     {
       id: "boost",
       name: "Boost Listing",
       price: "5.000đ",
+      studentPrice: "4.000đ",
       period: "/ ngày",
-      desc: "Đưa tin lên đầu danh mục tìm kiếm, gắn nhãn 'Cần gấp' và tiếp cận gấp 5 lần."
+      desc: "Ưu tiên hiển thị đầu trang tìm kiếm, gắn nhãn 'Cần gấp' nổi bật và tiếp cận gấp 5 lần lượt xem."
     },
     {
       id: "match-plus",
       name: "Match Plus",
       price: "9.000đ",
+      studentPrice: "7.000đ",
       period: "/ lượt match",
-      desc: "Phân tích tương thích chuyên sâu, bật radar lọc cùng trường và nhận mẫu hợp đồng ở ghép."
+      desc: "Mở khóa dự đoán gợi ý bạn cùng phòng real-time, đối chiếu thói quen ngủ, học & lọc cùng trường đại học."
     },
     {
       id: "verified-pro",
-      name: "Xác minh Sinh viên Pro",
+      name: "Sinh viên Pro",
       price: "15.000đ",
+      studentPrice: "12.000đ",
       period: "/ 6 tháng",
-      desc: "Huy hiệu tích xanh Đã xác thực Sinh viên, tăng 90% tỉ lệ phản hồi tin nhắn."
+      desc: "Cấp huy hiệu tích xanh Đã xác thực SV, tăng đến 90% tỉ lệ đồng ý kết nối 2 chiều."
     },
     {
       id: "combo",
       name: "Combo Thần Tốc",
       price: "29.000đ",
+      studentPrice: "23.000đ",
       period: "/ tuần",
-      desc: "3 lượt Boost Listing + Mở khóa toàn bộ Match Plus + Thông báo phòng mới qua Zalo."
+      desc: "Tặng 3 lượt Boost Listing đầu trang, mở khóa không giới hạn Match Plus & dự đoán gợi ý roommate."
     },
     {
       id: "host",
-      name: "Chủ trọ & Nhượng phòng",
+      name: "Chủ trọ & Nhượng",
       price: "49.000đ",
+      studentPrice: "39.000đ",
       period: "/ tháng",
-      desc: "Đăng không giới hạn ảnh/video, hiển thị SĐT/Zalo công khai và ghim top đầu chuyên mục."
+      desc: "Đăng không giới hạn ảnh & video thực tế, hiển thị SĐT & Zalo trực tiếp, ghim top 30 ngày."
     }
   ],
 
@@ -935,4 +1060,4 @@ window.RoomieData = {
       href: "/roomie/ve-chung-toi"
     }
   ]
-};
+});
