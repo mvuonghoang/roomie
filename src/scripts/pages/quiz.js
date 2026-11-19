@@ -50,10 +50,16 @@
 
     function finishQuiz() {
       const answeredVals = Object.values(savedAnswers);
-      const isNightOwl = savedAnswers[1] === "C" || savedAnswers[1] === "D";
-      const isNeat = savedAnswers[4] === "A" || savedAnswers[4] === "B" || !savedAnswers[4];
+      const genderOption = savedAnswers[1] || "A";
+      const userGender = genderOption === "B" || genderOption === "D" ? "Nữ" : "Nam";
+      const preferredGender = genderOption === "A" ? "Nam" : genderOption === "B" ? "Nữ" : "all";
+      const isNightOwl = savedAnswers[2] === "C" || savedAnswers[2] === "D";
+      const isNeat = savedAnswers[5] === "A" || savedAnswers[5] === "B" || !savedAnswers[5];
 
       const result = {
+        gender: userGender,
+        preferredGender,
+        genderOption,
         archetype: isNightOwl
           ? '"Kỷ Luật Tự Do - Cú Đêm Tri Thức"'
           : isNeat
@@ -61,16 +67,16 @@
           : '"Linh Hoạt Hòa Nhã - Sống Chung Bình Yên"',
         matchCount: 42,
         pillars: {
-          sleep: savedAnswers[1] ? 95 : 90,
-          clean: savedAnswers[4] === "A" ? 96 : 92,
-          guests: savedAnswers[6] === "A" ? 91 : 88,
-          finance: savedAnswers[8] === "A" ? 98 : 94
+          sleep: savedAnswers[2] ? 95 : 90,
+          clean: savedAnswers[5] === "A" ? 96 : 92,
+          guests: savedAnswers[7] === "A" ? 91 : 88,
+          finance: savedAnswers[9] === "A" ? 98 : 94
         },
         answeredCount: answeredVals.length,
         completedAt: new Date().toISOString()
       };
       Core.writeJSON(Core.STORAGE_KEYS.QUIZ_RESULT, result);
-      Core.showToast("Hoàn tất 8/8 câu hỏi! Đang mở danh sách Roommate hợp gu...");
+      Core.showToast(`Hoàn tất ${questions.length}/${questions.length} câu hỏi! Đang mở danh sách Roommate hợp gu...`);
       setTimeout(() => {
         window.location.href = "/roomie/tim-roommate?from=quiz";
       }, 450);
@@ -191,7 +197,8 @@
     pillarCards.forEach((card, pIdx) => {
       card.classList.add("cursor-pointer");
       card.addEventListener("click", () => {
-        currentIdx = pIdx * 2;
+        const firstQuestionIdx = questions.findIndex((q) => q.pillarIndex === pIdx);
+        currentIdx = firstQuestionIdx >= 0 ? firstQuestionIdx : 0;
         renderQuestion();
       });
     });

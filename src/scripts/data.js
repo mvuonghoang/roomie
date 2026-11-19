@@ -699,9 +699,46 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       number: 1,
       pillarIndex: 0,
       pillarName: "Nhịp sinh học & Giấc ngủ",
+      badgeText: "Phần 1 • Giới tính & Ghép phòng",
+      weightText: "Tiêu chí lọc cứng (Deal-breaker): 100% ưu tiên",
+      title: "Câu hỏi 1: Giới tính của bạn và mong muốn tìm bạn cùng phòng như thế nào?",
+      subtitle: "Giới tính là tiêu chí lọc cứng đầu tiên giúp hệ thống đề xuất danh sách bạn ở ghép phù hợp, thoải mái và an toàn nhất.",
+      options: [
+        {
+          key: "A",
+          title: "Mình là Nam — Tìm bạn cùng phòng Nam",
+          desc: "Chỉ đề xuất và kết nối với các bạn sinh viên nam đang tìm phòng hoặc tìm người ở ghép.",
+          popular: "46%",
+          icon: "male"
+        },
+        {
+          key: "B",
+          title: "Mình là Nữ — Tìm bạn cùng phòng Nữ",
+          desc: "Chỉ đề xuất và kết nối với các bạn sinh viên nữ để đảm bảo sự riêng tư, thoải mái và an toàn.",
+          popular: "48%",
+          icon: "female"
+        },
+        {
+          key: "C",
+          title: "Mình là Nam — Linh hoạt giới tính",
+          desc: "Ưu tiên bạn cùng phòng nam hoặc căn hộ nhiều phòng ngủ riêng biệt nếu hợp lối sống.",
+          icon: "wc"
+        },
+        {
+          key: "D",
+          title: "Mình là Nữ — Linh hoạt giới tính",
+          desc: "Ưu tiên bạn cùng phòng nữ hoặc nhóm bạn thuê chung căn hộ / nhà nguyên căn có phòng riêng.",
+          icon: "diversity_3"
+        }
+      ]
+    },
+    {
+      number: 2,
+      pillarIndex: 0,
+      pillarName: "Nhịp sinh học & Giấc ngủ",
       badgeText: "Phần 1 • Nhịp sinh học",
       weightText: "Trọng số thuật toán: 20% độ tương thích",
-      title: "Câu hỏi 1: Giờ đi ngủ và thức dậy thường ngày của bạn như thế nào?",
+      title: "Câu hỏi 2: Giờ đi ngủ và thức dậy thường ngày của bạn như thế nào?",
       subtitle: "Giờ giấc lệch pha là nguyên nhân hàng đầu khiến sinh viên khó ngủ ngon vào mùa ôn thi.",
       options: [
         {
@@ -733,12 +770,12 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       ]
     },
     {
-      number: 2,
+      number: 3,
       pillarIndex: 0,
       pillarName: "Nhịp sinh học & Giấc ngủ",
       badgeText: "Phần 1 • Mức độ tiếng ồn",
       weightText: "Trọng số thuật toán: 15% độ tương thích",
-      title: "Câu hỏi 2: Khi bạn cùng phòng đang nghỉ ngơi hoặc ôn thi, mức tiếng ồn bạn chấp nhận được?",
+      title: "Câu hỏi 3: Khi bạn cùng phòng đang nghỉ ngơi hoặc ôn thi, mức tiếng ồn bạn chấp nhận được?",
       subtitle: "Giúp thuật toán lọc ra những bạn có cùng thói quen dùng tai nghe, chơi game hoặc học nhóm.",
       options: [
         {
@@ -769,12 +806,12 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       ]
     },
     {
-      number: 3,
+      number: 4,
       pillarIndex: 1,
       pillarName: "Vệ sinh & Nấu nướng",
       badgeText: "Phần 2 • Thói quen bếp núc",
       weightText: "Trọng số thuật toán: 10% độ tương thích",
-      title: "Câu hỏi 3: Bạn thường nấu ăn tại phòng hay ăn ngoài?",
+      title: "Câu hỏi 4: Bạn thường nấu ăn tại phòng hay ăn ngoài?",
       subtitle: "Ảnh hưởng đến việc chọn phòng có bếp tách biệt, tủ lạnh chung và cách chia tiền gia vị.",
       options: [
         {
@@ -805,12 +842,12 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       ]
     },
     {
-      number: 4,
+      number: 5,
       pillarIndex: 1,
       pillarName: "Vệ sinh & Nấu nướng",
       badgeText: "Khảo sát lối sống độc lập",
       weightText: "Trọng số thuật toán: 25% độ tương thích",
-      title: "Câu hỏi 4: Thói quen dọn dẹp không gian chung và nấu nướng của bạn như thế nào?",
+      title: "Câu hỏi 5: Thói quen dọn dẹp không gian chung và nấu nướng của bạn như thế nào?",
       subtitle: "Chọn phương án phản ánh đúng nhất sinh hoạt thực tế của bạn khi ở trọ. Điều này giúp tránh 90% mâu thuẫn vụn vặt khi dọn về chung.",
       options: [
         {
@@ -841,12 +878,12 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       ]
     },
     {
-      number: 5,
+      number: 6,
       pillarIndex: 2,
       pillarName: "Thú cưng & Tiếp khách",
       badgeText: "Phần 3 • Hút thuốc & Thú cưng",
       weightText: "Trọng số thuật toán: 15% độ tương thích",
-      title: "Câu hỏi 5: Quan điểm của bạn về hút thuốc và nuôi thú cưng trong phòng trọ?",
+      title: "Câu hỏi 6: Quan điểm của bạn về hút thuốc và nuôi thú cưng trong phòng trọ?",
       subtitle: "Đây là tiêu chí lọc cứng (Deal-breaker) giúp đảm bảo sức khỏe và sự thoải mái lâu dài.",
       options: [
         {
@@ -877,12 +914,12 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       ]
     },
     {
-      number: 6,
+      number: 7,
       pillarIndex: 2,
       pillarName: "Thú cưng & Tiếp khách",
       badgeText: "Phần 3 • Khách & Riêng tư",
       weightText: "Trọng số thuật toán: 10% độ tương thích",
-      title: "Câu hỏi 6: Quy tắc về việc đưa bạn bè hoặc người thân ghé phòng chơi?",
+      title: "Câu hỏi 7: Quy tắc về việc đưa bạn bè hoặc người thân ghé phòng chơi?",
       subtitle: "Thống nhất trước giúp cả hai giữ được không gian riêng tư mà vẫn thoải mái khi cần thiết.",
       options: [
         {
@@ -913,12 +950,12 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       ]
     },
     {
-      number: 7,
+      number: 8,
       pillarIndex: 3,
       pillarName: "Ngân sách & Chia phòng",
       badgeText: "Phần 4 • Ngân sách & Khu vực",
       weightText: "Trọng số thuật toán: 10% độ tương thích",
-      title: "Câu hỏi 7: Tổng ngân sách hàng tháng (gồm tiền phòng + điện nước) bạn dự kiến là bao nhiêu?",
+      title: "Câu hỏi 8: Tổng ngân sách hàng tháng (gồm tiền phòng + điện nước) bạn dự kiến là bao nhiêu?",
       subtitle: "Roomie luôn tính tổng chi phí thực đóng mỗi tháng để bạn không gặp bất ngờ phí ẩn.",
       options: [
         {
@@ -949,12 +986,12 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
       ]
     },
     {
-      number: 8,
+      number: 9,
       pillarIndex: 3,
       pillarName: "Ngân sách & Chia phòng",
       badgeText: "Phần 4 • Thanh toán & Đồ dùng",
       weightText: "Trọng số thuật toán: 15% độ tương thích",
-      title: "Câu hỏi 8: Cách bạn muốn chia hóa đơn điện nước và dùng chung đồ đạc trong phòng?",
+      title: "Câu hỏi 9: Cách bạn muốn chia hóa đơn điện nước và dùng chung đồ đạc trong phòng?",
       subtitle: "Minh bạch tiền bạc là chìa khóa cho tình bạn cùng phòng bền vững suốt năm học.",
       options: [
         {

@@ -44,14 +44,55 @@
     "/pages/an-toan.html": "ve-chung-toi"
   };
 
+  /** Build right-side header action pill content depending on authentication state. */
+  function buildHeaderRightInnerHtml() {
+    const loggedIn = Core.isLoggedIn ? Core.isLoggedIn() : true;
+    const profile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
+    const avatarUrl = profile.avatar || "/assets/images/common/avatar-profile.jpg";
+    const profileName = profile.name || "Minh Thư";
+    const shortSchool = profile.shortSchool || "HCMUS";
+
+    if (!loggedIn) {
+      return `
+        <a class="hidden sm:inline-flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full bg-secondary-container/80 text-on-secondary-container hover:bg-primary hover:text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-all whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
+          <span class="material-symbols-outlined text-[15px] xl:text-[16px]">add_circle</span>
+          <span>Đăng tin</span>
+        </a>
+        <button id="rm-header-login-btn" type="button" class="px-3 xl:px-3.5 py-1.5 rounded-full text-on-surface hover:bg-surface-container-low font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-colors whitespace-nowrap">
+          Đăng nhập
+        </button>
+        <button id="rm-header-signup-btn" type="button" class="px-3 xl:px-3.5 py-1.5 rounded-full bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold shadow-xs transition-colors whitespace-nowrap">
+          Đăng ký
+        </button>
+      `.trim();
+    }
+
+    return `
+        <a class="hidden sm:inline-flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full bg-secondary-container/80 text-on-secondary-container hover:bg-primary hover:text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-all whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
+          <span class="material-symbols-outlined text-[15px] xl:text-[16px]">add_circle</span>
+          <span>Đăng tin</span>
+        </a>
+        <button aria-label="Thông báo" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
+          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">notifications</span>
+          <span class="absolute top-1.5 right-1.5 xl:top-2 xl:right-2 w-2 h-2 rounded-full bg-primary"></span>
+        </button>
+        <button aria-label="Kết nối" title="Quản lý kết nối 2 chiều &amp; Slot liên hệ" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
+          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">handshake</span>
+          <span id="rm-header-slot-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-secondary-container text-on-secondary-fixed text-[10px] font-bold leading-4 text-center"></span>
+        </button>
+        <div class="flex items-center pl-0.5">
+          <div id="rm-profile-trigger" class="relative flex items-center gap-1.5 p-0.5 pr-0.5 xl:pr-2.5 rounded-full hover:bg-surface-container-low/80 transition-colors cursor-pointer">
+            <img alt="Ảnh đại diện ${escapeHTML(profileName)}" class="w-7 h-7 xl:w-8 xl:h-8 rounded-full object-cover ring-2 ring-secondary-container" src="${escapeHTML(avatarUrl)}" />
+            <span class="hidden xl:inline-flex items-center text-tertiary font-label-sm text-label-sm font-bold">${escapeHTML(shortSchool)}</span>
+          </div>
+        </div>
+    `.trim();
+  }
+
   /** Build canonical Header markup matching Roomie architectural pill navbar. */
   function buildHeaderHtml() {
     const navItems = Array.isArray(Data.NAV_ITEMS) ? Data.NAV_ITEMS : [];
     const logoUrl = Data.LOGO_URL || "/assets/images/common/logo.png";
-    const profile = Data.USER_PROFILE || {};
-    const avatarUrl = profile.avatar || "/assets/images/common/avatar-profile.jpg";
-    const profileName = profile.name || "Minh Thư";
-    const shortSchool = profile.shortSchool || "HCMUS";
 
     const navLinksHtml = navItems
       .map(
@@ -73,25 +114,8 @@
         ${navLinksHtml}
       </nav>
 
-      <div class="pointer-events-auto flex items-center gap-0.5 xl:gap-1 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25 shrink-0">
-        <a class="hidden sm:inline-flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full bg-secondary-container/80 text-on-secondary-container hover:bg-primary hover:text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-all whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
-          <span class="material-symbols-outlined text-[15px] xl:text-[16px]">add_circle</span>
-          <span>Đăng tin</span>
-        </a>
-        <button aria-label="Thông báo" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
-          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">notifications</span>
-          <span class="absolute top-1.5 right-1.5 xl:top-2 xl:right-2 w-2 h-2 rounded-full bg-primary"></span>
-        </button>
-        <button aria-label="Kết nối" title="Quản lý kết nối 2 chiều &amp; Slot liên hệ" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
-          <span class="material-symbols-outlined text-[19px] xl:text-[20px]">handshake</span>
-          <span id="rm-header-slot-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-secondary-container text-on-secondary-fixed text-[10px] font-bold leading-4 text-center"></span>
-        </button>
-        <div class="flex items-center pl-0.5">
-          <div class="relative flex items-center gap-1.5 p-0.5 pr-0.5 xl:pr-2.5 rounded-full hover:bg-surface-container-low/80 transition-colors">
-            <img alt="Ảnh đại diện ${escapeHTML(profileName)}" class="w-7 h-7 xl:w-8 xl:h-8 rounded-full object-cover ring-2 ring-secondary-container" src="${escapeHTML(avatarUrl)}" />
-            <span class="hidden xl:inline-flex items-center text-tertiary font-label-sm text-label-sm font-bold">${escapeHTML(shortSchool)}</span>
-          </div>
-        </div>
+      <div id="rm-header-actions" class="pointer-events-auto flex items-center gap-0.5 xl:gap-1 p-1 xl:p-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_8px_24px_-6px_rgba(24,28,35,0.08)] border border-outline-variant/25 shrink-0">
+        ${buildHeaderRightInnerHtml()}
       </div>
     </div>
   </header>`.trim();
@@ -227,23 +251,36 @@
     window.addEventListener("hashchange", syncHeaderScroll, { passive: true });
   }
 
-  function initMobileDrawer() {
-    const headerContainer = document.querySelector("header > div");
-    if (!headerContainer || document.getElementById("rm-mobile-menu-btn")) return;
-    const rightActions = headerContainer.lastElementChild;
-    if (!rightActions) return;
-
-    const menuBtn = document.createElement("button");
-    menuBtn.id = "rm-mobile-menu-btn";
-    menuBtn.type = "button";
-    menuBtn.setAttribute("aria-label", "Mở menu điều hướng");
-    menuBtn.setAttribute("aria-expanded", "false");
-    menuBtn.className =
-      "lg:hidden w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors";
-    menuBtn.innerHTML = `<span class="material-symbols-outlined text-[20px]">menu</span>`;
-    rightActions.appendChild(menuBtn);
-
+  function buildMobileDrawerInnerHtml() {
     const navItems = Array.isArray(Data.NAV_ITEMS) ? Data.NAV_ITEMS : [];
+    const loggedIn = Core.isLoggedIn ? Core.isLoggedIn() : true;
+    const profile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
+
+    const authFooterHtml = loggedIn
+      ? `
+        <div class="mt-2 pt-3 border-t border-surface-container flex items-center justify-between gap-2 px-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <img src="${escapeHTML(profile.avatar || "/assets/images/common/avatar-profile.jpg")}" alt="${escapeHTML(profile.name || "Sinh viên")}" class="w-9 h-9 rounded-full object-cover ring-2 ring-secondary-container shrink-0" />
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-on-surface truncate">${escapeHTML(profile.name || "Minh Thư")}</div>
+              <div class="text-[11px] text-tertiary font-semibold truncate">${escapeHTML(profile.school || "HCMUS")}</div>
+            </div>
+          </div>
+          <button type="button" id="rm-mobile-signout-btn" class="px-3 py-1.5 rounded-xl bg-error-container/60 hover:bg-error-container text-on-error-container text-xs font-semibold shrink-0 flex items-center gap-1 transition-colors">
+            <span class="material-symbols-outlined text-[15px]">logout</span>
+            <span>Đăng xuất</span>
+          </button>
+        </div>`
+      : `
+        <div class="mt-2 pt-3 border-t border-surface-container grid grid-cols-2 gap-2">
+          <button type="button" id="rm-mobile-login-btn" class="py-2.5 px-3 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface font-label-md text-xs font-semibold text-center">
+            Đăng nhập
+          </button>
+          <button type="button" id="rm-mobile-signup-btn" class="py-2.5 px-3 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-xs font-semibold text-center">
+            Đăng ký mới
+          </button>
+        </div>`;
+
     const drawerLinksHtml = [
       ...navItems.map(
         (item) =>
@@ -254,29 +291,83 @@
           )}</a>`
       ),
       `<a href="/roomie/an-toan" data-path="nguyen-tac-an-toan" class="px-4 py-2.5 rounded-xl font-label-md text-on-surface hover:bg-surface-container-low">An toàn &amp; Hỗ trợ</a>`,
-      `<a href="/roomie/dang-tin" data-path="dang-tin" class="mt-2 px-4 py-3 rounded-xl bg-primary text-on-primary font-label-md text-center font-semibold">Đăng tin miễn phí</a>`
+      `<a href="/roomie/dang-tin" data-path="dang-tin" class="mt-1 px-4 py-3 rounded-xl bg-secondary-container text-on-secondary-container font-label-md text-center font-semibold">Đăng tin miễn phí</a>`,
+      authFooterHtml
     ].join("\n        ");
 
-    const drawer = document.createElement("div");
-    drawer.id = "rm-mobile-drawer";
-    drawer.className =
-      "hidden lg:hidden fixed top-20 left-4 right-4 z-40 rounded-2xl bg-surface-container-lowest/95 backdrop-blur-xl shadow-2xl border border-outline-variant/25 p-4";
-    drawer.innerHTML = `<div class="flex flex-col gap-1.5 max-w-[1280px] mx-auto">${drawerLinksHtml}</div>`;
-    document.body.appendChild(drawer);
+    return `<div class="flex flex-col gap-1.5 max-w-[1280px] mx-auto">${drawerLinksHtml}</div>`;
+  }
 
-    menuBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const willOpen = drawer.classList.contains("hidden");
-      drawer.classList.toggle("hidden", !willOpen);
-      menuBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  function bindMobileDrawerAuthEvents(drawer, menuBtn) {
+    if (!drawer) return;
+    const closeDrawer = () => {
+      drawer.classList.add("hidden");
+      menuBtn?.setAttribute("aria-expanded", "false");
+    };
+    drawer.querySelector("#rm-mobile-login-btn")?.addEventListener("click", () => {
+      closeDrawer();
+      Core.openAuthModal?.("login");
     });
+    drawer.querySelector("#rm-mobile-signup-btn")?.addEventListener("click", () => {
+      closeDrawer();
+      Core.openAuthModal?.("signup");
+    });
+    drawer.querySelector("#rm-mobile-signout-btn")?.addEventListener("click", () => {
+      closeDrawer();
+      Core.logoutUser?.();
+      Core.showToast?.("Đã đăng xuất khỏi tài khoản Roomie.", "info");
+    });
+  }
 
-    document.addEventListener("click", (e) => {
-      if (!drawer.classList.contains("hidden") && !drawer.contains(e.target) && !menuBtn.contains(e.target)) {
-        drawer.classList.add("hidden");
-        menuBtn.setAttribute("aria-expanded", "false");
-      }
-    });
+  function ensureMobileMenuButton() {
+    const rightActions = document.getElementById("rm-header-actions") || document.querySelector("header > div")?.lastElementChild;
+    if (!rightActions) return null;
+    let menuBtn = document.getElementById("rm-mobile-menu-btn");
+    if (!menuBtn) {
+      menuBtn = document.createElement("button");
+      menuBtn.id = "rm-mobile-menu-btn";
+      menuBtn.type = "button";
+      menuBtn.setAttribute("aria-label", "Mở menu điều hướng");
+      menuBtn.setAttribute("aria-expanded", "false");
+      menuBtn.className =
+        "lg:hidden w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors";
+      menuBtn.innerHTML = `<span class="material-symbols-outlined text-[20px]">menu</span>`;
+      rightActions.appendChild(menuBtn);
+
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const drawer = document.getElementById("rm-mobile-drawer");
+        if (!drawer) return;
+        const willOpen = drawer.classList.contains("hidden");
+        drawer.classList.toggle("hidden", !willOpen);
+        menuBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+      });
+    }
+    return menuBtn;
+  }
+
+  function initMobileDrawer() {
+    const menuBtn = ensureMobileMenuButton();
+    if (!menuBtn) return;
+
+    let drawer = document.getElementById("rm-mobile-drawer");
+    if (!drawer) {
+      drawer = document.createElement("div");
+      drawer.id = "rm-mobile-drawer";
+      drawer.className =
+        "hidden lg:hidden fixed top-20 left-4 right-4 z-40 rounded-2xl bg-surface-container-lowest/95 backdrop-blur-xl shadow-2xl border border-outline-variant/25 p-4";
+      document.body.appendChild(drawer);
+
+      document.addEventListener("click", (e) => {
+        const currentBtn = document.getElementById("rm-mobile-menu-btn");
+        if (!drawer.classList.contains("hidden") && !drawer.contains(e.target) && (!currentBtn || !currentBtn.contains(e.target))) {
+          drawer.classList.add("hidden");
+          currentBtn?.setAttribute("aria-expanded", "false");
+        }
+      });
+    }
+    drawer.innerHTML = buildMobileDrawerInnerHtml();
+    bindMobileDrawerAuthEvents(drawer, menuBtn);
   }
 
   function initNotificationsPopover() {
@@ -347,11 +438,15 @@
   }
 
   function initProfileQuickMenu() {
-    const profileImg = document.querySelector("header img[alt^='Ảnh đại diện']");
-    if (!profileImg || !profileImg.parentElement) return;
+    const loginBtn = document.getElementById("rm-header-login-btn");
+    const signupBtn = document.getElementById("rm-header-signup-btn");
+    loginBtn?.addEventListener("click", () => Core.openAuthModal?.("login"));
+    signupBtn?.addEventListener("click", () => Core.openAuthModal?.("signup"));
 
-    const trigger = profileImg.parentElement;
-    const profile = Data.USER_PROFILE || {};
+    const trigger = document.getElementById("rm-profile-trigger") || document.querySelector("header img[alt^='Ảnh đại diện']")?.parentElement;
+    if (!trigger) return;
+
+    const profile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
     trigger.classList.add("cursor-pointer");
     trigger.title = `Tài khoản ${profile.name || "Minh Thư"} (${profile.shortSchool || "HCMUS"})`;
 
@@ -363,6 +458,7 @@
         return;
       }
 
+      const currentProfile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
       const savedCount = Core.getSavedRoomIds().length;
       const customCount = Core.readJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, []).length;
       const activePlan = Core.getLatestPurchasedPlan();
@@ -372,10 +468,22 @@
         "rm-animate-in fixed top-20 right-4 sm:right-8 z-[80] w-72 bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container overflow-hidden";
       pop.innerHTML = `
         <div class="p-4 bg-surface-container-low border-b border-surface-container flex items-center gap-3">
-          <img src="${escapeHTML(profile.avatar)}" class="w-11 h-11 rounded-full object-cover ring-2 ring-secondary-container" alt="Ảnh đại diện ${escapeHTML(profile.name)}" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm text-on-surface">${escapeHTML(profile.name)}</div>
-            <div class="text-xs text-tertiary font-semibold">${escapeHTML(profile.school)}</div>
+          <img src="${escapeHTML(currentProfile.avatar || "/assets/images/common/avatar-profile.jpg")}" class="w-11 h-11 rounded-full object-cover ring-2 ring-secondary-container shrink-0" alt="Ảnh đại diện ${escapeHTML(currentProfile.name)}" />
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5">
+              <div class="font-bold text-sm text-on-surface truncate">${escapeHTML(currentProfile.name)}</div>
+              ${
+                currentProfile.verifiedStudent !== false
+                  ? `<span class="material-symbols-outlined text-[15px] text-tertiary shrink-0" title="Đã xác thực thẻ sinh viên">verified</span>`
+                  : ""
+              }
+            </div>
+            <div class="text-xs text-tertiary font-semibold truncate">${escapeHTML(currentProfile.school)}</div>
+            ${
+              currentProfile.email
+                ? `<div class="text-[11px] text-on-surface-variant truncate mt-0.5">${escapeHTML(currentProfile.email)}</div>`
+                : ""
+            }
           </div>
         </div>
         <div class="px-4 py-2.5 bg-surface border-b border-surface-container flex items-center justify-between gap-2 text-xs">
@@ -411,6 +519,21 @@
             <span class="material-symbols-outlined text-[16px] text-outline">shield</span>
           </a>
         </div>
+        <div class="p-2 border-t border-surface-container bg-surface-container-low/50 flex flex-col gap-1">
+          <button type="button" id="rm-switch-account-btn" class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-surface-container text-xs font-semibold text-on-surface transition-colors">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[17px] text-primary">switch_account</span>
+              <span>Đổi tài khoản / Đăng ký mới</span>
+            </span>
+            <span class="material-symbols-outlined text-[15px] text-outline">chevron_right</span>
+          </button>
+          <button type="button" id="rm-signout-btn" class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-error-container text-xs font-semibold text-error hover:text-on-error-container transition-colors">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[17px]">logout</span>
+              <span>Đăng xuất</span>
+            </span>
+          </button>
+        </div>
       `;
       document.body.appendChild(pop);
 
@@ -418,6 +541,17 @@
         Core.resetPurchasedPlans();
         pop.remove();
         Core.showToast("Đã đặt lại về Gói Cơ bản miễn phí.", "info");
+      });
+
+      pop.querySelector("#rm-switch-account-btn")?.addEventListener("click", () => {
+        pop.remove();
+        Core.openAuthModal?.("login");
+      });
+
+      pop.querySelector("#rm-signout-btn")?.addEventListener("click", () => {
+        pop.remove();
+        Core.logoutUser?.();
+        Core.showToast?.("Đã đăng xuất khỏi tài khoản Roomie.", "info");
       });
 
       setTimeout(() => {
@@ -432,6 +566,54 @@
           true
         );
       }, 10);
+    });
+  }
+
+  function refreshHeaderAuthUI() {
+    document.getElementById("rm-profile-popover")?.remove();
+    document.getElementById("rm-notif-popover")?.remove();
+
+    const actionsContainer = document.getElementById("rm-header-actions");
+    if (actionsContainer) {
+      actionsContainer.innerHTML = buildHeaderRightInnerHtml();
+    }
+
+    initMobileDrawer();
+    initNotificationsPopover();
+    Core.syncHeaderSlotBadge?.();
+
+    const connectBtn = document.querySelector('header button[aria-label="Kết nối"], header button[aria-label="Tin nhắn"]');
+    connectBtn?.addEventListener("click", () => {
+      Core.openConnectionsDrawer(() => {
+        window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
+      });
+    });
+
+    initProfileQuickMenu();
+    syncPageUserElements();
+  }
+
+  function syncPageUserElements() {
+    const user = Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE;
+
+    // Sync any elements tagged with data-auth-user-*
+    document.querySelectorAll("[data-auth-name]").forEach((el) => {
+      el.textContent = user ? `${user.name}${el.dataset.authSuffix || ""}` : "Khách (Chưa đăng nhập)";
+    });
+    document.querySelectorAll("[data-auth-school]").forEach((el) => {
+      el.textContent = user ? user.school : "Đăng nhập để đồng bộ trường ĐH";
+    });
+    document.querySelectorAll("[data-auth-major]").forEach((el) => {
+      el.textContent = user ? user.major || "Sinh viên Đại học" : "Chưa xác thực thẻ SV";
+    });
+    document.querySelectorAll("[data-auth-idcode]").forEach((el) => {
+      el.textContent = user ? `ID: ${user.idCode || "#SV-8924"}` : "Chưa đăng nhập";
+    });
+    document.querySelectorAll("[data-auth-email]").forEach((el) => {
+      el.textContent = user ? user.altEmail || user.email : "sinhvien@student.edu.vn";
+    });
+    document.querySelectorAll("img[data-auth-avatar]").forEach((img) => {
+      if (user?.avatar) img.src = user.avatar;
     });
   }
 
@@ -457,20 +639,13 @@
 
     highlightActiveNavLink();
     initHeaderScrollEffect();
-    initMobileDrawer();
-    initNotificationsPopover();
+    refreshHeaderAuthUI();
 
-    Core.syncHeaderSlotBadge();
-    const connectBtn = document.querySelector('header button[aria-label="Kết nối"], header button[aria-label="Tin nhắn"]');
-    connectBtn?.addEventListener("click", () => {
-      Core.openConnectionsDrawer(() => {
-        window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
-      });
+    Core.onAuthStateChange?.(() => {
+      refreshHeaderAuthUI();
     });
-
-    initProfileQuickMenu();
   }
 
-  window.RoomieLayout = { initGlobalShell };
+  window.RoomieLayout = { initGlobalShell, refreshHeaderAuthUI };
   document.addEventListener("DOMContentLoaded", initGlobalShell);
 })();

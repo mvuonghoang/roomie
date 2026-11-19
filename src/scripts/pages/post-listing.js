@@ -169,6 +169,14 @@
     });
 
     document.getElementById("post-submit-btn")?.addEventListener("click", () => {
+      if (Core.isLoggedIn && !Core.isLoggedIn()) {
+        Core.showToast("Vui lòng đăng nhập hoặc đăng ký tài khoản sinh viên trước khi đăng tin.", "info");
+        Core.openAuthModal?.("login", {
+          subtitle: "Đăng nhập để đăng tin tìm phòng & roommate chính chủ"
+        });
+        return;
+      }
+
       const addr = addressInput?.value.trim();
       const priceNum = Core.parseCurrencyNumber(priceInput?.value || "2200000");
       if (!addr || !priceNum) {
@@ -184,6 +192,7 @@
           ? "quan-10"
           : "quan-5";
 
+      const currentUser = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
       const newId = "user-" + Date.now();
       const newRoom = {
         id: newId,
@@ -212,12 +221,12 @@
         amenities: ["Máy lạnh", "Giờ linh hoạt"],
         images: [uploadedCover || pvCoverImg?.src || Core.FALLBACK_SVG],
         roommate: {
-          id: "minh-thu",
-          name: Data.USER_PROFILE?.name || "Minh Thư",
+          id: currentUser.id || "minh-thu",
+          name: currentUser.name || "Minh Thư",
           age: "20 tuổi",
-          bioTitle: "Sinh viên HCMUS • Đã xác thực thẻ SV",
+          bioTitle: `Sinh viên ${currentUser.shortSchool || "HCMUS"} • Đã xác thực thẻ SV`,
           note: messageInput?.value.trim() || "Tìm bạn cùng phòng sạch sẽ, tôn trọng giờ giấc.",
-          avatar: Data.USER_PROFILE?.avatar
+          avatar: currentUser.avatar || "/assets/images/common/avatar-profile.jpg"
         },
         costs: {
           electric: (electricInput?.value || "3.500") + "đ / kWh",

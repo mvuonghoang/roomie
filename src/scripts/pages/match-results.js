@@ -128,7 +128,13 @@
     const activeFiltersBar = document.getElementById("mr-active-filters-bar");
 
     const districtsByCity = Picker.getSharedDistrictsByCity();
-    const state = { ...createDefaultFilterState(), showAll: false };
+    const savedQuiz = Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null);
+    const fromQuiz = new URLSearchParams(window.location.search).get("from") === "quiz";
+    const initialGender =
+      fromQuiz && (savedQuiz?.preferredGender === "Nam" || savedQuiz?.preferredGender === "Nữ")
+        ? savedQuiz.preferredGender
+        : "all";
+    const state = { ...createDefaultFilterState(), gender: initialGender, showAll: false };
 
     function getDistrictRoommateCount(city, district) {
       const normDistName = normalizeSearchText(district.name);

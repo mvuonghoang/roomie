@@ -21,7 +21,9 @@
     LISTING_DRAFT: "rm_listing_draft",
     NOTIFICATIONS_READ: "rm_notifications_read",
     CONNECTIONS: "rm_connections",
-    ACTIVE_PLANS: "rm_active_plans"
+    ACTIVE_PLANS: "rm_active_plans",
+    AUTH_SESSION: "rm_auth_session",
+    AUTH_USERS: "rm_auth_users"
   };
 
   const MAX_CONTACT_SLOTS = 3;
@@ -1351,6 +1353,553 @@ Chữ ký Bên A                                                    Chữ ký B�
     });
   }
 
+  // =========================================================================
+  // AUTHENTICATION SYSTEM (Sign Up, Login, Sign Out)
+  // =========================================================================
+
+  const DEFAULT_DEMO_USERS = [
+    {
+      id: "user-minhthu",
+      name: "Minh Thư",
+      email: "minhthu@student.hcmus.edu.vn",
+      altEmail: "22120***@student.hcmus.edu.vn",
+      password: "123",
+      shortSchool: "HCMUS",
+      school: "ĐH Khoa học Tự nhiên (HCMUS)",
+      major: "Khoa CNTT • K22",
+      gender: "Nữ",
+      idCode: "#SV-8924",
+      avatar: "/assets/images/common/avatar-profile.jpg",
+      budgetRange: "1.8 - 2.5 tr/tháng",
+      preferredAreas: "Làng ĐHQG / Quận 5",
+      moveInTime: "Đầu tháng tới",
+      verifiedStudent: true
+    },
+    {
+      id: "user-hoangnam",
+      name: "Hoàng Nam",
+      email: "hoangnam@student.hcmus.edu.vn",
+      altEmail: "22120512@student.hcmus.edu.vn",
+      password: "123",
+      shortSchool: "HCMUS",
+      school: "ĐH Khoa học Tự nhiên (HCMUS)",
+      major: "Khoa CNTT • K22",
+      gender: "Nam",
+      idCode: "#SV-5120",
+      avatar: "/assets/images/phong-chi-tiet/avatar-1.jpg",
+      budgetRange: "2.0 - 2.6 tr/tháng",
+      preferredAreas: "Làng ĐHQG Thủ Đức",
+      moveInTime: "Sẵn sàng ở ngay",
+      verifiedStudent: true
+    }
+  ];
+
+  const AUTH_SCHOOL_OPTIONS = [
+    { code: "HCMUS", name: "ĐH Khoa học Tự nhiên (HCMUS)", area: "Làng ĐHQG / Quận 5" },
+    { code: "HCMUT", name: "ĐH Bách khoa - ĐHQG TP.HCM (HCMUT)", area: "Làng ĐHQG / Quận 10" },
+    { code: "UIT", name: "ĐH Công nghệ Thông tin (UIT)", area: "Làng ĐHQG Thủ Đức" },
+    { code: "USSH", name: "ĐH KHXH & Nhân văn (HCMUSSH)", area: "Làng ĐHQG / Quận 1" },
+    { code: "UEL", name: "ĐH Kinh tế - Luật (UEL)", area: "Làng ĐHQG Thủ Đức" },
+    { code: "IU", name: "ĐH Quốc tế - ĐHQG TP.HCM (HCMIU)", area: "Làng ĐHQG Thủ Đức" },
+    { code: "UEH", name: "ĐH Kinh tế TP.HCM (UEH)", area: "Quận 10 / Quận 3" },
+    { code: "HUTECH", name: "ĐH Công nghệ TP.HCM (HUTECH)", area: "Bình Thạnh / Thủ Đức" },
+    { code: "FTU2", name: "ĐH Ngoại thương CS2 (FTU2)", area: "Bình Thạnh" },
+    { code: "RMIT", name: "ĐH RMIT Việt Nam", area: "Quận 7" },
+    { code: "HUST", name: "ĐH Bách khoa Hà Nội (HUST)", area: "Hai Bà Trưng, Hà Nội" },
+    { code: "VNU", name: "ĐH Quốc gia Hà Nội (VNU)", area: "Cầu Giấy, Hà Nội" },
+    { code: "NEU", name: "ĐH Kinh tế Quốc dân (NEU)", area: "Hai Bà Trưng, Hà Nội" }
+  ];
+
+  function getRegisteredUsers() {
+    const stored = readJSON(STORAGE_KEYS.AUTH_USERS, null);
+    if (!Array.isArray(stored) || stored.length === 0) {
+      writeJSON(STORAGE_KEYS.AUTH_USERS, DEFAULT_DEMO_USERS);
+      return [...DEFAULT_DEMO_USERS];
+    }
+    const merged = [...stored];
+    DEFAULT_DEMO_USERS.forEach((demo) => {
+      if (!merged.some((u) => u && u.email && u.email.toLowerCase() === demo.email.toLowerCase())) {
+        merged.push(demo);
+      }
+    });
+    return merged;
+  }
+
+  function getAuthSession() {
+    const raw = readJSON(STORAGE_KEYS.AUTH_SESSION, null);
+    if (!raw || typeof raw !== "object") {
+      const defaultUser = DEFAULT_DEMO_USERS[0];
+      const initial = { loggedIn: true, user: defaultUser };
+      writeJSON(STORAGE_KEYS.AUTH_SESSION, initial);
+      return initial;
+    }
+    return raw;
+  }
+
+  function syncGlobalUserProfile(user) {
+    if (!window.RoomieData) window.RoomieData = {};
+    if (user) {
+      window.RoomieData.USER_PROFILE = {
+        ...DEFAULT_DEMO_USERS[0],
+        ...user
+      };
+    } else {
+      window.RoomieData.USER_PROFILE = null;
+    }
+  }
+
+  function isLoggedIn() {
+    const session = getAuthSession();
+    return Boolean(session && session.loggedIn && session.user);
+  }
+
+  function getCurrentUser() {
+    const session = getAuthSession();
+    const user = session && session.loggedIn ? session.user : null;
+    syncGlobalUserProfile(user);
+    return user;
+  }
+
+  function emitAuthChange(user) {
+    syncGlobalUserProfile(user);
+    window.dispatchEvent(
+      new CustomEvent("roomie:auth-changed", {
+        detail: { loggedIn: Boolean(user), user }
+      })
+    );
+  }
+
+  function setLoggedInUser(user) {
+    const cleanUser = { ...user };
+    delete cleanUser.password;
+    writeJSON(STORAGE_KEYS.AUTH_SESSION, {
+      loggedIn: true,
+      user: cleanUser,
+      updatedAt: Date.now()
+    });
+    emitAuthChange(cleanUser);
+    return cleanUser;
+  }
+
+  function logoutUser() {
+    writeJSON(STORAGE_KEYS.AUTH_SESSION, {
+      loggedIn: false,
+      user: null,
+      updatedAt: Date.now()
+    });
+    emitAuthChange(null);
+  }
+
+  function loginUser(identifier, password) {
+    const cleanId = String(identifier || "").trim().toLowerCase();
+    const cleanPass = String(password || "").trim();
+    if (!cleanId) {
+      return { ok: false, error: "Vui lòng nhập email sinh viên hoặc tên đăng nhập." };
+    }
+    const users = getRegisteredUsers();
+    const matched = users.find(
+      (u) =>
+        u.email?.toLowerCase() === cleanId ||
+        u.altEmail?.toLowerCase() === cleanId ||
+        u.id?.toLowerCase() === cleanId ||
+        u.name?.toLowerCase() === cleanId
+    );
+    if (!matched) {
+      return {
+        ok: false,
+        error: "Không tìm thấy tài khoản với email này. Bạn có thể chuyển qua tab Đăng ký để tạo mới!"
+      };
+    }
+    if (matched.password && cleanPass && matched.password !== cleanPass && cleanPass !== "123456") {
+      return { ok: false, error: "Mật khẩu chưa chính xác. Vui lòng kiểm tra lại." };
+    }
+    const activeUser = setLoggedInUser(matched);
+    return { ok: true, user: activeUser };
+  }
+
+  function registerUser(payload = {}) {
+    const name = String(payload.name || "").trim();
+    const email = String(payload.email || "").trim().toLowerCase();
+    const password = String(payload.password || "");
+    const confirmPassword = String(payload.confirmPassword || "");
+    const schoolCode = String(payload.schoolCode || "HCMUS").trim();
+    const major = String(payload.major || "Sinh viên • K23").trim() || "Sinh viên • K23";
+    const gender = payload.gender === "Nam" ? "Nam" : "Nữ";
+
+    if (name.length < 2) {
+      return { ok: false, error: "Vui lòng nhập họ và tên hợp lệ (tối thiểu 2 ký tự)." };
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return { ok: false, error: "Vui lòng nhập địa chỉ email hợp lệ." };
+    }
+    if (password.length < 6) {
+      return { ok: false, error: "Mật khẩu cần có tối thiểu 6 ký tự." };
+    }
+    if (confirmPassword && password !== confirmPassword) {
+      return { ok: false, error: "Mật khẩu xác nhận không khớp." };
+    }
+
+    const users = getRegisteredUsers();
+    if (users.some((u) => u.email?.toLowerCase() === email)) {
+      return { ok: false, error: "Email này đã được đăng ký. Vui lòng chuyển sang Đăng nhập." };
+    }
+
+    const schoolObj =
+      AUTH_SCHOOL_OPTIONS.find((s) => s.code === schoolCode) || {
+        code: schoolCode || "SV",
+        name: schoolCode || "Sinh viên Đại học",
+        area: "TP.HCM"
+      };
+    const isEduEmail = /\.edu(\.vn)?$/i.test(email);
+    const randomCode = "#SV-" + Math.floor(1000 + Math.random() * 9000);
+    const avatar =
+      gender === "Nam"
+        ? "/assets/images/phong-chi-tiet/avatar-1.jpg"
+        : "/assets/images/common/avatar-profile.jpg";
+
+    const newUser = {
+      id: "user-" + Date.now(),
+      name,
+      email,
+      password,
+      shortSchool: schoolObj.code,
+      school: schoolObj.name,
+      major,
+      gender,
+      idCode: randomCode,
+      avatar,
+      budgetRange: "1.8 - 2.5 tr/tháng",
+      preferredAreas: schoolObj.area,
+      moveInTime: "Đầu tháng tới",
+      verifiedStudent: isEduEmail
+    };
+
+    writeJSON(STORAGE_KEYS.AUTH_USERS, [newUser, ...users]);
+    const activeUser = setLoggedInUser(newUser);
+    return { ok: true, user: activeUser };
+  }
+
+  function onAuthStateChange(callback) {
+    window.addEventListener("roomie:auth-changed", callback);
+    window.addEventListener("storage", (event) => {
+      if (event.key === STORAGE_KEYS.AUTH_SESSION || event.key === STORAGE_KEYS.AUTH_USERS) {
+        callback();
+      }
+    });
+  }
+
+  function openAuthModal(initialTab = "login", options = {}) {
+    let activeTab = initialTab === "signup" ? "signup" : "login";
+    const schoolOptionsHtml = AUTH_SCHOOL_OPTIONS.map(
+      (s) => `<option value="${escapeHTML(s.code)}">${escapeHTML(s.name)}</option>`
+    ).join("");
+
+    const modal = openModal({
+      title: activeTab === "login" ? "Đăng nhập Roomie" : "Đăng ký tài khoản sinh viên",
+      subtitle:
+        options.subtitle ||
+        "Kết nối roommate hợp gu & tìm phòng trọ minh bạch dành riêng cho sinh viên",
+      maxWidth: "max-w-md",
+      bodyHtml: `
+        <div class="flex flex-col gap-4">
+          <!-- Tab Switcher -->
+          <div class="grid grid-cols-2 p-1 rounded-2xl bg-surface-container-low border border-outline-variant/25">
+            <button type="button" data-auth-tab="login" class="rm-auth-tab-btn py-2.5 px-4 rounded-xl text-xs font-bold transition-all">
+              Đăng nhập
+            </button>
+            <button type="button" data-auth-tab="signup" class="rm-auth-tab-btn py-2.5 px-4 rounded-xl text-xs font-bold transition-all">
+              Đăng ký mới
+            </button>
+          </div>
+
+          <!-- Error / Feedback Banner -->
+          <div id="rm-auth-error" class="hidden p-3 rounded-xl bg-error-container text-on-error-container text-xs font-medium flex items-start gap-2">
+            <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5">error</span>
+            <span id="rm-auth-error-text"></span>
+          </div>
+
+          <!-- LOGIN PANEL -->
+          <form id="rm-auth-login-form" class="flex flex-col gap-3.5" novalidate>
+            <div>
+              <label for="rm-login-email" class="block text-xs font-semibold text-on-surface mb-1">Email sinh viên hoặc tài khoản</label>
+              <div class="relative">
+                <span class="material-symbols-outlined text-[18px] text-outline absolute left-3.5 top-1/2 -translate-y-1/2">mail</span>
+                <input
+                  id="rm-login-email"
+                  type="email"
+                  required
+                  autocomplete="username"
+                  placeholder="vd: minhthu@student.hcmus.edu.vn"
+                  class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="rm-login-password" class="block text-xs font-semibold text-on-surface">Mật khẩu</label>
+                <button type="button" id="rm-forgot-pw-btn" class="text-[11.5px] font-semibold text-primary hover:underline">Quên mật khẩu?</button>
+              </div>
+              <div class="relative">
+                <span class="material-symbols-outlined text-[18px] text-outline absolute left-3.5 top-1/2 -translate-y-1/2">lock</span>
+                <input
+                  id="rm-login-password"
+                  type="password"
+                  required
+                  autocomplete="current-password"
+                  placeholder="Nhập mật khẩu của bạn"
+                  class="w-full h-11 pl-10 pr-10 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button type="button" data-toggle-pw="rm-login-password" aria-label="Hiện hoặc ẩn mật khẩu" class=" absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface">
+                  <span class="material-symbols-outlined text-[18px]">visibility</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="mt-1 w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-[18px]">login</span>
+              <span>Đăng nhập vào Roomie</span>
+            </button>
+
+            <!-- Quick Demo Accounts -->
+            <div class="pt-3 border-t border-surface-container flex flex-col gap-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Đăng nhập nhanh tài khoản sinh viên mẫu:</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button type="button" data-demo-login="minhthu@student.hcmus.edu.vn" class="p-2.5 rounded-xl bg-surface-container-low hover:bg-primary-fixed/60 border border-outline-variant/25 flex items-center gap-2.5 text-left transition-colors">
+                  <img src="/assets/images/common/avatar-profile.jpg" alt="Minh Thư" class="w-8 h-8 rounded-full object-cover ring-1 ring-secondary-container shrink-0" />
+                  <div class="min-w-0">
+                    <div class="text-xs font-bold text-on-surface truncate">Minh Thư</div>
+                    <div class="text-[10.5px] text-tertiary font-semibold truncate">HCMUS • Nữ</div>
+                  </div>
+                </button>
+                <button type="button" data-demo-login="hoangnam@student.hcmus.edu.vn" class="p-2.5 rounded-xl bg-surface-container-low hover:bg-primary-fixed/60 border border-outline-variant/25 flex items-center gap-2.5 text-left transition-colors">
+                  <img src="/assets/images/phong-chi-tiet/avatar-1.jpg" alt="Hoàng Nam" class="w-8 h-8 rounded-full object-cover ring-1 ring-secondary-container shrink-0" />
+                  <div class="min-w-0">
+                    <div class="text-xs font-bold text-on-surface truncate">Hoàng Nam</div>
+                    <div class="text-[10.5px] text-primary font-semibold truncate">HCMUS • Nam</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- SIGN UP PANEL -->
+          <form id="rm-auth-signup-form" class="hidden flex-col gap-3" novalidate>
+            <div>
+              <label for="rm-signup-name" class="block text-xs font-semibold text-on-surface mb-1">Họ và tên sinh viên</label>
+              <input
+                id="rm-signup-name"
+                type="text"
+                required
+                placeholder="vd: Nguyễn Minh Anh"
+                class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div>
+              <label for="rm-signup-email" class="block text-xs font-semibold text-on-surface mb-1">Email sinh viên (.edu.vn) hoặc cá nhân</label>
+              <input
+                id="rm-signup-email"
+                type="email"
+                required
+                placeholder="vd: 23120001@student.hcmus.edu.vn"
+                class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <span class="block text-[11px] text-tertiary font-medium mt-1">
+                * Email đuôi <strong>.edu.vn</strong> được cấp ngay huy hiệu Đã xác thực thẻ SV
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div class="sm:col-span-2">
+                <label for="rm-signup-school" class="block text-xs font-semibold text-on-surface mb-1">Trường Đại học</label>
+                <select
+                  id="rm-signup-school"
+                  class="w-full h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/30 text-xs font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  ${schoolOptionsHtml}
+                </select>
+              </div>
+              <div>
+                <label for="rm-signup-gender" class="block text-xs font-semibold text-on-surface mb-1">Giới tính</label>
+                <select
+                  id="rm-signup-gender"
+                  class="w-full h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/30 text-xs font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="Nữ">Nữ</option>
+                  <option value="Nam">Nam</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="rm-signup-major" class="block text-xs font-semibold text-on-surface mb-1">Khoa / Khóa học</label>
+              <input
+                id="rm-signup-major"
+                type="text"
+                placeholder="vd: Khoa CNTT • K23"
+                value="Khoa CNTT • K23"
+                class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label for="rm-signup-password" class="block text-xs font-semibold text-on-surface mb-1">Mật khẩu (≥ 6 ký tự)</label>
+                <div class="relative">
+                  <input
+                    id="rm-signup-password"
+                    type="password"
+                    required
+                    placeholder="Tối thiểu 6 ký tự"
+                    class="w-full h-10 pl-3.5 pr-9 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <button type="button" data-toggle-pw="rm-signup-password" aria-label="Hiện hoặc ẩn mật khẩu" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface">
+                    <span class="material-symbols-outlined text-[17px]">visibility</span>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label for="rm-signup-confirm" class="block text-xs font-semibold text-on-surface mb-1">Nhập lại mật khẩu</label>
+                <input
+                  id="rm-signup-confirm"
+                  type="password"
+                  required
+                  placeholder="Xác nhận mật khẩu"
+                  class="w-full h-10 px-3.5 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+
+            <label class="flex items-start gap-2 text-xs text-on-surface-variant cursor-pointer pt-0.5">
+              <input id="rm-signup-terms" type="checkbox" checked class="mt-0.5 w-4 h-4 rounded accent-primary" />
+              <span>Tôi đồng ý với <a href="/roomie/an-toan" class="text-primary font-semibold hover:underline">Quy chuẩn cộng đồng &amp; Nguyên tắc an toàn</a> của Roomie.</span>
+            </label>
+
+            <button type="submit" class="mt-1 w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-[18px]">person_add</span>
+              <span>Đăng ký tài khoản Roomie</span>
+            </button>
+          </form>
+        </div>
+      `
+    });
+
+    const titleEl = modal.querySelector("h3");
+    const errorBox = modal.querySelector("#rm-auth-error");
+    const errorText = modal.querySelector("#rm-auth-error-text");
+    const loginForm = modal.querySelector("#rm-auth-login-form");
+    const signupForm = modal.querySelector("#rm-auth-signup-form");
+    const tabBtns = modal.querySelectorAll("[data-auth-tab]");
+
+    const showError = (msg) => {
+      if (!msg) {
+        errorBox.classList.add("hidden");
+        return;
+      }
+      errorText.textContent = msg;
+      errorBox.classList.remove("hidden");
+    };
+
+    const syncTabUI = (tab) => {
+      activeTab = tab;
+      showError("");
+      if (titleEl) {
+        titleEl.textContent = tab === "login" ? "Đăng nhập Roomie" : "Đăng ký tài khoản sinh viên";
+      }
+      tabBtns.forEach((btn) => {
+        const isCurrent = btn.dataset.authTab === tab;
+        btn.className = isCurrent
+          ? "rm-auth-tab-btn py-2.5 px-4 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-xs transition-all"
+          : "rm-auth-tab-btn py-2.5 px-4 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all";
+      });
+      loginForm.classList.toggle("hidden", tab !== "login");
+      loginForm.classList.toggle("flex", tab === "login");
+      signupForm.classList.toggle("hidden", tab !== "signup");
+      signupForm.classList.toggle("flex", tab === "signup");
+    };
+
+    syncTabUI(activeTab);
+
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", () => syncTabUI(btn.dataset.authTab));
+    });
+
+    modal.querySelectorAll("[data-toggle-pw]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const input = modal.querySelector(`#${btn.dataset.togglePw}`);
+        const icon = btn.querySelector(".material-symbols-outlined");
+        if (!input) return;
+        const isPw = input.type === "password";
+        input.type = isPw ? "text" : "password";
+        if (icon) icon.textContent = isPw ? "visibility_off" : "visibility";
+      });
+    });
+
+    modal.querySelector("#rm-forgot-pw-btn")?.addEventListener("click", () => {
+      const emailVal = modal.querySelector("#rm-login-email")?.value.trim();
+      showToast(
+        emailVal
+          ? `Đã gửi hướng dẫn đặt lại mật khẩu tới ${emailVal}!`
+          : "Hãy nhập email sinh viên hoặc chọn tài khoản mẫu bên dưới để đăng nhập nhanh.",
+        "info"
+      );
+    });
+
+    modal.querySelectorAll("[data-demo-login]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const res = loginUser(btn.dataset.demoLogin, "123");
+        if (res.ok) {
+          closeModal();
+          options.onSuccess?.(res.user);
+          showToast(`Chào mừng trở lại, ${res.user.name} (${res.user.shortSchool})!`);
+        }
+      });
+    });
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = modal.querySelector("#rm-login-email")?.value;
+      const password = modal.querySelector("#rm-login-password")?.value;
+      const res = loginUser(email, password);
+      if (!res.ok) {
+        showError(res.error);
+        return;
+      }
+      closeModal();
+      options.onSuccess?.(res.user);
+      showToast(`Đăng nhập thành công! Xin chào ${res.user.name}.`);
+    });
+
+    signupForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const termsChecked = modal.querySelector("#rm-signup-terms")?.checked;
+      if (!termsChecked) {
+        showError("Vui lòng đồng ý với Quy chuẩn cộng đồng & Nguyên tắc an toàn.");
+        return;
+      }
+      const res = registerUser({
+        name: modal.querySelector("#rm-signup-name")?.value,
+        email: modal.querySelector("#rm-signup-email")?.value,
+        schoolCode: modal.querySelector("#rm-signup-school")?.value,
+        gender: modal.querySelector("#rm-signup-gender")?.value,
+        major: modal.querySelector("#rm-signup-major")?.value,
+        password: modal.querySelector("#rm-signup-password")?.value,
+        confirmPassword: modal.querySelector("#rm-signup-confirm")?.value
+      });
+      if (!res.ok) {
+        showError(res.error);
+        return;
+      }
+      closeModal();
+      options.onSuccess?.(res.user);
+      showToast(`Đăng ký thành công! Chào mừng ${res.user.name} (${res.user.shortSchool}) đến với Roomie.`);
+    });
+  }
+
+  // Initialize USER_PROFILE sync on script load
+  getCurrentUser();
+
   window.RoomieCore = {
     CONTACT,
     STORAGE_KEYS,
@@ -1369,6 +1918,13 @@ Chữ ký Bên A                                                    Chữ ký B�
     activatePurchasedPlan,
     resetPurchasedPlans,
     onPlanStateChange,
+    isLoggedIn,
+    getCurrentUser,
+    loginUser,
+    registerUser,
+    logoutUser,
+    openAuthModal,
+    onAuthStateChange,
     getAllRooms,
     isPrivateRoom,
     getSavedRoomIds,
