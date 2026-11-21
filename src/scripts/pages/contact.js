@@ -219,7 +219,9 @@
     form?.addEventListener("submit", (e) => {
       e.preventDefault();
       const nameVal = document.getElementById("contact-name")?.value.trim() || "bạn";
+      const phoneEmailVal = document.getElementById("contact-phone-email")?.value.trim() || "";
       const topicVal = topicInput?.value || "Hỗ trợ chung";
+      const messageVal = msgInput?.value.trim() || "";
       const ticketId = `#RM-${Math.floor(1000 + Math.random() * 9000)}`;
 
       const selectedDistLabel = districtSelect?.value
@@ -228,6 +230,18 @@
       const areaSummary = selectedDistLabel ? `${selectedDistLabel}, ${locationState.areaCity}` : locationState.areaCity;
       const uniSummary = locationState.selectedUniversity ? locationState.selectedUniversity.name : uniInput?.value.trim() || "";
       const locParts = [areaSummary, uniSummary].filter(Boolean);
+
+      Core.submitContactTicket?.({
+        ticketId,
+        name: nameVal,
+        email: phoneEmailVal.includes("@") ? phoneEmailVal : "",
+        phone: !phoneEmailVal.includes("@") ? phoneEmailVal : "",
+        topic: topicVal,
+        city: locationState.areaCity,
+        district: selectedDistLabel,
+        university: uniSummary,
+        message: messageVal
+      });
 
       const setElText = (id, text) => {
         const el = document.getElementById(id);

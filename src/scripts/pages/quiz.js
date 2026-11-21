@@ -75,7 +75,11 @@
         answeredCount: answeredVals.length,
         completedAt: new Date().toISOString()
       };
-      Core.writeJSON(Core.STORAGE_KEYS.QUIZ_RESULT, result);
+      if (Core.submitQuizResult) {
+        Core.submitQuizResult(savedAnswers, result);
+      } else {
+        Core.writeJSON(Core.STORAGE_KEYS.QUIZ_RESULT, result);
+      }
       Core.showToast(`Hoàn tất ${questions.length}/${questions.length} câu hỏi! Đang mở danh sách Roommate hợp gu...`);
       setTimeout(() => {
         window.location.href = "/roomie/tim-roommate?from=quiz";

@@ -472,6 +472,10 @@
     applyQueryParams();
     renderAreaOptions();
     render();
+    window.addEventListener("roomie:backend-synced", () => {
+      renderAreaOptions();
+      render();
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {

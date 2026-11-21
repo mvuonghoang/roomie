@@ -16,3 +16,7 @@ desktop.ini
 # Environment files
 .env
 .env.local
+
+# SQLite temporary WAL/SHM files
+*.sqlite-shm
+*.sqlite-wal

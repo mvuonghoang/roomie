@@ -664,6 +664,10 @@
     }
 
     renderMatches();
+    window.addEventListener("roomie:backend-synced", () => {
+      initQuizBannerState();
+      renderMatches();
+    });
   }
 
   function buildRoommateCardHtml(rm) {
