@@ -245,8 +245,12 @@
         ]
       };
 
-      const existing = Core.readJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, []);
-      Core.writeJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, [newRoom, ...existing]);
+      if (Core.createRoomListing) {
+        Core.createRoomListing(newRoom);
+      } else {
+        const existing = Core.readJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, []);
+        Core.writeJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, [newRoom, ...existing]);
+      }
 
       Core.openModal({
         title: "Đăng tin thành công!",

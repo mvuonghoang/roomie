@@ -126,11 +126,13 @@
     };
     writeJSON(STORAGE_KEYS.ACTIVE_PLANS, [nextRecord, ...current]);
     window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: nextRecord } }));
+    apiFetch("/api/plans/purchase", { method: "POST", body: nextRecord });
   }
 
   function resetPurchasedPlans() {
     writeJSON(STORAGE_KEYS.ACTIVE_PLANS, []);
     window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: null } }));
+    apiFetch("/api/plans/reset", { method: "POST" });
   }
 
   function onPlanStateChange(callback) {
@@ -142,7 +144,16 @@
 
   function getAllRooms() {
     const custom = readJSON(STORAGE_KEYS.CUSTOM_LISTINGS, []);
-    return [...custom, ...(Data.ROOMS || [])];
+    const base = Data.ROOMS || [];
+    const seen = new Set();
+    const merged = [];
+    [...custom, ...base].forEach((r) => {
+      if (r && r.id !== undefined && !seen.has(String(r.id))) {
+        seen.add(String(r.id));
+        merged.push(r);
+      }
+    });
+    return merged;
   }
 
   function isPrivateRoom(room) {
@@ -159,6 +170,7 @@
     const exists = saved.includes(strId);
     const next = exists ? saved.filter((x) => x !== strId) : [...saved, strId];
     writeJSON(STORAGE_KEYS.SAVED_ROOMS, next);
+    apiFetch(`/api/rooms/${encodeURIComponent(strId)}/save`, { method: "POST" });
     return !exists;
   }
 
@@ -288,6 +300,22 @@
     };
     const filtered = all.filter((c) => c.id !== nextRecord.id);
     saveConnections([nextRecord, ...filtered]);
+    apiFetch("/api/connections/invite", {
+      method: "POST",
+      body: {
+        connId: nextRecord.id,
+        partnerId: nextRecord.partnerId,
+        name: nextRecord.name,
+        meta: nextRecord.meta,
+        avatar: nextRecord.avatar,
+        roomId: nextRecord.roomId,
+        status: nextRecord.status,
+        note: nextRecord.note,
+        releaseReason: nextRecord.releaseReason,
+        revertedOnce: nextRecord.revertedOnce,
+        contact
+      }
+    });
     return nextRecord;
   }
 
@@ -300,6 +328,14 @@
       return updated;
     });
     saveConnections(nextList);
+    apiFetch(`/api/connections/${encodeURIComponent(connId)}`, {
+      method: "PATCH",
+      body: {
+        status: nextStatus,
+        releaseReason: extra.releaseReason,
+        revertedOnce: extra.revertedOnce
+      }
+    });
     return updated;
   }
 
@@ -698,6 +734,16 @@
     });
     modal.querySelector("#rm-support-callback-form").addEventListener("submit", (e) => {
       e.preventDefault();
+      const phoneVal = modal.querySelector("#rm-support-phone")?.value.trim() || "";
+      const topicVal = modal.querySelector("#rm-support-topic")?.value.trim() || title;
+      const user = getCurrentUser();
+      submitContactTicket({
+        name: user?.name || "Sinh viên Roomie",
+        email: user?.email || "",
+        phone: phoneVal,
+        topic: topicVal,
+        message: "Yêu cầu gọi lại hỗ trợ qua Zalo trong 15 phút"
+      });
       closeModal();
       showToast("Đã gửi yêu cầu! Ban Hỗ trợ Roomie sẽ liên hệ Zalo với bạn trong 15 phút.");
     });
@@ -1348,6 +1394,13 @@ Chữ ký Bên A                                                    Chữ ký B�
 
     modal.querySelector("#rm-report-form").addEventListener("submit", (e) => {
       e.preventDefault();
+      const reasonVal = modal.querySelector("select")?.value || "Báo cáo tin giả / phòng ma";
+      const descVal = modal.querySelector("textarea")?.value.trim() || "";
+      submitSafetyReport({
+        targetTitle,
+        reason: reasonVal,
+        description: descVal
+      });
       closeModal();
       showToast("Đã ghi nhận báo cáo! Ban An toàn Roomie sẽ kiểm tra ngay.");
     });
@@ -1469,12 +1522,14 @@ Chữ ký Bên A                                                    Chữ ký B�
     );
   }
 
-  function setLoggedInUser(user) {
+  function setLoggedInUser(user, token = "") {
     const cleanUser = { ...user };
     delete cleanUser.password;
+    const prevSession = readJSON(STORAGE_KEYS.AUTH_SESSION, {});
     writeJSON(STORAGE_KEYS.AUTH_SESSION, {
       loggedIn: true,
       user: cleanUser,
+      token: token || prevSession?.token || "",
       updatedAt: Date.now()
     });
     emitAuthChange(cleanUser);
@@ -1485,9 +1540,11 @@ Chữ ký Bên A                                                    Chữ ký B�
     writeJSON(STORAGE_KEYS.AUTH_SESSION, {
       loggedIn: false,
       user: null,
+      token: "",
       updatedAt: Date.now()
     });
     emitAuthChange(null);
+    apiFetch("/api/auth/logout", { method: "POST" });
   }
 
   function loginUser(identifier, password) {
@@ -1514,6 +1571,15 @@ Chữ ký Bên A                                                    Chữ ký B�
       return { ok: false, error: "Mật khẩu chưa chính xác. Vui lòng kiểm tra lại." };
     }
     const activeUser = setLoggedInUser(matched);
+    apiFetch("/api/auth/login", {
+      method: "POST",
+      body: { identifier: cleanId, password: cleanPass || "123" }
+    }).then((res) => {
+      if (res && res.ok && res.user) {
+        setLoggedInUser(res.user, res.token);
+        syncWithBackend();
+      }
+    });
     return { ok: true, user: activeUser };
   }
 
@@ -1576,6 +1642,25 @@ Chữ ký Bên A                                                    Chữ ký B�
 
     writeJSON(STORAGE_KEYS.AUTH_USERS, [newUser, ...users]);
     const activeUser = setLoggedInUser(newUser);
+    apiFetch("/api/auth/register", {
+      method: "POST",
+      body: {
+        id: newUser.id,
+        name,
+        email,
+        password,
+        confirmPassword,
+        schoolCode,
+        major,
+        gender,
+        avatar
+      }
+    }).then((res) => {
+      if (res && res.ok && res.user) {
+        setLoggedInUser(res.user, res.token);
+        syncWithBackend();
+      }
+    });
     return { ok: true, user: activeUser };
   }
 
@@ -1897,14 +1982,159 @@ Chữ ký Bên A                                                    Chữ ký B�
     });
   }
 
-  // Initialize USER_PROFILE sync on script load
+  // =========================================================================
+  // BACKEND API & SQLITE DATABASE SYNC LAYER
+  // =========================================================================
+
+  async function apiFetch(endpoint, options = {}) {
+    try {
+      const session = readJSON(STORAGE_KEYS.AUTH_SESSION, null);
+      const headers = {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      };
+      if (session?.token) {
+        headers.Authorization = `Bearer ${session.token}`;
+      }
+      if (session?.loggedIn && session?.user?.id) {
+        headers["X-User-Id"] = session.user.id;
+      } else if (session && session.loggedIn === false) {
+        headers["X-User-Id"] = "guest";
+      }
+
+      const fetchOpts = {
+        method: options.method || "GET",
+        headers
+      };
+      if (options.body !== undefined) {
+        fetchOpts.body = typeof options.body === "string" ? options.body : JSON.stringify(options.body);
+      }
+
+      const response = await fetch(endpoint, fetchOpts);
+      const data = await response.json().catch(() => null);
+      return data;
+    } catch {
+      return null;
+    }
+  }
+
+  async function syncWithBackend() {
+    const data = await apiFetch("/api/bootstrap");
+    if (!data || !data.ok) return null;
+
+    if (Array.isArray(data.users) && data.users.length) {
+      const localUsers = getRegisteredUsers();
+      const byEmail = new Map(localUsers.map((u) => [u.email?.toLowerCase(), u]));
+      data.users.forEach((dbUser) => {
+        const key = dbUser.email?.toLowerCase();
+        if (key) {
+          const existing = byEmail.get(key) || {};
+          byEmail.set(key, { ...existing, ...dbUser, password: existing.password || "123" });
+        }
+      });
+      writeJSON(STORAGE_KEYS.AUTH_USERS, Array.from(byEmail.values()));
+    }
+
+    if (Array.isArray(data.rooms) && data.rooms.length) {
+      Data.ROOMS = data.rooms;
+    }
+    if (Array.isArray(data.roommates) && data.roommates.length) {
+      Data.ROOMMATES = data.roommates;
+    }
+    if (Array.isArray(data.notifications) && data.notifications.length) {
+      Data.NOTIFICATIONS = data.notifications;
+    }
+    if (Array.isArray(data.savedRoomIds)) {
+      const localSaved = getSavedRoomIds();
+      const mergedSaved = Array.from(new Set([...data.savedRoomIds, ...localSaved]));
+      writeJSON(STORAGE_KEYS.SAVED_ROOMS, mergedSaved);
+    }
+    if (Array.isArray(data.connections) && data.connections.length) {
+      saveConnections(data.connections);
+    }
+    if (Array.isArray(data.activePlans) && data.activePlans.length) {
+      writeJSON(STORAGE_KEYS.ACTIVE_PLANS, data.activePlans);
+      window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: data.activePlans[0] } }));
+    }
+    if (data.quizResult && data.quizResult.archetype) {
+      writeJSON(STORAGE_KEYS.QUIZ_RESULT, data.quizResult);
+      if (data.quizAnswers && Object.keys(data.quizAnswers).length) {
+        writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, data.quizAnswers);
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent("roomie:backend-synced", { detail: data }));
+    window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
+    return data;
+  }
+
+  async function createRoomListing(newRoom) {
+    const existing = readJSON(STORAGE_KEYS.CUSTOM_LISTINGS, []);
+    writeJSON(STORAGE_KEYS.CUSTOM_LISTINGS, [newRoom, ...existing.filter((r) => r.id !== newRoom.id)]);
+    const res = await apiFetch("/api/rooms", {
+      method: "POST",
+      body: newRoom
+    });
+    if (res && res.ok && Array.isArray(res.rooms)) {
+      Data.ROOMS = res.rooms;
+    }
+    return res?.room || newRoom;
+  }
+
+  async function submitQuizResult(answers, result) {
+    writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers);
+    writeJSON(STORAGE_KEYS.QUIZ_RESULT, result);
+    const res = await apiFetch("/api/quiz/submit", {
+      method: "POST",
+      body: { answers, result }
+    });
+    if (res && res.ok) {
+      if (res.quizResult) writeJSON(STORAGE_KEYS.QUIZ_RESULT, res.quizResult);
+      if (Array.isArray(res.roommates)) Data.ROOMMATES = res.roommates;
+    }
+    return res;
+  }
+
+  async function submitSafetyReport(payload) {
+    return apiFetch("/api/reports", {
+      method: "POST",
+      body: payload
+    });
+  }
+
+  async function submitContactTicket(payload) {
+    return apiFetch("/api/contacts", {
+      method: "POST",
+      body: payload
+    });
+  }
+
+  async function markAllNotificationsRead() {
+    writeJSON(
+      STORAGE_KEYS.NOTIFICATIONS_READ,
+      (Data.NOTIFICATIONS || []).map((n) => n.id)
+    );
+    return apiFetch("/api/notifications/read-all", {
+      method: "POST"
+    });
+  }
+
+  // Initialize USER_PROFILE sync & Backend Database sync on script load
   getCurrentUser();
+  syncWithBackend();
 
   window.RoomieCore = {
     CONTACT,
     STORAGE_KEYS,
     MAX_CONTACT_SLOTS,
     FALLBACK_SVG,
+    apiFetch,
+    syncWithBackend,
+    createRoomListing,
+    submitQuizResult,
+    submitSafetyReport,
+    submitContactTicket,
+    markAllNotificationsRead,
     readJSON,
     writeJSON,
     escapeHTML,

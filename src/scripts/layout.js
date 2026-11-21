@@ -412,10 +412,14 @@
       document.body.appendChild(pop);
 
       pop.querySelector("#rm-mark-all-read").addEventListener("click", () => {
-        Core.writeJSON(
-          Core.STORAGE_KEYS.NOTIFICATIONS_READ,
-          (Data.NOTIFICATIONS || []).map((n) => n.id)
-        );
+        if (Core.markAllNotificationsRead) {
+          Core.markAllNotificationsRead();
+        } else {
+          Core.writeJSON(
+            Core.STORAGE_KEYS.NOTIFICATIONS_READ,
+            (Data.NOTIFICATIONS || []).map((n) => n.id)
+          );
+        }
         pop.remove();
         const dot = notifBtn.querySelector("span.bg-primary, span.bg-error");
         if (dot) dot.classList.add("hidden");
