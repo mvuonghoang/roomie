@@ -2524,6 +2524,8 @@ Chữ ký Bên A                                                    Chữ ký B�
     const schoolPreference = String(payload.schoolPreference || "").trim();
     const school = String(user.school || user.shortSchool || "Sinh viên").trim();
     const shortSchool = String(user.shortSchool || school).trim();
+    const bundlePlan = getPurchasedPlans().find((plan) => plan.id === "all-in-one");
+    const autoBoostExpiresAt = bundlePlan ? Number(bundlePlan.expiresAt) : null;
     const roommate = {
       id: `roommate-${now}-${Math.random().toString(36).slice(2, 10)}`,
       userId: String(user.id),
@@ -2554,8 +2556,8 @@ Chữ ký Bên A                                                    Chữ ký B�
       tags: Array.isArray(payload.criteria) ? payload.criteria.slice(0, 12) : [],
       contact: { phone: CONTACT.phone, zalo: CONTACT.zalo, facebook: "fb.com/roomie.student" },
       quizProfile: {},
-      isBoosted: false,
-      boostExpiresAt: null
+      isBoosted: Boolean(autoBoostExpiresAt && autoBoostExpiresAt > now),
+      boostExpiresAt: autoBoostExpiresAt && autoBoostExpiresAt > now ? autoBoostExpiresAt : null
     };
     const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
     writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, [roommate, ...listings]);
