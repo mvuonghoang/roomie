@@ -43,6 +43,7 @@
     { "source": "/roomie/ket-qua-match", "destination": "/pages/tim-roommate.html" },
     { "source": "/roomie/dang-tin", "destination": "/pages/dang-tin.html" },
     { "source": "/roomie/dang-tin-mien-phi", "destination": "/pages/dang-tin.html" },
+    { "source": "/roomie/tin-da-dang", "destination": "/pages/tin-da-dang.html" },
     { "source": "/roomie/dich-vu", "destination": "/pages/bang-gia.html" },
     { "source": "/roomie/bang-gia", "destination": "/pages/bang-gia.html" },
     { "source": "/roomie/ve-chung-toi", "destination": "/pages/ve-chung-toi.html" },
