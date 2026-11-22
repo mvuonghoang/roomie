@@ -1,6 +1,6 @@
 /**
- * Page: Match Results & Roommate Finder (/roomie/tim-roommate)
- * Hiển thị kết quả trắc nghiệm, bộ lọc drawer đồng bộ TP.HCM/Hà Nội & Trường ĐH, và kết nối Double Opt-in.
+ * Page: Roommate Finder (/roomie/tim-roommate)
+ * Duyệt bài đăng roommate theo nhu cầu, bộ lọc khu vực/trường học và kết nối Double Opt-in.
  */
 (function () {
   const Data = window.RoomieData || {};
@@ -10,8 +10,7 @@
 
   const FILTER_GROUPS = {
     tab: [
-      { value: "all", label: "Tất cả phù hợp" },
-      { value: "high", label: "Tương thích cao >90%" },
+      { value: "all", label: "Tất cả bài đăng" },
       { value: "vnu", label: "Cùng trường ĐHQG" },
       { value: "has-room", label: "Đã có sẵn phòng" }
     ],
@@ -39,6 +38,15 @@
     return Picker.inferLocationCity(`${rm?.school || ""} ${rm?.roomStatusDetail || ""}`, rm?.city);
   }
 
+  function getRoommateListings() {
+    return [...(Data.ROOMMATES || [])].sort((a, b) => {
+      const aCreatedAt = Number(a.createdAt) || 0;
+      const bCreatedAt = Number(b.createdAt) || 0;
+      if (aCreatedAt !== bCreatedAt) return bCreatedAt - aCreatedAt;
+      return String(a.name || "").localeCompare(String(b.name || ""), "vi");
+    });
+  }
+
   function parseBudgetRange(budgetStr) {
     const matches = String(budgetStr || "").match(/\d+(?:[.,]\d+)?/g) || [];
     const nums = matches.map((m) => parseFloat(m.replace(",", "."))).filter((n) => Number.isFinite(n));
@@ -58,67 +66,7 @@
     return true;
   }
 
-  function initQuizBannerState() {
-    const savedQuiz = Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null);
-    const hasQuizResult = Boolean(savedQuiz?.archetype && savedQuiz?.pillars);
-    document.getElementById("mr-quiz-complete-status")?.classList.toggle("hidden", !hasQuizResult);
-    document.getElementById("mr-quiz-welcome")?.classList.toggle("hidden", hasQuizResult);
-    document.getElementById("mr-quiz-results")?.classList.toggle("hidden", !hasQuizResult);
-
-    const matchSectionEyebrow = document.getElementById("mr-match-section-eyebrow");
-    const matchSectionTitle = document.getElementById("mr-match-section-title");
-    const matchSectionDescription = document.getElementById("mr-match-section-description");
-    const roomRecommendationsTitle = document.getElementById("mr-room-recommendations-title");
-    const roomRecommendationsDescription = document.getElementById("mr-room-recommendations-description");
-
-    if (hasQuizResult) {
-      const archEl = document.getElementById("mr-archetype-title");
-      if (archEl && savedQuiz.archetype) archEl.textContent = savedQuiz.archetype;
-      if (savedQuiz.pillars) {
-        [
-          ["mr-p1", savedQuiz.pillars.sleep],
-          ["mr-p2", savedQuiz.pillars.clean],
-          ["mr-p3", savedQuiz.pillars.guests],
-          ["mr-p4", savedQuiz.pillars.finance]
-        ].forEach(([id, pct]) => {
-          const val = document.getElementById(`${id}-val`);
-          const bar = document.getElementById(`${id}-bar`);
-          if (val) val.textContent = `${pct}%`;
-          if (bar) bar.style.width = `${pct}%`;
-        });
-      }
-      matchSectionDescription?.classList.remove("hidden");
-      roomRecommendationsDescription?.classList.remove("hidden");
-      const matchCount = Number(savedQuiz.matchCount);
-      if (Number.isFinite(matchCount)) {
-        const matchCountEl = document.getElementById("mr-match-count");
-        const connectionCountEl = document.getElementById("mr-connection-count");
-        if (matchCountEl) matchCountEl.textContent = `${matchCount} bạn sinh viên`;
-        if (connectionCountEl) connectionCountEl.textContent = String(matchCount);
-      }
-    } else {
-      if (matchSectionEyebrow) matchSectionEyebrow.textContent = "Khám phá cộng đồng";
-      if (matchSectionTitle) {
-        matchSectionTitle.innerHTML = 'Các bạn cùng phòng <span class="text-primary whitespace-nowrap">nổi bật</span>';
-      }
-      if (matchSectionDescription) {
-        matchSectionDescription.textContent = "";
-        matchSectionDescription.classList.add("hidden");
-      }
-      if (roomRecommendationsTitle) {
-        roomRecommendationsTitle.innerHTML =
-          '<span class="text-primary whitespace-nowrap">Phòng trọ</span> đang tìm <span class="text-primary whitespace-nowrap">người ở cùng</span>';
-      }
-      if (roomRecommendationsDescription) {
-        roomRecommendationsDescription.textContent = "";
-        roomRecommendationsDescription.classList.add("hidden");
-      }
-    }
-  }
-
   function initMatchResultsPage() {
-    initQuizBannerState();
-
     const grid = document.getElementById("roommate-matches-grid");
     const loadMoreBtn = document.getElementById("mr-load-more-btn");
     const loadMoreLabel = document.getElementById("mr-load-more-label");
@@ -128,17 +76,11 @@
     const activeFiltersBar = document.getElementById("mr-active-filters-bar");
 
     const districtsByCity = Picker.getSharedDistrictsByCity();
-    const savedQuiz = Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null);
-    const fromQuiz = new URLSearchParams(window.location.search).get("from") === "quiz";
-    const initialGender =
-      fromQuiz && (savedQuiz?.preferredGender === "Nam" || savedQuiz?.preferredGender === "Nữ")
-        ? savedQuiz.preferredGender
-        : "all";
-    const state = { ...createDefaultFilterState(), gender: initialGender, showAll: false };
+    const state = { ...createDefaultFilterState(), showAll: false };
 
     function getDistrictRoommateCount(city, district) {
       const normDistName = normalizeSearchText(district.name);
-      return (Data.ROOMMATES || []).filter((rm) => {
+      return getRoommateListings().filter((rm) => {
         if (getRoommateCity(rm) !== city) return false;
         if (rm.areaKey) return rm.areaKey === district.key;
         return normalizeSearchText(`${rm.school || ""} ${rm.roomStatusDetail || ""}`).includes(normDistName);
@@ -157,7 +99,7 @@
 
     function filterRoommates(criteria) {
       const normSearch = normalizeSearchText(criteria.search);
-      return (Data.ROOMMATES || []).filter((rm) => {
+      return getRoommateListings().filter((rm) => {
         if (criteria.areaCity && getRoommateCity(rm) !== criteria.areaCity) return false;
         if (criteria.selectedUniversity) {
           const uni = criteria.selectedUniversity;
@@ -172,7 +114,6 @@
         }
         if (criteria.areas.length > 0 && !criteria.areas.includes(rm.areaKey)) return false;
         if (!matchesBudgetFilter(rm, criteria.priceRange)) return false;
-        if (criteria.tab === "high" && rm.matchScore < 90) return false;
         if (criteria.tab === "vnu" && !rm.vnuMember) return false;
         if (criteria.tab === "has-room" && !rm.hasRoom) return false;
         if (criteria.gender !== "all" && rm.gender !== criteria.gender) return false;
@@ -219,7 +160,7 @@
       const activeCount = chips.length;
 
       if (resultsSummary) {
-        resultsSummary.textContent = activeCount > 0 ? `${filteredCount} / ${totalCount} ứng viên` : `${filteredCount} ứng viên`;
+        resultsSummary.textContent = activeCount > 0 ? `${filteredCount} / ${totalCount} bài đăng` : `${filteredCount} bài đăng`;
       }
       if (filterBadge) {
         filterBadge.textContent = String(activeCount);
@@ -284,10 +225,9 @@
     function openRoommateFilterDrawer() {
       if (document.getElementById("rm-mr-filter-overlay")) return;
       const draft = { ...state, areas: [...state.areas] };
-      const allRoommates = Data.ROOMMATES || [];
+      const allRoommates = getRoommateListings();
       const tabCounts = {
         all: allRoommates.length,
-        high: allRoommates.filter((rm) => rm.matchScore >= 90).length,
         vnu: allRoommates.filter((rm) => rm.vnuMember).length,
         "has-room": allRoommates.filter((rm) => rm.hasRoom).length
       };
@@ -443,7 +383,7 @@
 
       const syncFooterUI = () => {
         const previewMatches = filterRoommates(draft);
-        applyBtn.textContent = `Xem ${previewMatches.length} ứng viên`;
+        applyBtn.textContent = `Xem ${previewMatches.length} bài đăng`;
         const hasDraftFilter =
           Boolean(draft.selectedUniversity) ||
           Boolean(draft.search.trim()) ||
@@ -532,20 +472,20 @@
       const districtMap = new Map((districtsByCity[state.areaCity] || []).map((d) => [d.key, d.name]));
       const selectedDistrictLabels = state.areas.map((k) => districtMap.get(k)).filter(Boolean);
 
-      let emptyTitle = "Chưa có ứng viên khớp bộ lọc hiện tại";
-      let emptyDesc = "Hãy thử nới rộng khu vực hoặc nhấn Đặt lại bộ lọc để xem toàn bộ hồ sơ.";
+      let emptyTitle = "Chưa có bài đăng khớp bộ lọc hiện tại";
+      let emptyDesc = "Hãy thử nới rộng khu vực hoặc đặt lại bộ lọc để xem toàn bộ bài đăng.";
 
       if (state.selectedUniversity) {
-        emptyTitle = `Chưa có ứng viên phù hợp gần ${escapeHTML(state.selectedUniversity.name)}`;
+        emptyTitle = `Chưa có bài đăng gần ${escapeHTML(state.selectedUniversity.name)}`;
         emptyDesc = `Khu vực ${escapeHTML(state.selectedUniversity.district)}, ${escapeHTML(
           state.selectedUniversity.city
-        )} hiện chưa có hồ sơ khả dụng khớp các tiêu chí đã chọn.`;
+        )} hiện chưa có bài đăng khớp các tiêu chí đã chọn.`;
       } else if (selectedDistrictLabels.length > 0) {
-        emptyTitle = `Chưa có ứng viên tại ${escapeHTML(selectedDistrictLabels.join(", "))} (${escapeHTML(state.areaCity)})`;
-        emptyDesc = "Hiện chưa có hồ sơ phù hợp trong các quận đã chọn. Hãy chọn thêm quận khác hoặc Đặt lại bộ lọc.";
+        emptyTitle = `Chưa có bài đăng tại ${escapeHTML(selectedDistrictLabels.join(", "))} (${escapeHTML(state.areaCity)})`;
+        emptyDesc = "Hiện chưa có bài đăng trong các quận đã chọn. Hãy chọn thêm quận khác hoặc đặt lại bộ lọc.";
       } else if (state.areaCity === "Hà Nội") {
-        emptyTitle = "Chưa có ứng viên tại khu vực Hà Nội";
-        emptyDesc = "Hiện chưa có hồ sơ khả dụng tại khu vực này. Bạn có thể chọn khu vực khác hoặc Đặt lại bộ lọc.";
+        emptyTitle = "Chưa có bài đăng tại khu vực Hà Nội";
+        emptyDesc = "Hiện chưa có bài đăng tại khu vực này. Bạn có thể chọn khu vực khác hoặc đặt lại bộ lọc.";
       }
 
       return `
@@ -563,7 +503,7 @@
 
     function renderMatches() {
       if (!grid) return;
-      const allRoommates = Data.ROOMMATES || [];
+      const allRoommates = getRoommateListings();
       const list = filterRoommates(state);
       syncFilterToolbarUI(list.length, allRoommates.length);
 
@@ -572,7 +512,7 @@
       if (loadMoreBtn) {
         loadMoreBtn.classList.toggle("hidden", state.showAll || remaining === 0);
         if (loadMoreLabel && remaining > 0) {
-          loadMoreLabel.textContent = `Xem thêm ${remaining} bạn sinh viên phù hợp khác`;
+          loadMoreLabel.textContent = `Xem thêm ${remaining} bài đăng tìm roommate`;
         }
       }
 
@@ -604,7 +544,7 @@
           Core.openConnectInviteModal({
             partnerId: rm.id,
             name: rm.name,
-            meta: `${rm.school} • ${rm.matchScore}% Hợp gu`,
+            meta: rm.school,
             avatar: rm.avatar,
             roomId: rm.linkedRoomId,
             contact: rm.contact,
@@ -616,7 +556,7 @@
       grid.querySelectorAll("[data-profile-rm]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const rm = Data.ROOMMATES.find((r) => r.id === btn.dataset.profileRm);
-          if (rm) Core.openProfileModal(rm, renderMatches);
+          if (rm) Core.openProfileModal(rm, renderMatches, { showMatchScore: false });
         });
       });
     }
@@ -626,7 +566,7 @@
     loadMoreBtn?.addEventListener("click", () => {
       state.showAll = true;
       renderMatches();
-      Core.showToast("Đã hiển thị thêm các bạn sinh viên tương thích!", "info");
+      Core.showToast("Đã hiển thị thêm bài đăng tìm roommate!", "info");
     });
 
     document.getElementById("mr-share-result-btn")?.addEventListener("click", async () => {
@@ -665,7 +605,6 @@
 
     renderMatches();
     window.addEventListener("roomie:backend-synced", () => {
-      initQuizBannerState();
       renderMatches();
     });
   }
@@ -701,9 +640,6 @@
                 <img class="w-[74px] h-[74px] sm:w-20 sm:h-20 rounded-full object-cover ring-2 ring-primary-fixed" src="${escapeHTML(
                   rm.avatar
                 )}" alt="Ảnh đại diện ${escapeHTML(rm.name)}" />
-                <span class="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed-variant font-label-sm text-[11px] font-bold shadow-xs">${escapeHTML(
-                  rm.matchScore
-                )}%</span>
               </div>
               <div class="flex flex-col gap-0.5">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -719,12 +655,6 @@
                 <span class="font-body-md text-[13.5px] text-on-surface-variant">${escapeHTML(rm.major)}</span>
               </div>
             </div>
-            <span class="px-3.5 py-2 rounded-xl ${
-              rm.matchScore >= 95 ? "bg-secondary-container text-on-secondary-fixed-variant" : "bg-surface-container text-on-surface"
-            } font-label-md text-[13.5px] font-bold flex items-center gap-1.5 shrink-0">
-              ${rm.matchScore >= 95 ? `<span class="material-symbols-outlined text-[18px]">verified</span>` : ""}
-              ${escapeHTML(rm.matchLabel)}
-            </span>
           </div>
 
           <div class="p-3.5 sm:p-4 rounded-2xl ${
@@ -737,7 +667,7 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <span class="font-label-sm text-[11.5px] text-outline uppercase tracking-wide font-semibold">Tiêu chí lối sống tương hợp:</span>
+            <span class="font-label-sm text-[11.5px] text-outline uppercase tracking-wide font-semibold">Tiêu chí tìm bạn cùng phòng:</span>
             <div class="flex flex-wrap gap-2">
               ${(rm.criteria || [])
                 .map(
@@ -851,7 +781,7 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <span class="font-label-md text-label-md text-on-surface font-medium">Nhóm ứng viên</span>
+            <span class="font-label-md text-label-md text-on-surface font-medium">Nhóm bài đăng</span>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               ${FILTER_GROUPS.tab
                 .map(

@@ -1,11 +1,25 @@
 /**
  * Page: Personality Quiz (/roomie/trac-nghiem)
- * Trắc nghiệm 8 câu hỏi tính cách & phần Dự đoán gợi ý roommate mở khóa theo gói dịch vụ.
+ * Trắc nghiệm tính cách & gợi ý roommate; chọn/kết nối trực tiếp thuộc gói dịch vụ.
  */
 (function () {
   const Data = window.RoomieData || {};
   const Core = window.RoomieCore || {};
   const { escapeHTML } = Core;
+
+  function hasPersonalizedQuizResults() {
+    const questions = Data.QUIZ_QUESTIONS || [];
+    const result = Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null);
+    const answers = Core.readJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, {});
+    const genderOption = answers?.[1] || answers?.["1"];
+    return (
+      questions.length > 0 &&
+      Number(result?.answeredCount) === questions.length &&
+      Object.keys(answers || {}).length === questions.length &&
+      ["A", "B", "C", "D"].includes(genderOption) &&
+      (Data.ROOMMATES || []).some((rm) => rm.hasPersonalizedMatchScore)
+    );
+  }
 
   function initQuizPage() {
     const questions = Data.QUIZ_QUESTIONS || [];
@@ -31,26 +45,56 @@
     const finishBannerBtn = document.getElementById("quiz-finish-now-btn");
 
     const previewScores = [
-      { id: "hoang-nam", el: document.getElementById("preview-score-0"), base: 90 },
-      { id: "minh-anh", el: document.getElementById("preview-score-1"), base: 88 },
-      { id: "quoc-bao", el: document.getElementById("preview-score-2"), base: 85 }
+      {
+        id: "hoang-nam",
+        el: document.getElementById("preview-score-0"),
+        labelEl: document.getElementById("preview-match-label-0")
+      },
+      {
+        id: "minh-anh",
+        el: document.getElementById("preview-score-1"),
+        labelEl: document.getElementById("preview-match-label-1")
+      },
+      {
+        id: "quoc-bao",
+        el: document.getElementById("preview-score-2"),
+        labelEl: document.getElementById("preview-match-label-2")
+      }
     ];
 
     function updatePreviewPredictions() {
-      const answeredCount = Object.keys(savedAnswers).length;
-      const aCount = Object.values(savedAnswers).filter((v) => v === "A").length;
-      const bCount = Object.values(savedAnswers).filter((v) => v === "B").length;
+      const hasCompletedQuiz = hasPersonalizedQuizResults();
+      const canViewScores = Core.hasUnlockedPrediction();
 
-      previewScores.forEach((p, i) => {
+      previewScores.forEach((p) => {
         if (!p.el) return;
-        const delta = (aCount * 2 + bCount + answeredCount - i) % 8;
-        p.el.textContent = `${Math.min(99, p.base + delta)}%`;
+        const roommate = (Data.ROOMMATES || []).find((rm) => rm.id === p.id);
+        const hasCompleteProfile = [2, 3, 4, 5, 6, 7, 8, 9].every(
+          (question) => roommate?.quizProfile?.[question] || roommate?.quizProfile?.[String(question)]
+        );
+        const hasMatchScore =
+          canViewScores && hasCompletedQuiz && hasCompleteProfile && roommate?.hasPersonalizedMatchScore;
+        p.el.textContent = hasMatchScore ? `${roommate.matchScore}%` : "—";
+        if (p.labelEl) {
+          p.labelEl.textContent = hasMatchScore
+            ? String(roommate.matchLabel || "").replace(/^\d+%\s*/, "")
+            : hasCompletedQuiz
+            ? canViewScores
+              ? "Chưa đủ dữ liệu đối chiếu"
+              : "Mở gói dịch vụ để xem"
+            : "Hoàn thành trắc nghiệm để xem";
+        }
       });
     }
 
-    function finishQuiz() {
+    async function finishQuiz() {
+      const genderOption = savedAnswers[1] || savedAnswers["1"];
+      if (!["A", "B", "C", "D"].includes(genderOption)) {
+        Core.showToast("Câu giới tính là điều kiện bắt buộc. Vui lòng chọn một phương án.", "info");
+        return;
+      }
+
       const answeredVals = Object.values(savedAnswers);
-      const genderOption = savedAnswers[1] || "A";
       const userGender = genderOption === "B" || genderOption === "D" ? "Nữ" : "Nam";
       const preferredGender = genderOption === "A" ? "Nam" : genderOption === "B" ? "Nữ" : "all";
       const isNightOwl = savedAnswers[2] === "C" || savedAnswers[2] === "D";
@@ -75,15 +119,28 @@
         answeredCount: answeredVals.length,
         completedAt: new Date().toISOString()
       };
+      let submissionSucceeded = true;
       if (Core.submitQuizResult) {
-        Core.submitQuizResult(savedAnswers, result);
+        const submission = await Core.submitQuizResult(savedAnswers, result);
+        submissionSucceeded = Boolean(submission?.ok);
       } else {
         Core.writeJSON(Core.STORAGE_KEYS.QUIZ_RESULT, result);
       }
-      Core.showToast(`Hoàn tất ${questions.length}/${questions.length} câu hỏi! Đang mở danh sách Roommate hợp gu...`);
-      setTimeout(() => {
-        window.location.href = "/roomie/tim-roommate?from=quiz";
-      }, 450);
+      const hasAnsweredEveryQuestion = answeredVals.length === questions.length;
+      const toastMessage = !submissionSucceeded
+        ? "Chưa đồng bộ được kết quả. Phần trăm hợp gu sẽ hiện sau khi kết nối lại."
+        : hasAnsweredEveryQuestion
+        ? "Đã hoàn thành trắc nghiệm! Mở gói dịch vụ để xem phần trăm hợp gu."
+        : "Bạn chưa trả lời đủ câu nên chưa có phần trăm hợp gu.";
+      Core.showToast(toastMessage, submissionSucceeded && hasAnsweredEveryQuestion ? undefined : "info");
+      window.dispatchEvent(new CustomEvent("roomie:quiz-results-updated"));
+      if (submissionSucceeded && hasAnsweredEveryQuestion) {
+        const predictionSection = document.getElementById("quiz-prediction-section");
+        if (predictionSection) {
+          window.history.replaceState(null, "", "#quiz-prediction-section");
+          predictionSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
     }
 
     function renderQuestion() {
@@ -136,7 +193,7 @@
         }
       });
 
-      const selectedKey = savedAnswers[q.number] || "A";
+      const selectedKey = savedAnswers[q.number] || (q.number === 1 ? null : "A");
       if (optionsGrid) {
         optionsGrid.innerHTML = q.options
           .map((opt) => {
@@ -195,6 +252,7 @@
           label.textContent = currentIdx === questions.length - 1 ? "Hoàn tất & Xem kết quả Match" : "Lưu & Tiếp tục";
         }
       }
+      if (skipBtn) skipBtn.classList.toggle("hidden", q.number === 1);
       updatePreviewPredictions();
     }
 
@@ -213,6 +271,10 @@
       }
     });
     skipBtn?.addEventListener("click", () => {
+      if (questions[currentIdx].number === 1) {
+        Core.showToast("Câu giới tính là điều kiện bắt buộc.", "info");
+        return;
+      }
       if (currentIdx < questions.length - 1) {
         currentIdx += 1;
         renderQuestion();
@@ -223,6 +285,10 @@
     saveBtn?.addEventListener("click", () => {
       const q = questions[currentIdx];
       if (!savedAnswers[q.number]) {
+        if (q.number === 1) {
+          Core.showToast("Vui lòng chọn giới tính và mong muốn ghép phòng trước.", "info");
+          return;
+        }
         savedAnswers[q.number] = "A";
         Core.writeJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, savedAnswers);
       }
@@ -236,6 +302,9 @@
     finishBannerBtn?.addEventListener("click", finishQuiz);
 
     initQuizPredictionSection();
+    window.addEventListener("roomie:backend-synced", updatePreviewPredictions);
+    window.addEventListener("roomie:plan-updated", updatePreviewPredictions);
+    window.addEventListener("roomie:quiz-results-updated", updatePreviewPredictions);
     renderQuestion();
   }
 
@@ -250,6 +319,8 @@
     const previewProfileBtns = Array.from(document.querySelectorAll(".quiz-preview-profile-btn[data-preview-profile]"));
 
     const findRoommateById = (rmId) => (Data.ROOMMATES || []).find((r) => r.id === rmId);
+    const hasPersonalizedScore = (rm) => hasPersonalizedQuizResults() && Boolean(rm?.hasPersonalizedMatchScore);
+    const canViewPredictions = () => Core.hasUnlockedPrediction();
 
     const statusStyleMap = {
       matched: { cls: "bg-tertiary text-on-tertiary", icon: "done_all", text: "Đã chốt Roommate" },
@@ -269,13 +340,28 @@
     const allStateClasses = Array.from(new Set(Object.values(statusStyleMap).flatMap((v) => v.cls.split(" "))));
 
     function syncPreviewCardStates() {
-      const unlocked = Core.hasUnlockedPrediction();
+      const unlocked = canViewPredictions();
+      const completedQuiz = hasPersonalizedQuizResults();
+      const preferredGender = Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null)?.preferredGender || "all";
+      const rankedCards = previewCards
+        .map((card) => ({ card, roommate: findRoommateById(card.dataset.previewCard) }))
+        .filter(({ roommate }) => !completedQuiz || preferredGender === "all" || roommate?.gender === preferredGender)
+        .sort((a, b) => (completedQuiz ? (b.roommate?.matchScore || 0) - (a.roommate?.matchScore || 0) : 0));
+
       previewCards.forEach((card) => {
         card.classList.toggle("cursor-pointer", unlocked);
         card.classList.toggle("hover:-translate-y-1", unlocked);
         card.classList.toggle("hover:ring-2", unlocked);
         card.classList.toggle("hover:ring-primary/30", unlocked);
+        const roommate = findRoommateById(card.dataset.previewCard);
+        card.classList.toggle(
+          "hidden",
+          completedQuiz && preferredGender !== "all" && roommate?.gender !== preferredGender
+        );
       });
+      if (completedQuiz && previewCards[0]?.parentElement) {
+        rankedCards.forEach(({ card }) => previewCards[0].parentElement.appendChild(card));
+      }
 
       previewSelectBtns.forEach((btn) => {
         const rm = findRoommateById(btn.dataset.previewSelect);
@@ -297,7 +383,9 @@
     }
 
     function syncPredictionLockState() {
-      const unlocked = Core.hasUnlockedPrediction();
+      const planUnlocked = Core.hasUnlockedPrediction();
+      const quizComplete = hasPersonalizedQuizResults();
+      const unlocked = planUnlocked;
       const activePlan = Core.getLatestPurchasedPlan();
       const blurClasses = ["blur-[8px]", "opacity-65", "select-none", "pointer-events-none"];
 
@@ -314,16 +402,21 @@
       predictionOverlay?.classList.toggle("hidden", unlocked);
 
       if (statusPill && statusDot && statusLabel) {
-        if (unlocked) {
+        if (planUnlocked) {
           statusPill.className =
             "inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-bold mb-space-xs";
           statusDot.className = "w-2 h-2 rounded-full bg-tertiary animate-pulse";
-          statusLabel.textContent = `Live Preview • Đã mở khóa (${activePlan?.name || "Gói dịch vụ"})`;
+          statusLabel.textContent = `Đã mở khóa kết quả (${activePlan?.name || "Gói dịch vụ"})`;
+        } else if (quizComplete) {
+          statusPill.className =
+            "inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-bold mb-space-xs";
+          statusDot.className = "w-2 h-2 rounded-full bg-primary";
+          statusLabel.textContent = "Đã hoàn thành • Mở gói để xem kết quả";
         } else {
           statusPill.className =
             "inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-bold mb-space-xs";
           statusDot.className = "w-2 h-2 rounded-full bg-primary";
-          statusLabel.textContent = "Tính năng Gói Dịch Vụ • Đang khóa";
+          statusLabel.textContent = "Hoàn thành trắc nghiệm và mở gói để xem kết quả";
         }
       }
       syncPreviewCardStates();
@@ -341,9 +434,13 @@
     previewProfileBtns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        if (!Core.hasUnlockedPrediction()) return;
+        if (!canViewPredictions()) return;
         const rm = findRoommateById(btn.dataset.previewProfile);
-        if (rm) Core.openProfileModal(rm, syncPreviewCardStates);
+        if (rm) {
+          Core.openProfileModal(rm, syncPreviewCardStates, {
+            showMatchScore: hasPersonalizedScore(rm)
+          });
+        }
       });
     });
 
@@ -351,7 +448,12 @@
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const rm = findRoommateById(btn.dataset.previewSelect);
-        if (!rm || !Core.hasUnlockedPrediction()) return;
+        if (!rm) return;
+        if (!Core.hasUnlockedPrediction()) {
+          const pkg = (Data.PRICING_PACKAGES || []).find((p) => p.id === "match-plus");
+          if (pkg) Core.openPaymentModal(pkg);
+          return;
+        }
         const existing = Core.getConnectionForPartner(rm.id, rm.name);
         if (existing?.status === "incoming") {
           if (Core.getActiveSlotConnections().length >= Core.MAX_CONTACT_SLOTS) {
@@ -367,7 +469,7 @@
         Core.openConnectInviteModal({
           partnerId: rm.id,
           name: rm.name,
-          meta: `${rm.school} • ${rm.matchScore}% Hợp gu`,
+          meta: hasPersonalizedScore(rm) ? `${rm.school} • ${rm.matchScore}% Hợp gu` : rm.school,
           avatar: rm.avatar,
           roomId: rm.linkedRoomId,
           contact: rm.contact,
@@ -378,14 +480,20 @@
 
     previewCards.forEach((card) => {
       card.addEventListener("click", () => {
-        if (!Core.hasUnlockedPrediction()) return;
+        if (!canViewPredictions()) return;
         const rm = findRoommateById(card.dataset.previewCard);
-        if (rm) Core.openProfileModal(rm, syncPreviewCardStates);
+        if (rm) {
+          Core.openProfileModal(rm, syncPreviewCardStates, {
+            showMatchScore: hasPersonalizedScore(rm)
+          });
+        }
       });
     });
 
     syncPredictionLockState();
     Core.onPlanStateChange(syncPredictionLockState);
+    window.addEventListener("roomie:backend-synced", syncPredictionLockState);
+    window.addEventListener("roomie:quiz-results-updated", syncPredictionLockState);
     window.addEventListener("roomie:connections-updated", syncPreviewCardStates);
   }
 

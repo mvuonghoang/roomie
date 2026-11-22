@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roomie - Đăng tin tìm bạn ghép &amp; Cho thuê phòng | Ở cùng người hợp gu</title>
+  <title>Roomie - Đăng tin tìm roommate | Ở cùng người hợp gu</title>
   <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
   <link rel="shortcut icon" href="/favicon.ico?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,36 +37,36 @@
           </div>
           <!-- Main Headline -->
           <h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface max-w-3xl leading-tight">
-            Đăng tin tìm bạn cùng phòng hoặc Cho thuê phòng trọ
+            Đăng tin tìm bạn cùng phòng
           </h1>
           <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-space-sm mb-space-xl">
-            Đưa bài đăng của bạn tiếp cận hàng nghìn sinh viên cùng trường, đúng mức ngân sách và có nếp sinh hoạt hòa hợp nhất.
+            Chỉ dành cho sinh viên. Chọn tình trạng phòng của bạn để tìm người ở ghép hoặc cùng đi tìm phòng.
           </p>
           <!-- Purpose Selector (Large Segmented Tab Control) -->
           <div class="w-full max-w-3xl bg-surface-container p-1.5 rounded-2xl shadow-inner grid grid-cols-1 md:grid-cols-2 gap-1.5">
-            <button data-purpose="roommate" class="post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl bg-surface-container-lowest text-primary shadow-sm font-label-md text-label-md transition-all text-left" type="button">
+            <button data-purpose="has-room" class="post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl bg-surface-container-lowest text-primary shadow-sm font-label-md text-label-md transition-all text-left" type="button">
               <span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: 'FILL' 1;">
                 group_add
               </span>
               <div class="flex flex-col">
                 <span class="font-title-md text-title-md text-primary font-bold">
-                  Tìm bạn cùng phòng
+                  Tìm bạn đã có phòng
                 </span>
                 <span class="font-body-sm text-body-sm text-on-surface-variant">
-                  Tôi đã có phòng, cần tìm 1-2 người chia tiền
+                  Đã có phòng và muốn tìm bạn ở cùng
                 </span>
               </div>
             </button>
-            <button data-purpose="rent" class="post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest/60 transition-all text-left" type="button">
+            <button data-purpose="find-room" class="post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest/60 transition-all text-left" type="button">
               <span class="material-symbols-outlined text-outline text-headline-sm">
                 apartment
               </span>
               <div class="flex flex-col">
                 <span class="font-title-md text-title-md text-on-surface font-semibold">
-                  Cho thuê / Sang nhượng
+                  Cùng đi tìm phòng
                 </span>
                 <span class="font-body-sm text-body-sm text-on-surface-variant">
-                  Chủ nhà trọ hoặc sinh viên chuyển cơ sở học
+                  Cả hai chưa có phòng, muốn tìm người cùng thuê
                 </span>
               </div>
             </button>
@@ -89,7 +89,7 @@
                   Bước 1 • Xong
                 </span>
                 <span class="font-label-md text-label-md text-on-surface truncate">
-                  Vị trí &amp; Cơ sở vật chất
+                  Trường &amp; Khu vực
                 </span>
               </div>
             </div>
@@ -103,7 +103,7 @@
                   Bước 2 • Đang điền
                 </span>
                 <span class="font-label-md text-label-md text-primary font-semibold truncate">
-                  Chi phí &amp; Phòng ở
+                  Tình trạng phòng &amp; Ngân sách
                 </span>
               </div>
             </div>
@@ -131,7 +131,7 @@
                   Bước 4
                 </span>
                 <span class="font-label-md text-label-md text-on-surface truncate">
-                  Ảnh &amp; Xác thực SV
+                  Hồ sơ &amp; Xác thực SV
                 </span>
               </div>
             </div>
@@ -150,7 +150,7 @@
                   <span class="w-2.5 h-2.5 rounded-full bg-primary">
                   </span>
                   <h2 class="font-headline-sm text-headline-sm text-on-surface">
-                    1. Loại phòng &amp; Địa chỉ gần trường
+                    1. Loại phòng &amp; Khu vực tìm bạn
                   </h2>
                 </div>
                 <span class="font-label-sm text-label-sm text-primary bg-primary-fixed px-space-sm py-0.5 rounded-full">
@@ -159,7 +159,7 @@
               </div>
               <!-- Housing Type Chips -->
               <label class="block font-label-md text-label-md text-on-surface-variant mb-space-xs">
-                Loại hình chỗ ở
+                Loại phòng hiện có / mong muốn
               </label>
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-space-xs mb-space-md">
                 <button class="post-housing-btn py-space-sm px-space-xs rounded-xl bg-primary text-on-primary font-label-md text-label-md text-center transition-all" type="button">
@@ -179,7 +179,7 @@
               <div class="space-y-space-md">
                 <div>
                   <label class="block font-label-md text-label-md text-on-surface font-medium mb-space-xs">
-                    Gần trường Đại học nào nhất? (Để ưu tiên ghép bạn cùng trường)
+                    Trường hoặc khu vực ưu tiên tìm bạn
                   </label>
                   <div class="relative">
                     <select id="post-school" class="w-full h-12 bg-surface-container-low text-on-surface rounded-xl px-space-md font-body-md text-body-md focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary appearance-none cursor-pointer outline-none">
@@ -210,11 +210,17 @@
                 <!-- Full Address -->
                 <div>
                   <label class="block font-label-md text-label-md text-on-surface font-medium mb-space-xs">
-                    Địa chỉ chi tiết &amp; Khoảng cách ước tính
+                    <span id="post-address-label">Khu vực / địa chỉ gần phòng hiện có</span>
                   </label>
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-xs">
-                    <input class="sm:col-span-2 h-12 bg-surface-container-low rounded-xl px-space-md font-body-md text-body-md text-on-surface outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary" id="post-address" placeholder="Số nhà, tên đường" type="text" value="Đường số 6, Khu phố 6" />
-                    <input class="h-12 bg-surface-container-low rounded-xl px-space-md font-body-md text-body-md text-on-surface outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary" id="post-distance" placeholder="Ghi chú khoảng cách" type="text" value="Cách KTX B 300m" />
+                    <input class="sm:col-span-2 h-12 bg-surface-container-low rounded-xl px-space-md font-body-md text-body-md text-on-surface outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary" id="post-address" placeholder="Khu vực cụ thể gần phòng" type="text" />
+                    <select id="post-area-key" class="h-12 bg-surface-container-low text-on-surface rounded-xl px-space-sm font-body-sm text-body-sm focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary appearance-none cursor-pointer outline-none">
+                      <option value="thu-duc" selected="">Thủ Đức / Làng ĐHQG</option>
+                      <option value="binh-thanh">Bình Thạnh</option>
+                      <option value="quan-5">Quận 5</option>
+                      <option value="go-vap">Gò Vấp</option>
+                      <option value="quan-10">Quận 10</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -226,7 +232,7 @@
                   <span class="w-2.5 h-2.5 rounded-full bg-secondary">
                   </span>
                   <h2 class="font-headline-sm text-headline-sm text-on-surface">
-                    2. Chi phí minh bạch (Cam kết không phát sinh)
+                    2. Ngân sách thuê phòng
                   </h2>
                 </div>
                 <span class="font-label-sm text-label-sm text-secondary bg-secondary-container px-space-sm py-0.5 rounded-full">
@@ -237,7 +243,7 @@
                 <!-- Room price per person -->
                 <div class="p-space-md bg-surface-container-low rounded-xl">
                   <div class="flex items-center justify-between mb-space-xs">
-                    <span class="font-label-md text-label-md text-on-surface font-semibold">
+                    <span id="post-price-label" class="font-label-md text-label-md text-on-surface font-semibold">
                       Tiền phòng / người
                     </span>
                     <span class="material-symbols-outlined text-primary text-title-md">
@@ -245,70 +251,13 @@
                     </span>
                   </div>
                   <div class="relative flex items-center">
-                    <input id="post-price" class="w-full bg-surface-container-lowest h-11 rounded-lg px-space-sm font-currency-md text-currency-md text-primary outline-none focus:ring-2 focus:ring-primary" type="text" value="2.200.000" />
+                    <input id="post-price" class="w-full bg-surface-container-lowest h-11 rounded-lg px-space-sm font-currency-md text-currency-md text-primary outline-none focus:ring-2 focus:ring-primary" type="text" placeholder="Ví dụ: 2.200.000" />
                     <span class="absolute right-3 font-body-sm text-body-sm text-on-surface-variant font-medium">
                       VNĐ / tháng
                     </span>
                   </div>
                   <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
-                    Phòng 2 người, tổng 4.400.000đ chia đôi
-                  </p>
-                </div>
-                <!-- Electricity -->
-                <div class="p-space-md bg-surface-container-low rounded-xl">
-                  <div class="flex items-center justify-between mb-space-xs">
-                    <span class="font-label-md text-label-md text-on-surface font-semibold">
-                      Tiền điện
-                    </span>
-                    <span class="material-symbols-outlined text-on-surface-variant text-title-md">
-                      bolt
-                    </span>
-                  </div>
-                  <div class="relative flex items-center">
-                    <input id="post-electric" class="w-full bg-surface-container-lowest h-11 rounded-lg px-space-sm font-title-md text-title-md text-on-surface outline-none focus:ring-2 focus:ring-primary" type="text" value="3.500" />
-                    <span class="absolute right-3 font-body-sm text-body-sm text-on-surface-variant">
-                      VNĐ / kWh
-                    </span>
-                  </div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
-                    Đồng hồ riêng từng phòng rõ ràng
-                  </p>
-                </div>
-                <!-- Water -->
-                <div class="p-space-md bg-surface-container-low rounded-xl">
-                  <div class="flex items-center justify-between mb-space-xs">
-                    <span class="font-label-md text-label-md text-on-surface font-semibold">
-                      Tiền nước sinh hoạt
-                    </span>
-                    <span class="material-symbols-outlined text-on-surface-variant text-title-md">
-                      water_drop
-                    </span>
-                  </div>
-                  <div class="relative flex items-center">
-                    <input id="post-water" class="w-full bg-surface-container-lowest h-11 rounded-lg px-space-sm font-title-md text-title-md text-on-surface outline-none focus:ring-2 focus:ring-primary" type="text" value="50.000" />
-                    <span class="absolute right-3 font-body-sm text-body-sm text-on-surface-variant">
-                      VNĐ / người / th
-                    </span>
-                  </div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
-                    Nước máy thủy cục sạch
-                  </p>
-                </div>
-                <!-- Wifi & Services -->
-                <div class="p-space-md bg-surface-container-low rounded-xl">
-                  <div class="flex items-center justify-between mb-space-xs">
-                    <span class="font-label-md text-label-md text-on-surface font-semibold">
-                      Wifi &amp; Phí dịch vụ rác
-                    </span>
-                    <span class="material-symbols-outlined text-on-surface-variant text-title-md">
-                      wifi
-                    </span>
-                  </div>
-                  <div class="relative flex items-center">
-                    <input id="post-service" class="w-full bg-surface-container-lowest h-11 rounded-lg px-space-sm font-title-md text-title-md text-secondary outline-none focus:ring-2 focus:ring-primary" type="text" value="Miễn phí (Bao gồm)" />
-                  </div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
-                    Đã bao gồm trong tiền phòng
+                    <span id="post-price-help">Tiền phòng mỗi người mỗi tháng</span>
                   </p>
                 </div>
               </div>
@@ -328,11 +277,7 @@
                 </span>
               </div>
               <p class="font-body-md text-body-md text-on-surface-variant mb-space-md">
-                Hệ thống dựa trên các thói quen này để tính điểm phần trăm tương thích (
-                <strong class="text-primary">
-                  % Hợp gu
-                </strong>
-                ) với các bạn sinh viên khác.
+                Chọn những thói quen bạn muốn chia sẻ để người tìm roommate hiểu rõ nếp sinh hoạt của bạn.
               </p>
               <div class="flex flex-wrap gap-2.5">
                 <!-- Habit Tag 1 (Selected) -->
@@ -407,56 +352,16 @@
                   <span class="w-2.5 h-2.5 rounded-full bg-tertiary">
                   </span>
                   <h2 class="font-headline-sm text-headline-sm text-on-surface">
-                    4. Hình ảnh thực tế phòng &amp; Xác thực sinh viên
+                    4. Xác thực sinh viên
                   </h2>
                 </div>
                 <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-                  Tối thiểu 3 ảnh
+                  Hồ sơ người đăng
                 </span>
               </div>
               <p class="font-body-md text-body-md text-on-surface-variant mb-space-md">
-                Hình ảnh sáng sủa, chụp rõ góc giường ngủ, bàn học và nhà vệ sinh giúp bài đăng nhận được nhiều liên hệ gấp 4 lần.
+                Bài đăng sẽ sử dụng thông tin sinh viên và tiêu chí roommate của bạn; không cần thông tin chủ trọ hay tin cho thuê phòng.
               </p>
-              <!-- 4 Image Previews Grid -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm mb-space-lg">
-                <div class="relative group rounded-xl overflow-hidden aspect-[4/3] bg-surface-container shadow-sm">
-                  <img alt="Không gian phòng trọ sinh viên gọn gàng tràn ngập ánh sáng tự nhiên với bàn học gỗ và cây xanh" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="/assets/images/dang-tin/room-1.jpg" />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-space-xs">
-                    <span class="font-label-sm text-label-sm text-white">
-                      Ảnh bìa • Toàn cảnh
-                    </span>
-                  </div>
-                </div>
-                <div class="relative group rounded-xl overflow-hidden aspect-[4/3] bg-surface-container shadow-sm">
-                  <img alt="Góc bàn học tập ngăn nắp cạnh cửa sổ ngập nắng với đèn bàn và kệ sách sinh viên" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="/assets/images/dang-tin/room-2.jpg" />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-space-xs">
-                    <span class="font-label-sm text-label-sm text-white">
-                      Góc học tập riêng
-                    </span>
-                  </div>
-                </div>
-                <div class="relative group rounded-xl overflow-hidden aspect-[4/3] bg-surface-container shadow-sm">
-                  <img alt="Bếp chung sạch sẽ trong căn hộ sinh viên với bếp điện từ, kệ gỗ và dụng cụ nấu ăn gọn gàng" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="/assets/images/dang-tin/room-3.jpg" />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-space-xs">
-                    <span class="font-label-sm text-label-sm text-white">
-                      Bếp nấu ăn
-                    </span>
-                  </div>
-                </div>
-                <!-- Upload new button -->
-                <input id="post-photo-input" type="file" accept="image/*" class="hidden" />
-                <button id="post-upload-btn" class="rounded-xl border-dashed border-2 border-primary/40 hover:border-primary bg-primary-fixed/20 hover:bg-primary-fixed/40 transition-colors flex flex-col items-center justify-center p-space-xs text-primary aspect-[4/3]" type="button">
-                  <span class="material-symbols-outlined text-headline-md mb-1">
-                    add_photo_alternate
-                  </span>
-                  <span class="font-label-sm text-label-sm text-center font-semibold">
-                    Tải thêm ảnh
-                  </span>
-                  <span class="font-body-sm text-[10px] text-on-surface-variant">
-                    Tối đa 15MB
-                  </span>
-                </button>
-              </div>
               <!-- Student ID Verification Option Card -->
               <div class="p-space-md rounded-xl bg-secondary-container/40 flex items-start gap-space-md">
                 <input checked="" class="w-5 h-5 mt-0.5 rounded text-primary focus:ring-primary cursor-pointer accent-primary" id="verify-check" type="checkbox" />
@@ -476,7 +381,7 @@
                     <code data-auth-email class="bg-surface-container px-1 py-0.5 rounded text-tertiary">
                       22120***@student.hcmus.edu.vn
                     </code>
-                    . Tin đăng sẽ có tick xanh tăng uy tín lên 98%.
+                    . Tùy chọn chỉ ảnh hưởng huy hiệu hiển thị trong bản xem trước.
                   </p>
                 </div>
               </div>
@@ -537,12 +442,12 @@
                     Cách KTX B ĐHQG 300m
                   </span>
                 </div>
-                <!-- Match Score Indicator -->
+                <!-- Room status badge -->
                 <div class="absolute top-3 right-3 bg-secondary-container/95 text-on-secondary-container backdrop-blur-md px-space-sm py-1 rounded-full flex items-center gap-1 shadow-sm font-label-md text-label-md font-bold">
                   <span class="material-symbols-outlined text-[16px]">
-                    sentiment_very_satisfied
+                    home
                   </span>
-                  96% Hợp gu
+                  <span id="pv-purpose-badge">Đã có phòng</span>
                 </div>
                 <div id="pv-boost-badge" class="hidden absolute top-12 right-3 bg-primary text-on-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold shadow-sm">
                   ⚡ BOOST NỔI BẬT
@@ -622,7 +527,7 @@
                     <span class="material-symbols-outlined text-[16px] text-tertiary">
                       check_circle
                     </span>
-                    Giờ giấc tự do
+                    <span id="pv-secondary-label">Thông tin người đăng là sinh viên</span>
                   </span>
                 </div>
                 <!-- Connect CTA in preview -->
@@ -650,7 +555,7 @@
                     ✓
                   </span>
                   <span>
-                    Đăng đủ 4 ảnh thực tế (tránh ảnh mạng/ảnh đồ họa).
+                    Nêu rõ khu vực và ngân sách dự kiến của bạn.
                   </span>
                 </li>
                 <li class="flex items-start gap-2">
@@ -658,7 +563,7 @@
                     ✓
                   </span>
                   <span>
-                    Ghi rõ chi phí điện nước, không mập mờ phụ phí.
+                    Chia sẻ trung thực nếp sinh hoạt và mong muốn ở chung.
                   </span>
                 </li>
                 <li class="flex items-start gap-2">
@@ -702,7 +607,7 @@
                 Duyệt tin tự động &amp; Thủ công 15p
               </h3>
               <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                Hệ thống AI đối chiếu địa chỉ và hình ảnh kết hợp đội ngũ sinh viên hỗ trợ thẩm định, loại bỏ 100% cò mồi và tin lừa cọc.
+                Hồ sơ tập trung vào tình trạng phòng, khu vực, ngân sách và thói quen để sinh viên tự tìm người ở cùng phù hợp.
               </p>
             </div>
             <!-- Pillar 2 -->

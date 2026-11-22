@@ -168,7 +168,11 @@ async function handleApiRequest(req, res) {
     // 2. Full Frontend Bootstrap Endpoint
     if (pathname === '/api/bootstrap' && method === 'GET') {
       const uid = auth.userId || db.DEFAULT_USER_ID;
-      const quiz = db.getQuizSubmission(uid);
+      const requestedUserId = req.headers['x-user-id'] || reqUrl.searchParams.get('userId') || '';
+      const quiz =
+        auth.user && (!requestedUserId || requestedUserId === auth.user.id)
+          ? db.getQuizSubmission(uid)
+          : null;
       const connections = db.getConnections(uid);
       const activeSlots = connections.filter((c) => c.status === 'pending' || c.status === 'accepted').length;
 
@@ -315,6 +319,13 @@ async function handleApiRequest(req, res) {
     }
 
     if (pathname === '/api/rooms' && method === 'POST') {
+      if (!auth.user || auth.user.role !== 'student') {
+        sendJSON(res, 403, {
+          ok: false,
+          error: 'Chỉ tài khoản sinh viên mới được đăng tin trên Roomie.'
+        });
+        return true;
+      }
       if (!body.address || !body.price) {
         sendJSON(res, 400, {
           ok: false,
@@ -384,6 +395,32 @@ async function handleApiRequest(req, res) {
     }
 
     // 6. Roommates & Compatibility Matching Routes
+    if (pathname === '/api/roommates' && method === 'POST') {
+      if (!auth.user || auth.user.role !== 'student') {
+        sendJSON(res, 403, {
+          ok: false,
+          error: 'Chỉ tài khoản sinh viên mới được đăng tin tìm roommate.'
+        });
+        return true;
+      }
+
+      const roommate = db.createRoommateListing(auth.user, body);
+      if (!roommate) {
+        sendJSON(res, 400, {
+          ok: false,
+          error: 'Vui lòng kiểm tra loại tin, khu vực và ngân sách trước khi đăng.'
+        });
+        return true;
+      }
+
+      sendJSON(res, 201, {
+        ok: true,
+        roommate,
+        roommates: db.getAllRoommates(auth.userId)
+      });
+      return true;
+    }
+
     if (pathname === '/api/roommates' && method === 'GET') {
       let list = db.getAllRoommates(auth.userId);
       const gender = reqUrl.searchParams.get('gender');

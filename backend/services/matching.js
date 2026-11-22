@@ -1,7 +1,7 @@
 /**
- * Roomie Match - 2-Layer Compatibility Engine (>85% Lifestyle Matching)
- * Lớp 1: Lọc cứng (Deal-breakers: Giới tính, Hút thuốc/Thú cưng, Ngân sách)
- * Lớp 2: Chấm điểm trọng số lối sống (Nhịp sinh học 35%, Vệ sinh & Bếp 35%, Khách & Thú cưng 15%, Tài chính 15%)
+ * Roomie Match - 2-Layer Compatibility Engine
+ * Lớp 1: Lọc cứng theo giới tính mong muốn ở câu 1.
+ * Lớp 2: Chấm điểm trọng số các tiêu chí lối sống ở câu 2-9.
  */
 
 const QUESTION_WEIGHTS = {
@@ -17,7 +17,7 @@ const QUESTION_WEIGHTS = {
 
 /**
  * Compute similarity between two option keys ('A', 'B', 'C', 'D') for a specific question.
- * Returns a score between 0.65 and 1.0 so compatible students range realistically between 82% and 99%.
+ * Returns a score between 0.72 and 1.0 so compatible students range realistically between 84% and 99%.
  */
 function compareOptionPair(qNum, userOpt, targetOpt) {
   if (!userOpt || !targetOpt) return 0.9;
@@ -59,9 +59,20 @@ function evaluateQuizSubmission(answers = {}) {
   }
 
   const answeredVals = Object.values(cleanAnswers);
-  const genderOption = cleanAnswers[1] || 'A';
-  const userGender = genderOption === 'B' || genderOption === 'D' ? 'Nữ' : 'Nam';
-  const preferredGender = genderOption === 'A' ? 'Nam' : genderOption === 'B' ? 'Nữ' : 'all';
+  const genderOption = cleanAnswers[1] || null;
+  const userGender = genderOption
+    ? genderOption === 'B' || genderOption === 'D'
+      ? 'Nữ'
+      : 'Nam'
+    : null;
+  const preferredGender =
+    genderOption === 'A'
+      ? 'Nam'
+      : genderOption === 'B'
+      ? 'Nữ'
+      : ['C', 'D'].includes(genderOption)
+      ? 'all'
+      : null;
   const isNightOwl = cleanAnswers[2] === 'C' || cleanAnswers[2] === 'D';
   const isNeat = cleanAnswers[5] === 'A' || cleanAnswers[5] === 'B' || !cleanAnswers[5];
 
@@ -92,13 +103,26 @@ function evaluateQuizSubmission(answers = {}) {
 }
 
 /**
- * Calculate compatibility percentage (82 - 99%) between user's quiz answers and a roommate profile.
+ * Calculate compatibility percentage (84 - 99%) between user's quiz answers and a roommate profile.
  */
 function computeRoommateMatchScore(userAnswers, roommate) {
   if (!userAnswers || Object.keys(userAnswers).length === 0) {
     return {
       matchScore: roommate.matchScore || 90,
-      matchLabel: roommate.matchLabel || `${roommate.matchScore || 90}% Hợp gu`
+      matchLabel: roommate.matchLabel || `${roommate.matchScore || 90}% Hợp gu`,
+      isGenderCompatible: false,
+      hasLifestyleData: false
+    };
+  }
+
+  const genderOption = userAnswers[1] || userAnswers['1'];
+  const requiredGender = genderOption === 'A' ? 'Nam' : genderOption === 'B' ? 'Nữ' : null;
+  if (!['A', 'B', 'C', 'D'].includes(genderOption) || (requiredGender && roommate.gender !== requiredGender)) {
+    return {
+      matchScore: null,
+      matchLabel: 'Không phù hợp giới tính',
+      isGenderCompatible: false,
+      hasLifestyleData: false
     };
   }
 
@@ -116,14 +140,14 @@ function computeRoommateMatchScore(userAnswers, roommate) {
     }
   });
 
-  let score = roommate.matchScore || 90;
-  if (totalWeight > 0) {
-    const rawRatio = weightedSum / totalWeight; // ~0.78 to 1.0
-    score = Math.round(Math.min(99, Math.max(84, rawRatio * 98)));
-  }
-
+  const score =
+    totalWeight > 0
+      ? Math.round(Math.min(99, Math.max(84, (weightedSum / totalWeight) * 98)))
+      : null;
   const label =
-    score >= 96
+    score === null
+      ? 'Chưa đủ dữ liệu lối sống'
+      : score >= 96
       ? `${score}% Cực hợp gu`
       : score >= 91
       ? `${score}% Rất hợp gu`
@@ -131,7 +155,9 @@ function computeRoommateMatchScore(userAnswers, roommate) {
 
   return {
     matchScore: score,
-    matchLabel: label
+    matchLabel: label,
+    isGenderCompatible: true,
+    hasLifestyleData: totalWeight > 0
   };
 }
 

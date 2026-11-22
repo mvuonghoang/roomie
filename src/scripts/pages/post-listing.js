@@ -1,6 +1,6 @@
 /**
  * Page: Post Listing (/roomie/dang-tin)
- * Form đăng tin minh bạch chi phí, xem trước thời gian thực, tải ảnh và lưu bản nháp cục bộ.
+ * Form đăng tin tìm roommate dành cho sinh viên.
  */
 (function () {
   const Data = window.RoomieData || {};
@@ -13,16 +13,10 @@
 
     const schoolSelect = document.getElementById("post-school");
     const addressInput = document.getElementById("post-address");
-    const distanceInput = document.getElementById("post-distance");
+    const areaSelect = document.getElementById("post-area-key");
     const priceInput = document.getElementById("post-price");
-    const electricInput = document.getElementById("post-electric");
-    const waterInput = document.getElementById("post-water");
-    const serviceInput = document.getElementById("post-service");
     const messageInput = document.getElementById("post-message");
     const verifyCheck = document.getElementById("verify-check");
-    const photoInput = document.getElementById("post-photo-input");
-    const uploadBtn = document.getElementById("post-upload-btn");
-
     const pvDistance = document.getElementById("pv-distance");
     const pvPrice = document.getElementById("pv-price");
     const pvTotalHint = document.getElementById("pv-total-hint");
@@ -32,29 +26,63 @@
     const pvVerified = document.getElementById("pv-verified");
     const pvCoverImg = document.getElementById("pv-cover-img");
     const pvServiceLabel = document.getElementById("pv-service-label");
+    const pvSecondaryLabel = document.getElementById("pv-secondary-label");
     const pvBoostBadge = document.getElementById("pv-boost-badge");
+    const pvPurposeBadge = document.getElementById("pv-purpose-badge");
+    const addressLabel = document.getElementById("post-address-label");
+    const priceLabel = document.getElementById("post-price-label");
+    const priceHelp = document.getElementById("post-price-help");
 
-    let selectedPurpose = "roommate";
+    let selectedPurpose = "has-room";
     let selectedType = "Phòng Studio";
     let isBoosted = false;
-    let uploadedCover = "";
+    const defaultCover = pvCoverImg?.src || "";
 
     function updatePreview() {
-      const priceVal = Core.parseCurrencyNumber(priceInput?.value || "2200000");
-      const waterVal = Core.parseCurrencyNumber(waterInput?.value || "50000");
-      const serviceVal = Core.parseCurrencyNumber(serviceInput?.value || "0");
-      const estimatedTotal = priceVal + waterVal + serviceVal + 150000;
+      const hasRoom = selectedPurpose === "has-room";
+      const priceVal = Core.parseCurrencyNumber(priceInput?.value || "");
+      const budgetLabel = priceVal > 0 ? Core.formatVND(priceVal) : "Chưa nhập ngân sách";
 
-      if (pvPrice) pvPrice.textContent = Core.formatVND(priceVal);
-      if (pvTotalHint) pvTotalHint.textContent = `Tổng dự kiến ~ ${Core.formatVND(estimatedTotal)}/tháng`;
-      if (pvDistance) pvDistance.textContent = distanceInput?.value.trim() || "Cách KTX B ĐHQG 300m";
-      if (pvAddress) pvAddress.textContent = addressInput?.value.trim() || "Đường số 6, Phường Linh Trung, TP. Thủ Đức";
+      if (pvPrice) pvPrice.textContent = budgetLabel;
+      if (pvTotalHint) {
+        pvTotalHint.textContent = hasRoom
+          ? `Tiền phòng ${budgetLabel}/người/tháng, chưa gồm tiện ích`
+          : `Ngân sách tối đa ${budgetLabel}/người/tháng`;
+      }
+      if (pvDistance) {
+        pvDistance.textContent = areaSelect?.selectedOptions?.[0]?.textContent.trim() || "Ưu tiên gần trường";
+      }
+      if (pvAddress) pvAddress.textContent = addressInput?.value.trim() || "Chọn khu vực mong muốn";
       if (pvVerified) pvVerified.classList.toggle("hidden", !verifyCheck?.checked);
       if (pvServiceLabel) {
-        pvServiceLabel.textContent =
-          serviceVal === 0 ? "Wifi & Rác miễn phí" : `Phí dịch vụ ${Core.formatVND(serviceVal)}/th`;
+        pvServiceLabel.textContent = hasRoom
+          ? "Chưa gồm điện, nước và phí dịch vụ"
+          : "Cùng tìm phòng sau khi ghép bạn";
+      }
+      if (pvSecondaryLabel) {
+        pvSecondaryLabel.textContent = hasRoom ? "Thông tin người đăng là sinh viên" : "Ưu tiên khu vực & ngân sách";
       }
       if (pvBoostBadge) pvBoostBadge.classList.toggle("hidden", !isBoosted);
+      if (pvPurposeBadge) pvPurposeBadge.textContent = hasRoom ? "Đã có phòng" : "Cùng tìm phòng";
+      if (addressLabel) {
+        addressLabel.textContent = hasRoom ? "Khu vực / địa chỉ gần phòng hiện có" : "Khu vực mong muốn tìm phòng";
+      }
+      if (addressInput) {
+        addressInput.placeholder = hasRoom ? "Khu vực hoặc địa chỉ gần phòng" : "Ví dụ: Làng ĐHQG, Quận 5";
+      }
+      if (priceHelp) {
+        priceHelp.textContent = hasRoom
+          ? "Tiền phòng hiện tại tính trên mỗi người mỗi tháng"
+          : "Mức ngân sách tối đa bạn dự kiến chi mỗi tháng";
+      }
+      if (priceLabel) {
+        priceLabel.textContent = hasRoom ? "Tiền phòng / người" : "Ngân sách / người";
+      }
+      const currentUser = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
+      if (pvCoverImg) {
+        pvCoverImg.src = hasRoom ? defaultCover : currentUser.avatar || "/assets/images/common/avatar-profile.jpg";
+        pvCoverImg.alt = hasRoom ? "Ảnh minh họa phòng ở ghép" : "Ảnh đại diện sinh viên đăng tin";
+      }
 
       const customMsg = messageInput?.value.trim();
       if (pvTitle) {
@@ -62,9 +90,9 @@
           pvTitle.textContent = customMsg.slice(0, 68);
         } else {
           pvTitle.textContent =
-            selectedPurpose === "roommate"
-              ? `Tìm 1 bạn ở ghép ${selectedType} sạch đẹp full nội thất`
-              : `Cho thuê ${selectedType} chính chủ, giờ tự do`;
+            hasRoom
+              ? `Tìm bạn ở ghép ${selectedType}`
+              : `Tìm bạn cùng đi tìm ${selectedType.toLowerCase()}`;
         }
       }
 
@@ -89,17 +117,19 @@
       }
     }
 
-    purposeBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        selectedPurpose = btn.dataset.purpose;
-        purposeBtns.forEach((b) => {
-          b.className =
-            b === btn
-              ? "post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl bg-surface-container-lowest text-primary shadow-sm font-label-md text-label-md transition-all text-left cursor-pointer"
-              : "post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest/60 transition-all text-left cursor-pointer";
-        });
-        updatePreview();
+    function selectPurpose(purpose) {
+      selectedPurpose = purpose;
+      purposeBtns.forEach((btn) => {
+        btn.className =
+          btn.dataset.purpose === purpose
+            ? "post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl bg-surface-container-lowest text-primary shadow-sm font-label-md text-label-md transition-all text-left cursor-pointer"
+            : "post-purpose-btn flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest/60 transition-all text-left cursor-pointer";
       });
+      updatePreview();
+    }
+
+    purposeBtns.forEach((btn) => {
+      btn.addEventListener("click", () => selectPurpose(btn.dataset.purpose));
     });
 
     typeBtns.forEach((btn) => {
@@ -129,28 +159,16 @@
       });
     });
 
-    [schoolSelect, addressInput, distanceInput, priceInput, electricInput, waterInput, serviceInput, messageInput, verifyCheck].forEach(
+    [schoolSelect, addressInput, areaSelect, priceInput, messageInput, verifyCheck].forEach(
       (el) => el?.addEventListener("input", updatePreview)
     );
     verifyCheck?.addEventListener("change", updatePreview);
 
-    uploadBtn?.addEventListener("click", () => photoInput?.click());
-    photoInput?.addEventListener("change", (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        uploadedCover = String(reader.result);
-        if (pvCoverImg) pvCoverImg.src = uploadedCover;
-        Core.showToast(`Đã tải ảnh "${file.name}" lên xem trước!`);
-      };
-      reader.readAsDataURL(file);
-    });
-
     document.getElementById("post-save-draft-btn")?.addEventListener("click", () => {
       Core.writeJSON(Core.STORAGE_KEYS.LISTING_DRAFT, {
+        postType: selectedPurpose,
         address: addressInput?.value || "",
-        distance: distanceInput?.value || "",
+        areaKey: areaSelect?.value || "thu-duc",
         price: priceInput?.value || "",
         message: messageInput?.value || ""
       });
@@ -168,88 +186,56 @@
       );
     });
 
-    document.getElementById("post-submit-btn")?.addEventListener("click", () => {
+    document.getElementById("post-submit-btn")?.addEventListener("click", async () => {
       if (Core.isLoggedIn && !Core.isLoggedIn()) {
         Core.showToast("Vui lòng đăng nhập hoặc đăng ký tài khoản sinh viên trước khi đăng tin.", "info");
         Core.openAuthModal?.("login", {
-          subtitle: "Đăng nhập để đăng tin tìm phòng & roommate chính chủ"
+          subtitle: "Đăng nhập tài khoản sinh viên để đăng tin tìm roommate"
         });
         return;
       }
 
-      const addr = addressInput?.value.trim();
-      const priceNum = Core.parseCurrencyNumber(priceInput?.value || "2200000");
-      if (!addr || !priceNum) {
-        Core.showToast("Vui lòng nhập đầy đủ địa chỉ và tiền phòng hợp lệ.", "error");
+      const currentUser = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
+      if (String(currentUser.role || "student").toLowerCase() !== "student") {
+        Core.showToast("Chỉ tài khoản sinh viên mới được đăng tin tìm roommate.", "error");
         return;
       }
 
-      const schoolText = schoolSelect?.value || "";
-      const areaKey =
-        schoolText.includes("KTX") || schoolText.includes("Linh Trung")
-          ? "thu-duc"
-          : schoolText.includes("Bách Khoa") || schoolText.includes("UEH")
-          ? "quan-10"
-          : "quan-5";
+      const addr = addressInput?.value.trim();
+      const priceNum = Core.parseCurrencyNumber(priceInput?.value || "");
+      if (!addr || !priceNum) {
+        Core.showToast("Vui lòng nhập khu vực và ngân sách hợp lệ.", "error");
+        return;
+      }
 
-      const currentUser = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
-      const newId = "user-" + Date.now();
-      const newRoom = {
-        id: newId,
-        title: pvTitle?.textContent || `Phòng ${selectedType} - ${addr}`,
-        shortTitle: addr,
-        breadcrumbTitle: addr,
-        districtLabel: areaKey === "thu-duc" ? "TP. Thủ Đức" : areaKey === "quan-10" ? "Quận 10" : "Quận 5",
-        areaKey,
-        address: addr,
-        shortAddress: areaKey === "thu-duc" ? "TP. Thủ Đức" : areaKey === "quan-10" ? "Quận 10" : "Quận 5",
-        distanceLabel: distanceInput?.value.trim() || "Gần trường ĐH",
-        schoolDistanceBadge: distanceInput?.value.trim() || "Gần trường ĐH",
-        price: priceNum,
-        priceFormatted: Core.formatVND(priceNum),
-        totalRoomPrice: selectedPurpose === "roommate" ? Core.formatVND(priceNum * 2) + "/tháng" : Core.formatVND(priceNum) + "/tháng",
-        areaSqm: 28,
-        capacityLabel: "Tối đa 2 người",
-        spotsLabel: selectedPurpose === "roommate" ? "Còn 1 chỗ ở ghép" : "Nguyên phòng riêng",
-        badgeText: isBoosted ? "NỔI BẬT" : "Mới đăng",
-        floorLabel: "Tầng 2",
-        depositLabel: "1 tháng cọc",
-        typeKey: selectedPurpose === "roommate" ? "o-ghep" : "phong-rieng",
-        typeLabel: selectedType,
-        matchScore: 96,
-        isNewUserPost: true,
-        amenities: ["Máy lạnh", "Giờ linh hoạt"],
-        images: [uploadedCover || pvCoverImg?.src || Core.FALLBACK_SVG],
-        roommate: {
-          id: currentUser.id || "minh-thu",
-          name: currentUser.name || "Minh Thư",
-          age: "20 tuổi",
-          bioTitle: `Sinh viên ${currentUser.shortSchool || "HCMUS"} • Đã xác thực thẻ SV`,
-          note: messageInput?.value.trim() || "Tìm bạn cùng phòng sạch sẽ, tôn trọng giờ giấc.",
-          avatar: currentUser.avatar || "/assets/images/common/avatar-profile.jpg"
-        },
-        costs: {
-          electric: (electricInput?.value || "3.500") + "đ / kWh",
-          electricNote: "Đồng hồ điện riêng",
-          water: (waterInput?.value || "50.000") + "đ / người / tháng",
-          waterNote: "Nước máy sạch",
-          service: serviceInput?.value || "Miễn phí",
-          serviceNote: "Wifi + Rác",
-          parking: "Miễn phí",
-          parkingNote: "Nhà xe an ninh",
-          estimatedTotal: Core.formatVND(priceNum + 200000)
-        },
-        description: [
-          messageInput?.value.trim() || "Phòng sạch sẽ thoáng mát, đầy đủ tiện nghi sinh viên, chủ nhà thân thiện.",
-          `Địa chỉ cụ thể: ${addr} (${distanceInput?.value.trim() || ""}).`
-        ]
+      if (!currentUser.gender) {
+        Core.showToast("Hồ sơ sinh viên chưa có giới tính. Vui lòng cập nhật hồ sơ trước khi đăng tin.", "error");
+        return;
+      }
+
+      const criteria = Array.from(habitBtns)
+        .filter((btn) => btn.classList.contains("bg-primary"))
+        .map((btn) => {
+          const clone = btn.cloneNode(true);
+          clone.querySelectorAll(".material-symbols-outlined").forEach((el) => el.remove());
+          return clone.textContent.trim().replace(/\s+/g, " ");
+        });
+      const listing = {
+        postType: selectedPurpose,
+        area: addr,
+        areaKey: areaSelect?.value || "thu-duc",
+        roomType: selectedType,
+        schoolPreference: schoolSelect?.value || "",
+        budget: priceNum,
+        criteria,
+        note: messageInput?.value.trim() || "",
+        city: "TP.HCM"
       };
 
-      if (Core.createRoomListing) {
-        Core.createRoomListing(newRoom);
-      } else {
-        const existing = Core.readJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, []);
-        Core.writeJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, [newRoom, ...existing]);
+      const result = await Core.createRoommateListing?.(listing);
+      if (!result || !result.ok || !result.roommate) {
+        Core.showToast(result?.error || "Không thể đăng tin lúc này. Vui lòng thử lại.", "error");
+        return;
       }
 
       Core.openModal({
@@ -261,10 +247,10 @@
             <div class="w-16 h-16 rounded-full bg-secondary-container text-tertiary flex items-center justify-center">
               <span class="material-symbols-outlined text-4xl">check_circle</span>
             </div>
-            <p class="text-sm text-on-surface-variant">Tin <strong>"${Core.escapeHTML(newRoom.title)}"</strong> đã xuất hiện trong danh sách Tìm phòng trọ và sẵn sàng tiếp cận sinh viên.</p>
+            <p class="text-sm text-on-surface-variant">Tin <strong>"${Core.escapeHTML(result.roommate.roomStatusTitle)}"</strong> đã xuất hiện trong danh sách tìm roommate.</p>
             <div class="flex flex-col sm:flex-row gap-2.5 w-full pt-2">
-              <a href="/roomie/phong-chi-tiet?id=${Core.escapeHTML(newId)}" class="flex-1 py-3 px-4 rounded-xl bg-primary text-on-primary font-semibold text-sm">Xem chi tiết tin</a>
-              <a href="/roomie/tim-phong" class="flex-1 py-3 px-4 rounded-xl bg-surface-container-high text-on-surface font-semibold text-sm">Về trang Tìm phòng</a>
+              <a href="/roomie/tim-roommate" class="flex-1 py-3 px-4 rounded-xl bg-primary text-on-primary font-semibold text-sm">Xem danh sách roommate</a>
+              <a href="/roomie/dang-tin" class="flex-1 py-3 px-4 rounded-xl bg-surface-container-high text-on-surface font-semibold text-sm">Đăng tin khác</a>
             </div>
           </div>
         `
@@ -288,12 +274,15 @@
 
     const draft = Core.readJSON(Core.STORAGE_KEYS.LISTING_DRAFT, null);
     if (draft) {
+      if (draft.postType === "has-room" || draft.postType === "find-room") {
+        selectedPurpose = draft.postType;
+      }
       if (addressInput && draft.address) addressInput.value = draft.address;
-      if (distanceInput && draft.distance) distanceInput.value = draft.distance;
+      if (areaSelect && draft.areaKey) areaSelect.value = draft.areaKey;
       if (priceInput && draft.price) priceInput.value = draft.price;
       if (messageInput && draft.message) messageInput.value = draft.message;
     }
-    updatePreview();
+    selectPurpose(selectedPurpose);
   }
 
   document.addEventListener("DOMContentLoaded", () => {

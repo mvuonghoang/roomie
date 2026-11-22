@@ -341,6 +341,8 @@ function mapRoommateRow(row, userQuizAnswers = null) {
     major: row.major,
     matchScore: Number(row.match_score) || 90,
     matchLabel: row.match_label || `${row.match_score || 90}% Hợp gu`,
+    hasPersonalizedMatchScore: false,
+    createdAt: row.created_at,
     vnuMember: Boolean(row.vnu_member),
     hasRoom: Boolean(row.has_room),
     roomStatusTitle: row.room_status_title,
@@ -359,8 +361,11 @@ function mapRoommateRow(row, userQuizAnswers = null) {
 
   if (userQuizAnswers && Object.keys(userQuizAnswers).length > 0) {
     const dynamicMatch = computeRoommateMatchScore(userQuizAnswers, baseRm);
-    baseRm.matchScore = dynamicMatch.matchScore;
+    baseRm.matchScore =
+      dynamicMatch.isGenderCompatible && dynamicMatch.hasLifestyleData ? dynamicMatch.matchScore : null;
     baseRm.matchLabel = dynamicMatch.matchLabel;
+    baseRm.hasPersonalizedMatchScore =
+      dynamicMatch.isGenderCompatible && dynamicMatch.hasLifestyleData;
   }
 
   return baseRm;
@@ -841,8 +846,82 @@ function getAllRoommates(userId = DEFAULT_USER_ID) {
   const db = openDatabaseConnection();
   const quiz = getQuizSubmission(userId);
   const userAnswers = quiz?.answers || null;
-  const rows = db.prepare('SELECT * FROM roommates ORDER BY is_boosted DESC, match_score DESC').all();
+  const rows = db.prepare('SELECT * FROM roommates ORDER BY created_at DESC').all();
   return rows.map((r) => mapRoommateRow(r, userAnswers));
+}
+
+function createRoommateListing(user, payload = {}) {
+  if (!user || user.role !== 'student') return null;
+
+  const postType = String(payload.postType || '');
+  const hasRoom = postType === 'has-room';
+  if (!hasRoom && postType !== 'find-room') return null;
+
+  const area = String(payload.area || '').trim().slice(0, 180);
+  const areaKey = String(payload.areaKey || '');
+  const roomType = String(payload.roomType || '').trim().slice(0, 80);
+  const schoolPreference = String(payload.schoolPreference || '').trim().slice(0, 120);
+  const allowedAreaKeys = ['thu-duc', 'binh-thanh', 'quan-5', 'go-vap', 'quan-10'];
+  const budgetAmount = Number(payload.budget);
+  const gender = String(user.gender || '').trim();
+  if (!area || !allowedAreaKeys.includes(areaKey) || !Number.isFinite(budgetAmount) || budgetAmount <= 0 || !gender) {
+    return null;
+  }
+
+  const criteria = Array.isArray(payload.criteria)
+    ? payload.criteria.map((item) => String(item).trim().slice(0, 80)).filter(Boolean).slice(0, 12)
+    : [];
+  const note = String(payload.note || '').trim().slice(0, 500);
+  const budget = `${(budgetAmount / 1000000).toFixed(1)} tr/tháng/người`;
+  const statusTitle = hasRoom ? 'Đang tìm bạn ở ghép:' : 'Đang tìm bạn cùng đi tìm phòng:';
+  const statusDetail = hasRoom
+    ? `${area}${roomType ? ` • ${roomType}` : ''}${schoolPreference ? ` • Gần ${schoolPreference}` : ''} • ${budget}`
+    : `Mong muốn tìm phòng tại ${area}${roomType ? ` • ${roomType}` : ''}${schoolPreference ? ` • Ưu tiên ${schoolPreference}` : ''} • Ngân sách ${budget}`;
+  const now = Date.now();
+  const id = `roommate-${now}-${crypto.randomBytes(4).toString('hex')}`;
+  const name = String(user.name || 'Sinh viên Roomie').trim();
+  const school = String(user.school || 'Sinh viên').trim();
+  const shortSchool = String(user.shortSchool || school).trim();
+  const isVnuMember = /HCMUS|HCMUT|UIT|UEL|HCMUSSH|HCMIU|ĐHQG/i.test(`${school} ${shortSchool}`);
+
+  const db = openDatabaseConnection();
+  db.prepare(`
+    INSERT INTO roommates (
+      id, user_id, name, short_name, age, gender, school, short_school, major,
+      match_score, match_label, vnu_member, has_room, room_status_title,
+      room_status_detail, linked_room_id, area_key, city, budget, avatar, quote,
+      criteria_json, tags_json, contact_json, quiz_profile_json, is_boosted,
+      created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, '{}', '{}', 0, ?, ?)
+  `).run(
+    id,
+    user.id,
+    name,
+    name,
+    Number(user.age) || 20,
+    gender,
+    school,
+    shortSchool,
+    String(user.major || '').trim(),
+    90,
+    'Chưa có điểm hợp gu',
+    isVnuMember ? 1 : 0,
+    hasRoom ? 1 : 0,
+    statusTitle,
+    statusDetail,
+    areaKey,
+    String(payload.city || 'TP.HCM').trim().slice(0, 80),
+    budget,
+    String(user.avatar || ''),
+    note,
+    JSON.stringify(criteria),
+    JSON.stringify(criteria),
+    now,
+    now
+  );
+
+  const row = db.prepare('SELECT * FROM roommates WHERE id = ?').get(id);
+  return mapRoommateRow(row);
 }
 
 function getRoommateById(rmId, userId = DEFAULT_USER_ID) {
@@ -1244,6 +1323,7 @@ module.exports = {
   getSavedRoomIds,
   toggleSavedRoom,
   getAllRoommates,
+  createRoommateListing,
   getRoommateById,
   getQuizSubmission,
   saveQuizSubmission,

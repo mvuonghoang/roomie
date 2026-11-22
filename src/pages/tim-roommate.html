@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roomie - Tìm Roommate &amp; Kết quả Match | Ở cùng người hợp gu</title>
+  <title>Roomie - Tìm roommate | Ở cùng người hợp gu</title>
   <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
   <link rel="shortcut icon" href="/favicon.ico?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -331,18 +331,18 @@
           <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
             <div class="flex flex-col gap-space-xs">
               <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">
-                <span id="mr-match-section-eyebrow">Tương thích cao nhất hôm nay</span>
+                <span id="mr-match-section-eyebrow">Tìm thủ công theo nhu cầu</span>
               </span>
               <h2 id="mr-match-section-title" class="font-headline-lg text-headline-lg font-bold text-on-surface">
-                Top Bạn cùng phòng Match trên 88%
+                Danh sách bài đăng tìm roommate
               </h2>
               <p id="mr-match-section-description" class="font-body-sm text-body-sm text-on-surface-variant">
-                Sắp xếp theo thứ tự chỉ số hòa hợp thói quen sinh hoạt và khoảng cách trường học
+                Tự tìm theo trường, khu vực, ngân sách và thông tin sinh hoạt. Điểm hợp gu nằm trong tab Trắc nghiệm.
               </p>
             </div>
             <div class="flex items-center gap-3 shrink-0 self-start md:self-auto">
               <span id="mr-results-summary" class="font-body-md text-[14px] font-medium text-on-surface-variant">
-                6 ứng viên
+                6 bài đăng
               </span>
               <button
                 id="mr-filter-toggle-btn"
@@ -362,7 +362,7 @@
           <div id="mr-active-filters-bar" class="hidden flex-wrap items-center gap-2 -mt-space-sm"></div>
           <!-- Roommate Cards Grid -->
           <div id="roommate-matches-grid" class="grid grid-cols-1 md:grid-cols-2 gap-gutter-lg">
-            <!-- CARD 1: Nguyễn Hoàng Nam - 98% Match -->
+            <!-- CARD 1: Nguyễn Hoàng Nam -->
             <article class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-space-lg relative overflow-hidden group">
               <div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container/40 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none">
               </div>
@@ -371,9 +371,6 @@
                   <div class="flex items-center gap-space-md">
                     <div class="relative">
                       <img alt="Ảnh đại diện ẩn danh nam sinh viên trên Roomie" class="w-16 h-16 rounded-full object-cover ring-2 ring-primary-fixed" src="/assets/images/trang-chu/avatar-2.jpg" />
-                      <span class="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed-variant font-label-sm text-[10px] font-bold">
-                        98%
-                      </span>
                     </div>
                     <div class="flex flex-col">
                       <div class="flex items-center gap-2">
@@ -395,13 +392,6 @@
                       </span>
                     </div>
                   </div>
-                  <!-- High Compatibility Pill -->
-                  <span class="px-3 py-1.5 rounded-xl bg-secondary-container text-on-secondary-fixed-variant font-label-md text-label-md font-bold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[18px]">
-                      verified
-                    </span>
-                    98% Cực hợp gu
-                  </span>
                 </div>
                 <!-- Room status highlight -->
                 <div class="p-3 rounded-xl bg-primary-fixed/40 flex items-center gap-2 text-on-primary-fixed-variant font-body-sm text-body-sm">
@@ -418,7 +408,7 @@
                 <!-- Overlapping Habits -->
                 <div class="flex flex-col gap-space-xs">
                   <span class="font-label-sm text-label-sm text-outline uppercase font-semibold">
-                    4/4 Tiêu chí trùng khớp 100%:
+                    Tiêu chí tìm bạn cùng phòng:
                   </span>
                   <div class="flex flex-wrap gap-1.5">
                     <span class="px-2.5 py-1 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm flex items-center gap-1">
@@ -469,16 +459,13 @@
                 </button>
               </div>
             </article>
-            <!-- CARD 2: Lê Minh Anh - 94% Match -->
+            <!-- CARD 2: Lê Minh Anh -->
             <article class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-space-lg group">
               <div class="flex flex-col gap-space-md">
                 <div class="flex items-start justify-between gap-space-sm">
                   <div class="flex items-center gap-space-md">
                     <div class="relative">
                       <img alt="Ảnh đại diện ẩn danh nữ sinh viên trên Roomie" class="w-16 h-16 rounded-full object-cover ring-2 ring-primary-fixed" src="/assets/images/trang-chu/avatar-1.jpg" />
-                      <span class="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed-variant font-label-sm text-[10px] font-bold">
-                        95%
-                      </span>
                     </div>
                     <div class="flex flex-col">
                       <div class="flex items-center gap-2">
@@ -500,9 +487,6 @@
                       </span>
                     </div>
                   </div>
-                  <span class="px-3 py-1.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md font-bold flex items-center gap-1">
-                    95% Rất hợp gu
-                  </span>
                 </div>
                 <!-- Room looking status -->
                 <div class="p-3 rounded-xl bg-surface-container-low flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
@@ -555,16 +539,13 @@
                 </button>
               </div>
             </article>
-            <!-- CARD 3: Trần Quốc Bảo - 91% Match -->
+            <!-- CARD 3: Trần Quốc Bảo -->
             <article class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-space-lg group">
               <div class="flex flex-col gap-space-md">
                 <div class="flex items-start justify-between gap-space-sm">
                   <div class="flex items-center gap-space-md">
                     <div class="relative">
                       <img alt="Ảnh đại diện ẩn danh nam sinh viên trên Roomie" class="w-16 h-16 rounded-full object-cover ring-2 ring-primary-fixed" src="/assets/images/trang-chu/avatar-2.jpg" />
-                      <span class="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed-variant font-label-sm text-[10px] font-bold">
-                        92%
-                      </span>
                     </div>
                     <div class="flex flex-col">
                       <div class="flex items-center gap-2">
@@ -586,9 +567,6 @@
                       </span>
                     </div>
                   </div>
-                  <span class="px-3 py-1.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md font-bold flex items-center gap-1">
-                    92% Hòa hợp
-                  </span>
                 </div>
                 <!-- Room looking status -->
                 <div class="p-3 rounded-xl bg-primary-fixed/30 flex items-center gap-2 text-on-primary-fixed-variant font-body-sm text-body-sm">
@@ -641,16 +619,13 @@
                 </button>
               </div>
             </article>
-            <!-- CARD 4: Vũ Thảo Vy - 89% Match -->
+            <!-- CARD 4: Vũ Thảo Vy -->
             <article class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-space-lg group">
               <div class="flex flex-col gap-space-md">
                 <div class="flex items-start justify-between gap-space-sm">
                   <div class="flex items-center gap-space-md">
                     <div class="relative">
                       <img alt="Ảnh đại diện ẩn danh nữ sinh viên trên Roomie" class="w-16 h-16 rounded-full object-cover ring-2 ring-primary-fixed" src="/assets/images/trang-chu/avatar-3.jpg" />
-                      <span class="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed-variant font-label-sm text-[10px] font-bold">
-                        88%
-                      </span>
                     </div>
                     <div class="flex flex-col">
                       <div class="flex items-center gap-2">
@@ -672,9 +647,6 @@
                       </span>
                     </div>
                   </div>
-                  <span class="px-3 py-1.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md font-bold flex items-center gap-1">
-                    88% Hòa hợp
-                  </span>
                 </div>
                 <!-- Room looking status -->
                 <div class="p-3 rounded-xl bg-surface-container-low flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
@@ -732,7 +704,7 @@
           <div class="flex justify-center pt-space-md">
             <button id="mr-load-more-btn" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-container-lowest text-primary font-label-md text-label-md font-semibold shadow-sm hover:shadow transition-all" type="button">
               <span id="mr-load-more-label">
-                Xem thêm bạn sinh viên tương thích khác
+                Xem thêm bài đăng tìm roommate
               </span>
               <span class="material-symbols-outlined text-[18px]">
                 expand_more
@@ -742,7 +714,7 @@
         </div>
       </section>
       <!-- SECTION: RECOMMENDED ROOMS MATCHING LIFESTYLE -->
-      <section class="w-full bg-surface-container-lowest py-space-2xl px-margin-lg">
+      <section id="mr-room-recommendations" class="hidden w-full bg-surface-container-lowest py-space-2xl px-margin-lg">
         <div class="max-w-[1280px] mx-auto flex flex-col gap-space-xl">
           <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-sm">
             <div class="flex flex-col gap-space-xs">

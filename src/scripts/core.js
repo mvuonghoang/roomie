@@ -17,6 +17,7 @@
     INVITED_ROOMMATES: "rm_invited_roommates",
     QUIZ_ANSWERS: "rm_quiz_answers",
     QUIZ_RESULT: "rm_quiz_result",
+    QUIZ_USER_ID: "rm_quiz_user_id",
     CUSTOM_LISTINGS: "rm_custom_listings",
     LISTING_DRAFT: "rm_listing_draft",
     NOTIFICATIONS_READ: "rm_notifications_read",
@@ -52,6 +53,9 @@
   /** Read and parse JSON safely from localStorage. */
   function readJSON(key, fallback) {
     try {
+      if (key === STORAGE_KEYS.QUIZ_ANSWERS || key === STORAGE_KEYS.QUIZ_RESULT) {
+        ensureQuizDataBelongsToCurrentUser();
+      }
       const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : fallback;
     } catch {
@@ -62,9 +66,27 @@
   /** Serialize and store JSON safely in localStorage. */
   function writeJSON(key, value) {
     try {
+      if (key === STORAGE_KEYS.QUIZ_ANSWERS || key === STORAGE_KEYS.QUIZ_RESULT) {
+        ensureQuizDataBelongsToCurrentUser();
+      }
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
       // Ignore storage quota errors in private browsing mode
+    }
+  }
+
+  function ensureQuizDataBelongsToCurrentUser() {
+    try {
+      const session = JSON.parse(localStorage.getItem(STORAGE_KEYS.AUTH_SESSION) || "null");
+      const userId = session?.loggedIn && session.user?.id ? String(session.user.id) : "guest";
+      const ownerId = localStorage.getItem(STORAGE_KEYS.QUIZ_USER_ID);
+      if (ownerId === userId) return;
+
+      localStorage.removeItem(STORAGE_KEYS.QUIZ_ANSWERS);
+      localStorage.removeItem(STORAGE_KEYS.QUIZ_RESULT);
+      localStorage.setItem(STORAGE_KEYS.QUIZ_USER_ID, userId);
+    } catch {
+      // Local storage may be unavailable in private browsing mode.
     }
   }
 
@@ -1044,7 +1066,7 @@
     overlay.querySelector("#rm-connections-close").focus();
   }
 
-  function openProfileModal(rm, onUpdate) {
+  function openProfileModal(rm, onUpdate, options = {}) {
     if (!rm) return;
     const renderProfile = () => {
       const conn = getConnectionForPartner(rm.id, rm.name);
@@ -1077,6 +1099,15 @@
           </div>
         `;
       }
+      const matchScoreHtml =
+        options.showMatchScore === false
+          ? ""
+          : `
+            <div class="text-center px-3.5 py-2 rounded-2xl bg-secondary-container text-on-secondary-container w-full">
+              <div class="text-2xl font-bold leading-none">${escapeHTML(rm.matchScore)}%</div>
+              <div class="text-[11px] font-semibold mt-1">Hợp gu</div>
+            </div>
+          `;
 
       const modal = openModal({
         title: `Hồ sơ sinh viên • ${rm.name}`,
@@ -1097,10 +1128,7 @@
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1.5 shrink-0">
-                <div class="text-center px-3.5 py-2 rounded-2xl bg-secondary-container text-on-secondary-container w-full">
-                  <div class="text-2xl font-bold leading-none">${escapeHTML(rm.matchScore)}%</div>
-                  <div class="text-[11px] font-semibold mt-1">Hợp gu</div>
-                </div>
+                ${matchScoreHtml}
                 <span class="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold w-full ${
                   rm.gender === "Nam"
                     ? "bg-sky-100 text-sky-700 border border-sky-200"
@@ -1509,6 +1537,7 @@ Chữ ký Bên A                                                    Chữ ký B�
   function getCurrentUser() {
     const session = getAuthSession();
     const user = session && session.loggedIn ? session.user : null;
+    ensureQuizDataBelongsToCurrentUser();
     syncGlobalUserProfile(user);
     return user;
   }
@@ -1532,6 +1561,7 @@ Chữ ký Bên A                                                    Chữ ký B�
       token: token || prevSession?.token || "",
       updatedAt: Date.now()
     });
+    ensureQuizDataBelongsToCurrentUser();
     emitAuthChange(cleanUser);
     return cleanUser;
   }
@@ -1543,6 +1573,7 @@ Chữ ký Bên A                                                    Chữ ký B�
       token: "",
       updatedAt: Date.now()
     });
+    ensureQuizDataBelongsToCurrentUser();
     emitAuthChange(null);
     apiFetch("/api/auth/logout", { method: "POST" });
   }
@@ -2039,7 +2070,7 @@ Chữ ký Bên A                                                    Chữ ký B�
       Data.ROOMS = data.rooms;
     }
     if (Array.isArray(data.roommates) && data.roommates.length) {
-      Data.ROOMMATES = data.roommates;
+      Data.ROOMMATES = markPersonalizedRoommateScores(data.roommates, data.quizAnswers);
     }
     if (Array.isArray(data.notifications) && data.notifications.length) {
       Data.NOTIFICATIONS = data.notifications;
@@ -2081,6 +2112,17 @@ Chữ ký Bên A                                                    Chữ ký B�
     return res?.room || newRoom;
   }
 
+  async function createRoommateListing(listing) {
+    const res = await apiFetch("/api/roommates", {
+      method: "POST",
+      body: listing
+    });
+    if (res && res.ok && Array.isArray(res.roommates)) {
+      Data.ROOMMATES = res.roommates;
+    }
+    return res;
+  }
+
   async function submitQuizResult(answers, result) {
     writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers);
     writeJSON(STORAGE_KEYS.QUIZ_RESULT, result);
@@ -2090,9 +2132,35 @@ Chữ ký Bên A                                                    Chữ ký B�
     });
     if (res && res.ok) {
       if (res.quizResult) writeJSON(STORAGE_KEYS.QUIZ_RESULT, res.quizResult);
-      if (Array.isArray(res.roommates)) Data.ROOMMATES = res.roommates;
+      if (Array.isArray(res.roommates)) {
+        Data.ROOMMATES = markPersonalizedRoommateScores(res.roommates, answers);
+      }
     }
     return res;
+  }
+
+  function markPersonalizedRoommateScores(roommates, answers) {
+    const questionCount = (Data.QUIZ_QUESTIONS || []).length;
+    const hasCompleteAnswers = questionCount > 0 && Object.keys(answers || {}).length === questionCount;
+    const genderOption = answers?.[1] || answers?.["1"];
+
+    return roommates.map((roommate) => {
+      const hasCompleteProfile = [2, 3, 4, 5, 6, 7, 8, 9].every(
+        (question) => roommate.quizProfile?.[question] || roommate.quizProfile?.[String(question)]
+      );
+      const genderCompatible =
+        (genderOption === "A" && roommate.gender === "Nam") ||
+        (genderOption === "B" && roommate.gender === "Nữ") ||
+        genderOption === "C" ||
+        genderOption === "D";
+      return {
+        ...roommate,
+        ...(genderOption && !genderCompatible ? { matchScore: null } : {}),
+        hasPersonalizedMatchScore: Boolean(
+          genderCompatible && (roommate.hasPersonalizedMatchScore || (hasCompleteAnswers && hasCompleteProfile))
+        )
+      };
+    });
   }
 
   async function submitSafetyReport(payload) {
@@ -2131,6 +2199,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     apiFetch,
     syncWithBackend,
     createRoomListing,
+    createRoommateListing,
     submitQuizResult,
     submitSafetyReport,
     submitContactTicket,
