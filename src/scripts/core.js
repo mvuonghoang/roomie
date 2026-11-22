@@ -1069,13 +1069,24 @@
   function openProfileModal(rm, onUpdate, options = {}) {
     if (!rm) return;
     const renderProfile = () => {
+      const currentUser = getCurrentUser();
+      const isOwnListing = Boolean(
+        currentUser?.id && rm.userId && String(currentUser.id) === String(rm.userId)
+      );
       const conn = getConnectionForPartner(rm.id, rm.name);
       const status = conn?.status || "none";
       const activeCount = getActiveSlotConnections().length;
       const isAcceptedOrMatched = status === "accepted" || status === "matched";
 
       let statusBannerHtml = "";
-      if (isAcceptedOrMatched) {
+      if (isOwnListing) {
+        statusBannerHtml = `
+          <div class="px-3.5 py-2.5 rounded-xl bg-surface-container-low text-on-surface-variant text-xs flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-primary">person</span>
+            <span>Đây là bài đăng của bạn. Bạn không thể gửi lời mời kết nối cho chính mình.</span>
+          </div>
+        `;
+      } else if (isAcceptedOrMatched) {
         statusBannerHtml = buildUnlockedContactCardHtml(conn);
       } else if (status === "pending") {
         statusBannerHtml = `
@@ -1166,22 +1177,29 @@
             ${statusBannerHtml}
 
             <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-              <button type="button" id="rm-modal-connect-btn" class="flex-1 py-3 px-4 rounded-xl ${
-                isAcceptedOrMatched
-                  ? "bg-tertiary hover:bg-on-tertiary-fixed-variant text-on-tertiary"
-                  : status === "pending"
-                  ? "bg-primary-fixed text-on-primary-fixed-variant hover:bg-primary-fixed-dim"
-                  : "bg-primary hover:bg-on-primary-fixed-variant text-on-primary"
-              } font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
-                <span class="material-symbols-outlined text-[18px]">${isAcceptedOrMatched ? "verified" : status === "pending" ? "hourglass_top" : "handshake"}</span>
-                <span>${
-                  isAcceptedOrMatched
-                    ? "Cập nhật kết quả / Chốt Roommate"
-                    : status === "pending"
-                    ? "Đang chờ đồng ý (Quản lý Slot)"
-                    : "Gửi lời mời kết nối 2 chiều"
-                }</span>
-              </button>
+              ${
+                isOwnListing
+                  ? `<span class="flex-1 py-3 px-4 rounded-xl bg-surface-container-high text-on-surface-variant font-semibold text-sm flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-[18px]">person</span>
+                      Bài đăng của bạn
+                    </span>`
+                  : `<button type="button" id="rm-modal-connect-btn" class="flex-1 py-3 px-4 rounded-xl ${
+                      isAcceptedOrMatched
+                        ? "bg-tertiary hover:bg-on-tertiary-fixed-variant text-on-tertiary"
+                        : status === "pending"
+                        ? "bg-primary-fixed text-on-primary-fixed-variant hover:bg-primary-fixed-dim"
+                        : "bg-primary hover:bg-on-primary-fixed-variant text-on-primary"
+                    } font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+                      <span class="material-symbols-outlined text-[18px]">${isAcceptedOrMatched ? "verified" : status === "pending" ? "hourglass_top" : "handshake"}</span>
+                      <span>${
+                        isAcceptedOrMatched
+                          ? "Cập nhật kết quả / Chốt Roommate"
+                          : status === "pending"
+                          ? "Đang chờ đồng ý (Quản lý Slot)"
+                          : "Gửi lời mời kết nối 2 chiều"
+                      }</span>
+                    </button>`
+              }
               ${
                 rm.linkedRoomId
                   ? `<a href="/roomie/phong-chi-tiet?id=${escapeHTML(rm.linkedRoomId)}" class="py-3 px-4 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface font-semibold text-sm flex items-center justify-center gap-1 transition-colors">
@@ -1217,7 +1235,7 @@
         showToast(`Đã đồng ý kết nối với ${rm.name}!`);
         renderProfile();
       });
-      modal.querySelector("#rm-modal-connect-btn").addEventListener("click", () => {
+      modal.querySelector("#rm-modal-connect-btn")?.addEventListener("click", () => {
         openConnectInviteModal({
           partnerId: rm.id,
           name: rm.name,
@@ -2123,6 +2141,17 @@ Chữ ký Bên A                                                    Chữ ký B�
     return res;
   }
 
+  async function deleteRoommateListing(roommateId) {
+    const res = await apiFetch(`/api/roommates/${encodeURIComponent(roommateId)}`, {
+      method: "DELETE"
+    });
+    if (res && res.ok && Array.isArray(res.roommates)) {
+      Data.ROOMMATES = res.roommates;
+      window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    }
+    return res;
+  }
+
   async function submitQuizResult(answers, result) {
     writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers);
     writeJSON(STORAGE_KEYS.QUIZ_RESULT, result);
@@ -2200,6 +2229,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     syncWithBackend,
     createRoomListing,
     createRoommateListing,
+    deleteRoommateListing,
     submitQuizResult,
     submitSafetyReport,
     submitContactTicket,

@@ -924,6 +924,15 @@ function createRoommateListing(user, payload = {}) {
   return mapRoommateRow(row);
 }
 
+function deleteRoommateListing(user, roommateId) {
+  if (!user || user.role !== 'student' || !user.id || !roommateId) return false;
+  const db = openDatabaseConnection();
+  const result = db
+    .prepare('DELETE FROM roommates WHERE id = ? AND user_id = ?')
+    .run(String(roommateId), String(user.id));
+  return Number(result.changes) > 0;
+}
+
 function getRoommateById(rmId, userId = DEFAULT_USER_ID) {
   const db = openDatabaseConnection();
   const quiz = getQuizSubmission(userId);
@@ -1324,6 +1333,7 @@ module.exports = {
   toggleSavedRoom,
   getAllRoommates,
   createRoommateListing,
+  deleteRoommateListing,
   getRoommateById,
   getQuizSubmission,
   saveQuizSubmission,

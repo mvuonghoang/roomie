@@ -39,6 +39,7 @@
     "/pages/lien-he.html": "lien-he",
     "/dang-tin": "dang-tin",
     "/dang-tin-mien-phi": "dang-tin",
+    "/tin-da-dang": "dang-tin",
     "/pages/dang-tin.html": "dang-tin",
     "/an-toan": "ve-chung-toi",
     "/pages/an-toan.html": "ve-chung-toi"
@@ -464,7 +465,9 @@
 
       const currentProfile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
       const savedCount = Core.getSavedRoomIds().length;
-      const customCount = Core.readJSON(Core.STORAGE_KEYS.CUSTOM_LISTINGS, []).length;
+      const customCount = (Data.ROOMMATES || []).filter(
+        (roommate) => roommate.userId && String(roommate.userId) === String(currentProfile.id)
+      ).length;
       const activePlan = Core.getLatestPurchasedPlan();
       const pop = document.createElement("div");
       pop.id = "rm-profile-popover";
@@ -510,7 +513,7 @@
             <span>Phòng đã lưu</span>
             <span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-xs font-bold">${savedCount}</span>
           </a>
-          <a href="/roomie/dang-tin" class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-surface-container-low text-on-surface">
+          <a href="/roomie/tin-da-dang" class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-surface-container-low text-on-surface">
             <span>Tin đăng của tôi</span>
             <span class="text-xs text-on-surface-variant font-semibold">${customCount}</span>
           </a>

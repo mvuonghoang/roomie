@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roomie - Tin đăng của tôi</title>
+  <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
+  <link rel="shortcut icon" href="/favicon.ico?v=3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/styles/tailwind.config.js"></script>
+</head>
+<body data-page="tin-da-dang" class="bg-surface font-body-md text-on-surface antialiased overflow-x-clip">
+  <div id="rm-header-root"></div>
+  <main class="w-full pt-24 min-h-[calc(100vh-80px)]">
+    <section class="max-w-[1080px] mx-auto px-margin md:px-margin-md lg:px-margin-lg py-space-xl">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-space-md mb-space-lg">
+        <div>
+          <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">Tin đăng của tôi</h1>
+          <p class="font-body-md text-body-md text-on-surface-variant mt-2">Quản lý các bài tìm bạn ở ghép hoặc cùng đi tìm phòng.</p>
+        </div>
+        <a href="/roomie/dang-tin" class="inline-flex items-center justify-center gap-2 px-space-lg py-3 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary/90 transition-colors">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          Đăng tin mới
+        </a>
+      </div>
+      <div id="my-roommate-listings-status" class="mb-space-md" aria-live="polite"></div>
+      <div id="my-roommate-listings" class="grid grid-cols-1 gap-space-md">
+        <div class="rounded-2xl bg-surface-container-lowest p-space-xl text-center text-on-surface-variant">Đang tải tin đăng...</div>
+      </div>
+    </section>
+  </main>
+  <div id="rm-footer-root"></div>
+  <script src="/scripts/data.js"></script>
+  <script src="/scripts/core.js"></script>
+  <script src="/scripts/layout.js"></script>
+  <script src="/scripts/pages/my-roommate-listings.js"></script>
+</body>
+</html>

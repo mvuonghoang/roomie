@@ -423,6 +423,13 @@ async function handleApiRequest(req, res) {
 
     if (pathname === '/api/roommates' && method === 'GET') {
       let list = db.getAllRoommates(auth.userId);
+      if (reqUrl.searchParams.get('mine') === '1') {
+        if (!auth.user || auth.user.role !== 'student') {
+          sendJSON(res, 403, { ok: false, error: 'Chỉ sinh viên mới xem được tin roommate của mình.' });
+          return true;
+        }
+        list = list.filter((rm) => String(rm.userId) === String(auth.user.id));
+      }
       const gender = reqUrl.searchParams.get('gender');
       const area = reqUrl.searchParams.get('area');
       const tab = reqUrl.searchParams.get('tab');
@@ -477,6 +484,22 @@ async function handleApiRequest(req, res) {
         ok: true,
         quizAnswers: quiz?.answers || {},
         quizResult: quiz?.result || null
+      });
+      return true;
+    }
+    if (roommateDetailMatch && method === 'DELETE') {
+      if (!auth.user || auth.user.role !== 'student') {
+        sendJSON(res, 403, { ok: false, error: 'Chỉ sinh viên mới được xóa tin roommate.' });
+        return true;
+      }
+      const deleted = db.deleteRoommateListing(auth.user, roommateDetailMatch[1]);
+      if (!deleted) {
+        sendJSON(res, 404, { ok: false, error: 'Không tìm thấy tin hoặc bạn không có quyền xóa tin này.' });
+        return true;
+      }
+      sendJSON(res, 200, {
+        ok: true,
+        roommates: db.getAllRoommates(auth.userId)
       });
       return true;
     }

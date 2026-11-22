@@ -47,6 +47,11 @@
     });
   }
 
+  function isOwnRoommateListing(roommate) {
+    const user = Core.getCurrentUser ? Core.getCurrentUser() : null;
+    return Boolean(user?.id && roommate?.userId && String(user.id) === String(roommate.userId));
+  }
+
   function parseBudgetRange(budgetStr) {
     const matches = String(budgetStr || "").match(/\d+(?:[.,]\d+)?/g) || [];
     const nums = matches.map((m) => parseFloat(m.replace(",", "."))).filter((n) => Number.isFinite(n));
@@ -528,7 +533,7 @@
       grid.querySelectorAll("[data-connect-rm]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const rm = Data.ROOMMATES.find((r) => r.id === btn.dataset.connectRm);
-          if (!rm) return;
+          if (!rm || isOwnRoommateListing(rm)) return;
           const existing = Core.getConnectionForPartner(rm.id, rm.name);
           if (existing?.status === "incoming") {
             if (Core.getActiveSlotConnections().length >= Core.MAX_CONTACT_SLOTS) {
@@ -607,9 +612,11 @@
     window.addEventListener("roomie:backend-synced", () => {
       renderMatches();
     });
+    window.addEventListener("roomie:roommates-updated", renderMatches);
   }
 
   function buildRoommateCardHtml(rm) {
+    const isOwnListing = isOwnRoommateListing(rm);
     const conn = Core.getConnectionForPartner(rm.id, rm.name);
     const status = conn?.status || "none";
     const primaryLabel =
@@ -682,10 +689,17 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 pt-1">
-          <button type="button" data-connect-rm="${escapeHTML(rm.id)}" class="flex-1 py-3 px-5 rounded-xl ${primaryCls} font-label-md text-[14px] font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer">
-            <span class="material-symbols-outlined text-[19px]">${primaryIcon}</span>
-            <span>${primaryLabel}</span>
-          </button>
+          ${
+            isOwnListing
+              ? `<span class="flex-1 py-3 px-5 rounded-xl bg-surface-container-low text-on-surface-variant font-label-md text-[14px] font-semibold flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-[19px]">person</span>
+                  Bài đăng của bạn
+                </span>`
+              : `<button type="button" data-connect-rm="${escapeHTML(rm.id)}" class="flex-1 py-3 px-5 rounded-xl ${primaryCls} font-label-md text-[14px] font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                  <span class="material-symbols-outlined text-[19px]">${primaryIcon}</span>
+                  <span>${primaryLabel}</span>
+                </button>`
+          }
           <button type="button" data-profile-rm="${escapeHTML(rm.id)}" class="py-3 px-5 rounded-xl bg-surface-container-high text-on-surface font-label-md text-[14px] font-semibold hover:bg-surface-container transition-colors flex items-center gap-1.5 cursor-pointer" title="Xem hồ sơ chi tiết">
             <span class="material-symbols-outlined text-[19px]">person</span>
             <span>Hồ sơ</span>
