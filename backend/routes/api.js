@@ -1,209 +1,255 @@
 /**
- * Roomie Match - RESTful Backend API Router
- * Xử lý toàn bộ API endpoints dưới /api/* (và /roomie/api/*).
+ * Roomie Match - REST API Router (Shared between local server.js & Vercel Serverless)
  */
 
-const db = require('../database/db');
-const { PRICING_PACKAGES } = require('../database/seed-data');
-const { getVietQrConfig } = require('../config');
+const { getVietQrConfig, isDemoLoginEnabled } = require('../config');
 const { createVietQr } = require('../services/vietqr');
+const { QUIZ_QUESTIONS, PRICING_PACKAGES } = require('../database/seed-data');
+const db = require('../database/db');
 
-const MAX_BODY_BYTES = 12 * 1024 * 1024; // 12MB to support Base64 room cover images
+const MAX_BODY_BYTES = 1024 * 1024; // 1 MB
+const COOKIE_NAME = 'roomie_token';
 
 function sendJSON(res, statusCode, payload, extraHeaders = {}) {
   const body = JSON.stringify(payload);
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Cache-Control': 'no-store, no-cache, must-revalidate',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-Id',
+    'Cache-Control': 'no-store',
+    Vary: 'Cookie, Authorization',
     ...extraHeaders
   });
   res.end(body);
 }
 
-function parseCookies(cookieHeader = '') {
-  const out = {};
-  String(cookieHeader)
-    .split(';')
-    .forEach((part) => {
-      const idx = part.indexOf('=');
-      if (idx > 0) {
-        const k = part.slice(0, idx).trim();
-        const v = part.slice(idx + 1).trim();
-        out[k] = decodeURIComponent(v);
-      }
-    });
-  return out;
+function parseCookies(req) {
+  const raw = String(req?.headers?.cookie || '');
+  const map = {};
+  if (!raw) return map;
+  raw.split(';').forEach((part) => {
+    const idx = part.indexOf('=');
+    if (idx <= 0) return;
+    const key = part.slice(0, idx).trim();
+    const val = part.slice(idx + 1).trim();
+    try {
+      map[key] = decodeURIComponent(val);
+    } catch {
+      map[key] = val;
+    }
+  });
+  return map;
 }
 
-function readJsonBody(req) {
+function isHttpsRequest(req) {
+  const proto = String(req?.headers?.['x-forwarded-proto'] || '').toLowerCase();
+  return proto === 'https' || Boolean(req?.socket?.encrypted);
+}
+
+function buildSessionCookieHeader(req, token, maxAgeSeconds = 30 * 24 * 3600) {
+  const parts = [
+    `${COOKIE_NAME}=${encodeURIComponent(token)}`,
+    'HttpOnly',
+    'Path=/',
+    'SameSite=Lax',
+    `Max-Age=${maxAgeSeconds}`
+  ];
+  if (isHttpsRequest(req)) {
+    parts.push('Secure');
+  }
+  return parts.join('; ');
+}
+
+function extractToken(req) {
+  const authHeader = String(req?.headers?.authorization || '');
+  if (authHeader.toLowerCase().startsWith('bearer ')) {
+    const bearer = authHeader.slice(7).trim();
+    if (bearer) return bearer;
+  }
+  const cookies = parseCookies(req);
+  return cookies[COOKIE_NAME] || null;
+}
+
+async function resolveRequestAuth(req) {
+  const token = extractToken(req);
+  if (!token) return { token: null, user: null };
+  const user = await db.getUserByToken(token);
+  return { token, user };
+}
+
+async function readJsonBody(req) {
+  if (req && req.body !== undefined && req.body !== null) {
+    if (typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
+      return req.body;
+    }
+    const text = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : String(req.body);
+    return text.trim() ? JSON.parse(text) : {};
+  }
+
   return new Promise((resolve, reject) => {
-    if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') {
-      resolve({});
-      return;
-    }
-    // If Vercel / Express already parsed req.body
-    if (req.body && typeof req.body === 'object') {
-      resolve(req.body);
-      return;
-    }
-    let raw = '';
-    let bytes = 0;
+    let totalBytes = 0;
+    const chunks = [];
     req.on('data', (chunk) => {
-      bytes += chunk.length;
-      if (bytes > MAX_BODY_BYTES) {
-        reject(new Error('PAYLOAD_TOO_LARGE'));
-        req.destroy();
+      totalBytes += chunk.length;
+      if (totalBytes > MAX_BODY_BYTES) {
+        const err = new Error('Kích thước dữ liệu vượt quá giới hạn 1MB.');
+        err.statusCode = 413;
+        reject(err);
+        req.destroy?.();
         return;
       }
-      raw += chunk.toString('utf8');
+      chunks.push(chunk);
     });
     req.on('end', () => {
-      if (!raw.trim()) {
+      const raw = Buffer.concat(chunks).toString('utf8').trim();
+      if (!raw) {
         resolve({});
         return;
       }
       try {
         resolve(JSON.parse(raw));
       } catch {
-        reject(new Error('INVALID_JSON'));
+        const err = new Error('Body JSON không hợp lệ.');
+        err.statusCode = 400;
+        reject(err);
       }
     });
     req.on('error', reject);
   });
 }
 
-function resolveRequestAuth(req, reqUrl, body = {}) {
-  const authHeader = req.headers.authorization || '';
-  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
-  const cookies = parseCookies(req.headers.cookie || '');
-  const token = bearerToken || cookies.rm_token || '';
+function normalizeApiUrl(req) {
+  const host = req?.headers?.host || 'localhost';
+  const reqUrl = new URL(req?.url || '/', `http://${host}`);
+  const rewriteRoute = reqUrl.searchParams.get('__route');
+  let pathname = rewriteRoute ? String(rewriteRoute) : decodeURIComponent(reqUrl.pathname);
 
-  let user = token ? db.getUserByToken(token) : null;
-  const explicitUserId =
-    req.headers['x-user-id'] ||
-    reqUrl.searchParams.get('userId') ||
-    (body && body.userId) ||
-    '';
-
-  if (!user && explicitUserId) {
-    if (explicitUserId === 'guest') {
-      return { token: '', user: null, userId: null };
-    }
-    user = db.getUserById(explicitUserId);
+  if (rewriteRoute) {
+    reqUrl.searchParams.delete('__route');
   }
-
-  if (!user && explicitUserId !== 'guest') {
-    user = db.getUserById(db.DEFAULT_USER_ID);
+  if (pathname === '/roomie/api') {
+    pathname = '/api';
+  } else if (pathname.startsWith('/roomie/api/')) {
+    pathname = pathname.slice('/roomie'.length);
   }
-
-  return {
-    token,
-    user,
-    userId: user ? user.id : db.DEFAULT_USER_ID
-  };
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    pathname = pathname.slice(0, -1);
+  }
+  return { pathname, searchParams: reqUrl.searchParams };
 }
 
-function normalizeSearch(value) {
-  return String(value || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/[.\-–—_/(),·]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+function requireAuth(res, auth) {
+  if (!auth.user) {
+    sendJSON(res, 401, {
+      ok: false,
+      code: 'AUTH_REQUIRED',
+      error: 'Vui lòng đăng nhập để sử dụng tính năng này.'
+    });
+    return false;
+  }
+  return true;
+}
+
+function requireAdmin(res, auth) {
+  if (!requireAuth(res, auth)) return false;
+  if (auth.user.role !== 'admin') {
+    sendJSON(res, 403, {
+      ok: false,
+      code: 'FORBIDDEN',
+      error: 'Bạn không có quyền truy cập dữ liệu quản trị.'
+    });
+    return false;
+  }
+  return true;
 }
 
 async function handleApiRequest(req, res) {
-  if (req.method === 'OPTIONS') {
-    sendJSON(res, 200, { ok: true });
-    return true;
-  }
-
-  const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  let pathname = decodeURIComponent(reqUrl.pathname);
-
-  if (pathname.startsWith('/roomie/api')) {
-    pathname = pathname.slice('/roomie'.length);
-  }
+  const { pathname, searchParams } = normalizeApiUrl(req);
   if (!pathname.startsWith('/api')) {
     return false;
   }
 
-  // Strip trailing slash except root /api
-  if (pathname.length > 4 && pathname.endsWith('/')) {
-    pathname = pathname.slice(0, -1);
-  }
-
-  let body = {};
-  try {
-    body = await readJsonBody(req);
-  } catch (err) {
-    const status = err.message === 'PAYLOAD_TOO_LARGE' ? 413 : 400;
-    sendJSON(res, status, {
-      ok: false,
-      error: err.message === 'PAYLOAD_TOO_LARGE' ? 'Dữ liệu tải lên vượt quá 12MB.' : 'JSON không hợp lệ.'
+  const method = String(req.method || 'GET').toUpperCase();
+  if (method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+      'Cache-Control': 'no-store'
     });
+    res.end();
     return true;
   }
 
-  const auth = resolveRequestAuth(req, reqUrl, body);
-  const method = req.method.toUpperCase();
+  let body = {};
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    try {
+      body = await readJsonBody(req);
+    } catch (err) {
+      sendJSON(res, err.statusCode || 400, {
+        ok: false,
+        error: err.message || 'Dữ liệu gửi lên không hợp lệ.'
+      });
+      return true;
+    }
+  }
 
   try {
-    // 1. Health & Database Stats
-    if ((pathname === '/api' || pathname === '/api/health' || pathname === '/api/stats') && method === 'GET') {
-      const stats = db.getDatabaseStats();
-      sendJSON(res, 200, {
-        ok: true,
-        service: 'Roomie Match Backend API',
-        version: '1.0.0',
-        timestamp: new Date().toISOString(),
-        database: stats
-      });
+    // 1. Health Check
+    if (pathname === '/api/health' && method === 'GET') {
+      const stats = await db.getDatabaseStats();
+      sendJSON(res, 200, { ok: true, service: 'roomie-api', stats });
       return true;
     }
 
-    // 2. Full Frontend Bootstrap Endpoint
+    const auth = await resolveRequestAuth(req);
+    const vietqrCfg = getVietQrConfig();
+    const paymentConfigured = Boolean(vietqrCfg.bankBin && vietqrCfg.accountNumber);
+
+    // 2. Application Bootstrap
     if (pathname === '/api/bootstrap' && method === 'GET') {
-      const uid = auth.userId || db.DEFAULT_USER_ID;
-      const requestedUserId = req.headers['x-user-id'] || reqUrl.searchParams.get('userId') || '';
-      const quiz =
-        auth.user && (!requestedUserId || requestedUserId === auth.user.id)
-          ? db.getQuizSubmission(uid)
-          : null;
-      const connections = db.getConnections(uid);
-      const activeSlots = connections.filter((c) => c.status === 'pending' || c.status === 'accepted').length;
+      const userId = auth.user?.id || null;
+      const bootstrap = await db.getBootstrapData(userId);
+      const quizResult = bootstrap.quiz
+        ? {
+            ...bootstrap.quiz.result,
+            locked: !bootstrap.entitlements.unlockedPrediction
+          }
+        : null;
 
       sendJSON(res, 200, {
         ok: true,
+        authenticated: Boolean(auth.user),
         user: auth.user,
-        users: db.getAllUsers(),
-        rooms: db.getAllRooms(),
-        roommates: db.getAllRoommates(uid),
-        savedRoomIds: db.getSavedRoomIds(uid),
-        connections,
-        slots: {
-          active: activeSlots,
-          max: db.MAX_CONTACT_SLOTS
-        },
-        activePlans: db.getUserPlans(uid),
-        quizAnswers: quiz?.answers || null,
-        quizResult: quiz?.result || null,
-        notifications: db.getNotifications(uid),
-        pricingPackages: PRICING_PACKAGES
+        demoLoginEnabled: isDemoLoginEnabled(),
+        demoAccounts: db.getDemoAccounts(),
+        rooms: bootstrap.rooms,
+        roommates: bootstrap.roommates,
+        savedRoomIds: bootstrap.savedRoomIds,
+        connections: bootstrap.connections,
+        quizAnswers: bootstrap.quiz?.answers || null,
+        quizResult,
+        unlockedPrediction: bootstrap.entitlements.unlockedPrediction,
+        entitlements: bootstrap.entitlements,
+        plans: bootstrap.plans,
+        postQuota: bootstrap.postQuota,
+        notifications: bootstrap.notifications,
+        quizQuestions: QUIZ_QUESTIONS,
+        pricingPackages: PRICING_PACKAGES,
+        paymentConfigured
       });
       return true;
     }
 
-    // 3. Authentication Routes
+    // 3. Authentication
+    if (pathname === '/api/auth/me' && method === 'GET') {
+      sendJSON(res, 200, {
+        ok: true,
+        authenticated: Boolean(auth.user),
+        user: auth.user
+      });
+      return true;
+    }
+
     if (pathname === '/api/auth/login' && method === 'POST') {
-      const identifier = body.identifier || body.email || '';
-      const password = body.password || '';
-      const result = db.loginUser(identifier, password);
+      const result = await db.loginUser(body.identifier || body.email, body.password);
       if (!result.ok) {
         sendJSON(res, 401, result);
         return true;
@@ -211,20 +257,29 @@ async function handleApiRequest(req, res) {
       sendJSON(
         res,
         200,
-        {
-          ok: true,
-          user: result.user,
-          token: result.token
-        },
-        {
-          'Set-Cookie': `rm_token=${encodeURIComponent(result.token)}; Path=/; Max-Age=${30 * 24 * 3600}; SameSite=Lax`
-        }
+        { ok: true, user: result.user },
+        { 'Set-Cookie': buildSessionCookieHeader(req, result.token) }
+      );
+      return true;
+    }
+
+    if (pathname === '/api/auth/demo-login' && method === 'POST') {
+      const result = await db.loginDemoAccount(body.account || body.id);
+      if (!result.ok) {
+        sendJSON(res, 400, result);
+        return true;
+      }
+      sendJSON(
+        res,
+        200,
+        { ok: true, user: result.user },
+        { 'Set-Cookie': buildSessionCookieHeader(req, result.token) }
       );
       return true;
     }
 
     if (pathname === '/api/auth/register' && method === 'POST') {
-      const result = db.registerUser(body);
+      const result = await db.registerUser(body);
       if (!result.ok) {
         sendJSON(res, 400, result);
         return true;
@@ -232,260 +287,139 @@ async function handleApiRequest(req, res) {
       sendJSON(
         res,
         201,
-        {
-          ok: true,
-          user: result.user,
-          token: result.token
-        },
-        {
-          'Set-Cookie': `rm_token=${encodeURIComponent(result.token)}; Path=/; Max-Age=${30 * 24 * 3600}; SameSite=Lax`
-        }
+        { ok: true, user: result.user },
+        { 'Set-Cookie': buildSessionCookieHeader(req, result.token) }
       );
       return true;
     }
 
     if (pathname === '/api/auth/logout' && method === 'POST') {
-      if (auth.token) db.logoutSession(auth.token);
-      sendJSON(
-        res,
-        200,
-        { ok: true },
-        {
-          'Set-Cookie': 'rm_token=; Path=/; Max-Age=0; SameSite=Lax'
-        }
-      );
+      await db.logoutSession(auth.token);
+      sendJSON(res, 200, { ok: true }, { 'Set-Cookie': buildSessionCookieHeader(req, '', 0) });
       return true;
     }
 
-    if (pathname === '/api/auth/me' && method === 'GET') {
-      sendJSON(res, 200, {
-        ok: true,
-        loggedIn: Boolean(auth.user),
-        user: auth.user
-      });
-      return true;
-    }
-
-    // 4. Rooms & Listings Routes
+    // 4. Rooms & Saved Rooms
     if (pathname === '/api/rooms' && method === 'GET') {
-      let list = db.getAllRooms();
-      const city = reqUrl.searchParams.get('city');
-      const area = reqUrl.searchParams.get('area');
-      const type = reqUrl.searchParams.get('type');
-      const q = normalizeSearch(reqUrl.searchParams.get('q'));
-      const minPrice = Number(reqUrl.searchParams.get('minPrice')) || 0;
-      const maxPrice = Number(reqUrl.searchParams.get('maxPrice')) || 0;
-      const savedOnly = reqUrl.searchParams.get('savedOnly') === '1' || reqUrl.searchParams.get('saved') === '1';
-      const sort = reqUrl.searchParams.get('sort') || 'newest';
-
-      if (savedOnly) {
-        const savedSet = new Set(db.getSavedRoomIds(auth.userId));
-        list = list.filter((r) => savedSet.has(String(r.id)));
-      }
-      if (city) {
-        list = list.filter((r) => (r.city || 'TP.HCM').toLowerCase() === city.toLowerCase());
-      }
-      if (area) {
-        const areaKeys = area.split(',').map((s) => s.trim()).filter(Boolean);
-        if (areaKeys.length) list = list.filter((r) => areaKeys.includes(r.areaKey));
-      }
-      if (type && type !== 'all') {
-        list = list.filter((r) => r.typeKey === type);
-      }
-      if (minPrice > 0) {
-        list = list.filter((r) => r.price >= minPrice);
-      }
-      if (maxPrice > 0) {
-        list = list.filter((r) => r.price <= maxPrice);
-      }
-      if (q) {
-        list = list.filter((r) => {
-          const hay = normalizeSearch(
-            `${r.title} ${r.shortTitle} ${r.address} ${r.districtLabel} ${r.distanceLabel} ${(r.description || []).join(' ')}`
-          );
-          return q.split(' ').every((tok) => hay.includes(tok));
-        });
-      }
-      if (sort === 'price-asc') {
-        list = [...list].sort((a, b) => a.price - b.price);
-      } else if (sort === 'price-desc') {
-        list = [...list].sort((a, b) => b.price - a.price);
-      }
-
-      sendJSON(res, 200, {
-        ok: true,
-        total: list.length,
-        rooms: list
-      });
+      const rooms = await db.getAllRooms({ userId: auth.user?.id || null });
+      sendJSON(res, 200, { ok: true, rooms });
       return true;
     }
 
     if (pathname === '/api/rooms' && method === 'POST') {
-      if (!auth.user || auth.user.role !== 'student') {
-        sendJSON(res, 403, {
-          ok: false,
-          error: 'Chỉ tài khoản sinh viên mới được đăng tin trên Roomie.'
-        });
+      if (!requireAuth(res, auth)) return true;
+      const result = await db.createRoom(body, auth.user);
+      if (!result.ok) {
+        sendJSON(res, 400, result);
         return true;
       }
-      if (!body.address || !body.price) {
-        sendJSON(res, 400, {
-          ok: false,
-          error: 'Vui lòng nhập đầy đủ địa chỉ và tiền phòng hợp lệ.'
-        });
-        return true;
-      }
-      const created = db.createRoom(body, auth.user);
       sendJSON(res, 201, {
         ok: true,
-        room: created,
-        rooms: db.getAllRooms()
+        room: result.room,
+        rooms: await db.getAllRooms({ userId: auth.user.id })
       });
       return true;
     }
 
     const roomSaveMatch = pathname.match(/^\/api\/rooms\/([^/]+)\/save$/);
     if (roomSaveMatch && method === 'POST') {
-      const roomId = roomSaveMatch[1];
-      const result = db.toggleSavedRoom(auth.userId, roomId);
-      sendJSON(res, 200, {
-        ok: true,
-        roomId,
-        ...result
-      });
-      return true;
-    }
-
-    const roomPingMatch = pathname.match(/^\/api\/rooms\/([^/]+)\/ping$/);
-    if (roomPingMatch && (method === 'POST' || method === 'PATCH')) {
-      const roomId = roomPingMatch[1];
-      const updated = db.pingRoomAvailability(roomId, body.status || 'active');
-      if (!updated) {
-        sendJSON(res, 404, { ok: false, error: 'Không tìm thấy phòng trọ.' });
-        return true;
-      }
-      sendJSON(res, 200, { ok: true, room: updated });
-      return true;
-    }
-
-    const roomDetailMatch = pathname.match(/^\/api\/rooms\/([^/]+)$/);
-    if (roomDetailMatch) {
-      const roomId = roomDetailMatch[1];
-      if (method === 'GET') {
-        const room = db.getRoomById(roomId);
-        if (!room) {
-          sendJSON(res, 404, { ok: false, error: 'Không tìm thấy phòng trọ.' });
-          return true;
-        }
-        sendJSON(res, 200, { ok: true, room });
-        return true;
-      }
-      if (method === 'DELETE') {
-        db.deleteRoom(roomId);
-        sendJSON(res, 200, { ok: true, roomId });
-        return true;
-      }
-    }
-
-    // 5. Saved Rooms List
-    if (pathname === '/api/saved-rooms' && method === 'GET') {
-      sendJSON(res, 200, {
-        ok: true,
-        savedRoomIds: db.getSavedRoomIds(auth.userId)
-      });
-      return true;
-    }
-
-    // 6. Roommates & Compatibility Matching Routes
-    if (pathname === '/api/roommates' && method === 'POST') {
-      if (!auth.user || auth.user.role !== 'student') {
-        sendJSON(res, 403, {
-          ok: false,
-          error: 'Chỉ tài khoản sinh viên mới được đăng tin tìm roommate.'
-        });
-        return true;
-      }
-
-      const result = db.createRoommateListing(auth.user, body);
-      if (!result || !result.ok) {
-        sendJSON(res, result?.code === 'daily_limit' ? 429 : 400, {
-          ok: false,
-          error: result?.error || 'Vui lòng kiểm tra loại tin, khu vực và ngân sách trước khi đăng.'
-        });
-        return true;
-      }
-
-      sendJSON(res, 201, {
-        ok: true,
-        roommate: result.roommate,
-        roommates: db.getAllRoommates(auth.userId)
-      });
-      return true;
-    }
-
-    if (pathname === '/api/roommates' && method === 'GET') {
-      let list = db.getAllRoommates(auth.userId);
-      if (reqUrl.searchParams.get('mine') === '1') {
-        if (!auth.user || auth.user.role !== 'student') {
-          sendJSON(res, 403, { ok: false, error: 'Chỉ sinh viên mới xem được tin roommate của mình.' });
-          return true;
-        }
-        list = list.filter((rm) => String(rm.userId) === String(auth.user.id));
-      }
-      const gender = reqUrl.searchParams.get('gender');
-      const area = reqUrl.searchParams.get('area');
-      const tab = reqUrl.searchParams.get('tab');
-      const q = normalizeSearch(reqUrl.searchParams.get('q'));
-
-      if (gender && gender !== 'all') {
-        list = list.filter((rm) => rm.gender === gender);
-      }
-      if (area) {
-        const areaKeys = area.split(',').map((s) => s.trim()).filter(Boolean);
-        if (areaKeys.length) list = list.filter((rm) => areaKeys.includes(rm.areaKey));
-      }
-      if (tab === 'high') {
-        list = list.filter((rm) => rm.matchScore >= 90);
-      } else if (tab === 'vnu') {
-        list = list.filter((rm) => rm.vnuMember);
-      } else if (tab === 'has-room') {
-        list = list.filter((rm) => rm.hasRoom);
-      }
-      if (q) {
-        list = list.filter((rm) => {
-          const hay = normalizeSearch(
-            `${rm.name} ${rm.school} ${rm.major} ${rm.roomStatusDetail} ${(rm.tags || []).join(' ')} ${(rm.criteria || []).join(' ')}`
-          );
-          return q.split(' ').every((tok) => hay.includes(tok));
-        });
-      }
-
-      sendJSON(res, 200, {
-        ok: true,
-        total: list.length,
-        roommates: list
-      });
-      return true;
-    }
-
-    const roommateBoostMatch = pathname.match(/^\/api\/roommates\/([^/]+)\/boost$/);
-    if (roommateBoostMatch && method === 'POST') {
-      if (!auth.user || auth.user.role !== 'student') {
-        sendJSON(res, 403, { ok: false, error: 'Chỉ sinh viên mới được đẩy tin roommate.' });
-        return true;
-      }
-      const result = db.boostRoommateListing(auth.userId, roommateBoostMatch[1], body.period);
-      if (!result.ok) {
-        sendJSON(res, result.error && result.error.includes('Không tìm thấy') ? 404 : 403, result);
-        return true;
-      }
+      if (!requireAuth(res, auth)) return true;
+      const roomId = decodeURIComponent(roomSaveMatch[1]);
+      const result = await db.toggleSavedRoom(auth.user.id, roomId);
       sendJSON(res, 200, result);
       return true;
     }
 
-    const roommateDetailMatch = pathname.match(/^\/api\/roommates\/([^/]+)$/);
-    if (roommateDetailMatch && method === 'GET') {
-      const rm = db.getRoommateById(roommateDetailMatch[1], auth.userId);
+    if (pathname === '/api/saved-rooms' && method === 'GET') {
+      if (!requireAuth(res, auth)) return true;
+      sendJSON(res, 200, { ok: true, savedRoomIds: await db.getSavedRoomIds(auth.user.id) });
+      return true;
+    }
+
+    if (pathname === '/api/saved-rooms/toggle' && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      if (!body.roomId) {
+        sendJSON(res, 400, { ok: false, error: 'Thiếu roomId.' });
+        return true;
+      }
+      sendJSON(res, 200, await db.toggleSavedRoom(auth.user.id, body.roomId));
+      return true;
+    }
+
+    const roomPingMatch = pathname.match(/^\/api\/rooms\/([^/]+)\/ping$/);
+    if (roomPingMatch && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      const roomId = decodeURIComponent(roomPingMatch[1]);
+      const result = await db.pingRoomAvailability(roomId, body.status || 'active', auth.user);
+      sendJSON(res, result.ok ? 200 : result.statusCode || 400, result);
+      return true;
+    }
+
+    const roomItemMatch = pathname.match(/^\/api\/rooms\/([^/]+)$/);
+    if (roomItemMatch && method === 'GET') {
+      const roomId = decodeURIComponent(roomItemMatch[1]);
+      const room = await db.getRoomById(roomId, { userId: auth.user?.id || null });
+      if (!room) {
+        sendJSON(res, 404, { ok: false, error: 'Không tìm thấy phòng trọ.' });
+        return true;
+      }
+      sendJSON(res, 200, { ok: true, room });
+      return true;
+    }
+
+    if (roomItemMatch && method === 'DELETE') {
+      if (!requireAuth(res, auth)) return true;
+      const roomId = decodeURIComponent(roomItemMatch[1]);
+      const result = await db.deleteRoom(roomId, auth.user);
+      sendJSON(res, result.ok ? 200 : result.statusCode || 400, result);
+      return true;
+    }
+
+    // 5. Roommates, Quota & Boost
+    if (pathname === '/api/roommates/quota' && method === 'GET') {
+      if (!requireAuth(res, auth)) return true;
+      sendJSON(res, 200, { ok: true, quota: await db.getRoommatePostQuotaStatus(auth.user.id) });
+      return true;
+    }
+
+    if (pathname === '/api/roommates' && method === 'GET') {
+      const mineOnly = searchParams.get('mine') === '1';
+      if (mineOnly && !requireAuth(res, auth)) return true;
+      const list = await db.getAllRoommates(auth.user?.id || null);
+      sendJSON(res, 200, {
+        ok: true,
+        roommates: mineOnly ? list.filter((r) => String(r.userId) === String(auth.user.id)) : list
+      });
+      return true;
+    }
+
+    if (pathname === '/api/roommates' && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      const result = await db.createRoommateListing(auth.user, body);
+      if (!result.ok) {
+        sendJSON(res, result.code === 'daily_limit' ? 429 : 400, result);
+        return true;
+      }
+      sendJSON(res, 201, {
+        ...result,
+        roommates: await db.getAllRoommates(auth.user.id)
+      });
+      return true;
+    }
+
+    const boostMatch = pathname.match(/^\/api\/roommates\/([^/]+)\/boost$/);
+    if (boostMatch && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      const targetId = decodeURIComponent(boostMatch[1]);
+      const result = await db.boostRoommateListing(auth.user.id, targetId, body.period);
+      sendJSON(res, result.ok ? 200 : 400, result);
+      return true;
+    }
+
+    const rmItemMatch = pathname.match(/^\/api\/roommates\/([^/]+)$/);
+    if (rmItemMatch && method === 'GET') {
+      const rmId = decodeURIComponent(rmItemMatch[1]);
+      const rm = await db.getRoommateById(rmId, auth.user?.id || null);
       if (!rm) {
         sendJSON(res, 404, { ok: false, error: 'Không tìm thấy hồ sơ roommate.' });
         return true;
@@ -494,140 +428,134 @@ async function handleApiRequest(req, res) {
       return true;
     }
 
-    // 7. Personality Quiz Submission & Evaluation
-    if ((pathname === '/api/quiz' || pathname === '/api/quiz/me') && method === 'GET') {
-      const quiz = db.getQuizSubmission(auth.userId);
-      sendJSON(res, 200, {
-        ok: true,
-        quizAnswers: quiz?.answers || {},
-        quizResult: quiz?.result || null
-      });
-      return true;
-    }
-    if (roommateDetailMatch && method === 'DELETE') {
-      if (!auth.user || auth.user.role !== 'student') {
-        sendJSON(res, 403, { ok: false, error: 'Chỉ sinh viên mới được xóa tin roommate.' });
-        return true;
-      }
-      const deleted = db.deleteRoommateListing(auth.user, roommateDetailMatch[1]);
+    if (rmItemMatch && method === 'DELETE') {
+      if (!requireAuth(res, auth)) return true;
+      const rmId = decodeURIComponent(rmItemMatch[1]);
+      const deleted = await db.deleteRoommateListing(auth.user, rmId);
       if (!deleted) {
-        sendJSON(res, 404, { ok: false, error: 'Không tìm thấy tin hoặc bạn không có quyền xóa tin này.' });
+        sendJSON(res, 404, { ok: false, error: 'Không tìm thấy bài đăng của bạn để xóa.' });
         return true;
       }
+      const [roommates, quota] = await Promise.all([
+        db.getAllRoommates(auth.user.id),
+        db.getRoommatePostQuotaStatus(auth.user.id)
+      ]);
       sendJSON(res, 200, {
         ok: true,
-        roommates: db.getAllRoommates(auth.userId)
+        roommates,
+        quota
       });
       return true;
     }
 
-    if ((pathname === '/api/quiz' || pathname === '/api/quiz/submit') && method === 'POST') {
-      const answers = body.answers || body.quizAnswers || {};
-      const explicitResult = body.result || body.quizResult || null;
-      const savedQuiz = db.saveQuizSubmission(auth.userId, answers, explicitResult);
-      if (!savedQuiz.ok) {
-        sendJSON(res, savedQuiz.code === 'daily_match_limit' ? 429 : 400, savedQuiz);
-        return true;
-      }
+    // 6. Quiz & Gói 4/5 Locked Predictions
+    if (pathname === '/api/quiz' && method === 'GET') {
+      if (!requireAuth(res, auth)) return true;
+      const [quiz, unlocked] = await Promise.all([
+        db.getQuizSubmission(auth.user.id),
+        db.hasUnlockedPrediction(auth.user.id)
+      ]);
       sendJSON(res, 200, {
         ok: true,
-        quizAnswers: savedQuiz.answers,
-        quizResult: savedQuiz.result,
-        roommates: db.getAllRoommates(auth.userId)
+        quiz: quiz ? { ...quiz, result: { ...quiz.result, locked: !unlocked } } : null,
+        unlockedPrediction: unlocked
       });
       return true;
     }
 
-    // 8. Double Opt-in Connections & Active Slot Management (Max 3 Slots)
+    if (pathname === '/api/quiz' && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      const result = await db.saveQuizSubmission(auth.user.id, body.answers || {}, body.result || null);
+      if (!result.ok) {
+        sendJSON(res, result.code === 'daily_match_limit' ? 429 : 400, result);
+        return true;
+      }
+      sendJSON(res, 200, {
+        ...result,
+        roommates: await db.getAllRoommates(auth.user.id, {
+          unlockedPrediction: result.unlockedPrediction,
+          quiz: { answers: result.answers, result: result.result }
+        })
+      });
+      return true;
+    }
+
+    if (pathname === '/api/quiz/predictions' && method === 'GET') {
+      if (!requireAuth(res, auth)) return true;
+      const result = await db.getQuizPredictions(auth.user.id);
+      sendJSON(res, result.ok ? 200 : result.statusCode || 400, result);
+      return true;
+    }
+
+    // 7. Double Opt-in Connections
     if (pathname === '/api/connections' && method === 'GET') {
-      const connections = db.getConnections(auth.userId);
-      const activeSlots = connections.filter((c) => c.status === 'pending' || c.status === 'accepted').length;
+      if (!requireAuth(res, auth)) return true;
+      const connections = await db.getConnections(auth.user.id);
       sendJSON(res, 200, {
         ok: true,
         connections,
-        slots: {
-          active: activeSlots,
-          max: db.MAX_CONTACT_SLOTS
-        }
+        activeCount: connections.filter((c) => c.status === 'pending' || c.status === 'accepted').length
       });
       return true;
     }
 
-    if ((pathname === '/api/connections' || pathname === '/api/connections/invite') && method === 'POST') {
-      const status = body.status || 'pending';
-      const result = db.upsertConnection(auth.userId, body, status, {
-        note: body.note,
-        releaseReason: body.releaseReason,
-        revertedOnce: body.revertedOnce
-      });
+    if (pathname === '/api/connections' && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      const result = await db.upsertConnection(
+        auth.user.id,
+        body.target || body,
+        body.status || 'pending',
+        body
+      );
       if (!result.ok) {
-        sendJSON(res, 409, result);
+        sendJSON(res, result.code === 'SLOTS_FULL' ? 409 : 400, result);
         return true;
       }
       sendJSON(res, 200, result);
       return true;
     }
 
-    const connUpdateMatch = pathname.match(/^\/api\/connections\/([^/]+)$/);
-    if (connUpdateMatch && (method === 'PATCH' || method === 'PUT' || method === 'POST')) {
-      const connId = decodeURIComponent(connUpdateMatch[1]);
-      const nextStatus = body.status || 'accepted';
-      const result = db.updateConnectionStatusById(auth.userId, connId, nextStatus, {
-        releaseReason: body.releaseReason,
-        revertedOnce: body.revertedOnce
-      });
+    const connStatusMatch = pathname.match(/^\/api\/connections\/([^/]+)(?:\/status)?$/);
+    if (connStatusMatch && (method === 'PATCH' || method === 'POST')) {
+      if (!requireAuth(res, auth)) return true;
+      const connId = decodeURIComponent(connStatusMatch[1]);
+      const result = await db.updateConnectionStatusById(auth.user.id, connId, body.status, body);
       if (!result.ok) {
-        sendJSON(res, result.code === 'SLOTS_FULL' ? 409 : 404, result);
+        sendJSON(res, result.code === 'SLOTS_FULL' ? 409 : 400, result);
         return true;
       }
       sendJSON(res, 200, result);
       return true;
     }
 
-    // 9. Pricing Plans & VietQR Subscriptions
+    // 8. Pricing Plans & VietQR Checkout
     if (pathname === '/api/plans' && method === 'GET') {
+      const activePlans = auth.user ? await db.getUserPlans(auth.user.id) : [];
       sendJSON(res, 200, {
         ok: true,
         packages: PRICING_PACKAGES,
-        activePlans: db.getUserPlans(auth.userId),
-        paymentConfigured: getVietQrConfig().configured
+        activePlans,
+        entitlements: db.buildPlanEntitlements(activePlans),
+        paymentConfigured
       });
       return true;
     }
 
-    if (
-      (pathname === '/api/plans/checkout' ||
-        pathname === '/api/plans' ||
-        pathname === '/api/plans/purchase') &&
-      method === 'POST'
-    ) {
-      const result = db.createPlanOrder(auth.userId, body);
+    if (pathname === '/api/plans/checkout' && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      const result = await db.createPlanOrder(auth.user.id, body);
       if (!result.ok) {
         sendJSON(res, 400, result);
         return true;
       }
-
-      const qr = await createVietQr(result.order.amountVnd, result.order.transferCode);
-      if (!qr.ok) {
-        sendJSON(res, 503, qr);
-        return true;
-      }
-      sendJSON(res, 201, {
-        ok: true,
-        order: result.order,
-        payment: {
-          qrDataUrl: qr.qrDataUrl,
-          bank: qr.bank,
-          accountNumber: qr.accountNumber,
-          accountName: qr.accountName,
-          isDemo: qr.isDemo
-        }
-      });
+      const payment = await createVietQr(result.order.amountVnd, result.order.transferCode);
+      sendJSON(res, 201, { ok: true, order: result.order, payment });
       return true;
     }
 
     if (pathname === '/api/plans/confirm' && method === 'POST') {
-      const result = db.confirmPlanOrder(auth.userId, body.orderId);
+      if (!requireAuth(res, auth)) return true;
+      const result = await db.confirmPlanOrder(auth.user.id, body.orderId);
       if (!result.ok) {
         sendJSON(res, 400, result);
         return true;
@@ -636,61 +564,56 @@ async function handleApiRequest(req, res) {
       return true;
     }
 
-    if (pathname === '/api/plans/reset' && (method === 'POST' || method === 'DELETE')) {
-      const result = db.resetUserPlans(auth.userId);
-      sendJSON(res, 200, result);
+    if (pathname === '/api/plans/reset' && method === 'POST') {
+      if (!requireAuth(res, auth)) return true;
+      if (!isDemoLoginEnabled() && auth.user.role !== 'admin') {
+        sendJSON(res, 403, { ok: false, error: 'Chức năng đặt lại gói chỉ bật ở chế độ demo.' });
+        return true;
+      }
+      sendJSON(res, 200, await db.resetUserPlans(auth.user.id));
       return true;
     }
 
-    // 10. Notifications
+    // 9. Notifications, Reports & Contacts
     if (pathname === '/api/notifications' && method === 'GET') {
-      sendJSON(res, 200, {
-        ok: true,
-        notifications: db.getNotifications(auth.userId)
-      });
+      if (!requireAuth(res, auth)) return true;
+      sendJSON(res, 200, { ok: true, notifications: await db.getNotifications(auth.user.id) });
       return true;
     }
 
-    if (pathname === '/api/notifications/read-all' && method === 'POST') {
-      const notifications = db.markAllNotificationsRead(auth.userId);
-      sendJSON(res, 200, {
-        ok: true,
-        notifications
-      });
+    if (
+      (pathname === '/api/notifications/read-all' || pathname === '/api/notifications/read') &&
+      method === 'POST'
+    ) {
+      if (!requireAuth(res, auth)) return true;
+      sendJSON(res, 200, { ok: true, notifications: await db.markAllNotificationsRead(auth.user.id) });
       return true;
     }
 
-    // 11. Trust & Safety Reports (Báo cáo tin giả / phòng ma / lừa cọc)
     if (pathname === '/api/reports' && method === 'GET') {
-      sendJSON(res, 200, {
-        ok: true,
-        reports: db.getReports()
-      });
+      if (!requireAdmin(res, auth)) return true;
+      sendJSON(res, 200, { ok: true, reports: await db.getReports() });
       return true;
     }
 
     if (pathname === '/api/reports' && method === 'POST') {
-      const result = db.createReport(body, auth.user?.id || null);
+      const result = await db.createReport(body, auth.user?.id || null);
       sendJSON(res, 201, result);
       return true;
     }
 
-    // 12. Contact & Support Callback Tickets
     if (pathname === '/api/contacts' && method === 'GET') {
-      sendJSON(res, 200, {
-        ok: true,
-        tickets: db.getContactTickets()
-      });
+      if (!requireAdmin(res, auth)) return true;
+      sendJSON(res, 200, { ok: true, tickets: await db.getContactTickets() });
       return true;
     }
 
     if (pathname === '/api/contacts' && method === 'POST') {
-      const result = db.createContactTicket(body, auth.user?.id || null);
-      sendJSON(res, 201, result);
+      const result = await db.createContactTicket(body, auth.user?.id || null);
+      sendJSON(res, result.ok ? 201 : 400, result);
       return true;
     }
 
-    // Fallback 404 for unknown /api/* route
     sendJSON(res, 404, {
       ok: false,
       error: `API endpoint không tồn tại: ${method} ${pathname}`
@@ -698,15 +621,21 @@ async function handleApiRequest(req, res) {
     return true;
   } catch (err) {
     console.error('[Roomie API Error]', err);
-    sendJSON(res, 500, {
+    const statusCode = err?.code === 'MISSING_DATABASE_URL' ? 503 : 500;
+    const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+    sendJSON(res, statusCode, {
       ok: false,
-      error: 'Lỗi máy chủ nội bộ (Internal Server Error)',
-      detail: err.message
+      error:
+        err?.code === 'MISSING_DATABASE_URL'
+          ? err.message
+          : 'Lỗi máy chủ nội bộ (Internal Server Error)',
+      ...(isProduction ? {} : { detail: err.message })
     });
     return true;
   }
 }
 
 module.exports = {
-  handleApiRequest
+  handleApiRequest,
+  normalizeApiUrl
 };

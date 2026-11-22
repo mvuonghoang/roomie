@@ -1,10 +1,10 @@
 /**
- * Roomie Core Utilities, Shared State & Modals
- * Quản lý lưu trữ cục bộ, định dạng tiền tệ, tìm kiếm chuẩn hóa, toast, modal và luồng Double Opt-in.
+ * Roomie Core Client-Server State, Utilities & Modals
+ * Giao tiếp hoàn toàn với backend REST API (/api/*) & Supabase PostgreSQL.
+ * Không lưu trữ hay nhúng database trên frontend.
  */
 (function () {
   const Data = window.RoomieData || {};
-  const SEED_ROOMMATES = Array.isArray(Data.ROOMMATES) ? [...Data.ROOMMATES] : [];
   const CONTACT = Data.CONTACT_INFO || {
     phone: "+84 777 639 593",
     tel: "+84777639593",
@@ -13,25 +13,11 @@
     address: "227 Nguyễn Văn Cừ, Chợ Quán, TPHCM"
   };
 
+  // Only transient client-side drafts are stored in localStorage
   const STORAGE_KEYS = {
-    SAVED_ROOMS: "rm_saved_rooms",
-    INVITED_ROOMMATES: "rm_invited_roommates",
-    QUIZ_ANSWERS: "rm_quiz_answers",
-    QUIZ_RESULT: "rm_quiz_result",
-    QUIZ_USER_ID: "rm_quiz_user_id",
-    CUSTOM_LISTINGS: "rm_custom_listings",
-    CUSTOM_ROOMMATE_LISTINGS: "rm_custom_roommate_listings",
     LISTING_DRAFT: "rm_listing_draft",
-    NOTIFICATIONS_READ: "rm_notifications_read",
-    CONNECTIONS: "rm_connections",
-    ACTIVE_PLANS: "rm_active_plans",
-    AUTH_SESSION: "rm_auth_session",
-    AUTH_USERS: "rm_auth_users",
-    DEMO_POST_USAGE: "rm_demo_post_usage",
-    DEMO_MATCH_USAGE: "rm_demo_match_usage",
-    DEMO_PLAN_ORDERS: "rm_demo_plan_orders",
-    DEMO_REPORTS: "rm_demo_reports",
-    DEMO_CONTACT_TICKETS: "rm_demo_contact_tickets"
+    QUIZ_ANSWERS: "rm_quiz_draft_answers",
+    QUIZ_RESULT: "rm_quiz_result_cache"
   };
 
   const MAX_CONTACT_SLOTS = 3;
@@ -40,6 +26,22 @@
     "Không hợp ngân sách",
     "Phòng đã có người đặt",
     "Đã chọn được bạn khác"
+  ];
+
+  const AUTH_SCHOOL_OPTIONS = [
+    { code: "HCMUS", name: "ĐH Khoa học Tự nhiên (HCMUS)", area: "Làng ĐHQG / Quận 5" },
+    { code: "HCMUT", name: "ĐH Bách khoa - ĐHQG TP.HCM (HCMUT)", area: "Làng ĐHQG / Quận 10" },
+    { code: "UIT", name: "ĐH Công nghệ Thông tin (UIT)", area: "Làng ĐHQG Thủ Đức" },
+    { code: "USSH", name: "ĐH KHXH & Nhân văn (HCMUSSH)", area: "Làng ĐHQG / Quận 1" },
+    { code: "UEL", name: "ĐH Kinh tế - Luật (UEL)", area: "Làng ĐHQG Thủ Đức" },
+    { code: "IU", name: "ĐH Quốc tế - ĐHQG TP.HCM (HCMIU)", area: "Làng ĐHQG Thủ Đức" },
+    { code: "UEH", name: "ĐH Kinh tế TP.HCM (UEH)", area: "Quận 10 / Quận 3" },
+    { code: "HUTECH", name: "ĐH Công nghệ TP.HCM (HUTECH)", area: "Bình Thạnh / Thủ Đức" },
+    { code: "FTU2", name: "ĐH Ngoại thương CS2 (FTU2)", area: "Bình Thạnh" },
+    { code: "RMIT", name: "ĐH RMIT Việt Nam", area: "Quận 7" },
+    { code: "HUST", name: "ĐH Bách khoa Hà Nội (HUST)", area: "Hai Bà Trưng, Hà Nội" },
+    { code: "VNU", name: "ĐH Quốc gia Hà Nội (VNU)", area: "Cầu Giấy, Hà Nội" },
+    { code: "NEU", name: "ĐH Kinh tế Quốc dân (NEU)", area: "Hai Bà Trưng, Hà Nội" }
   ];
 
   const FALLBACK_SVG =
@@ -57,12 +59,33 @@
       </svg>`
     );
 
-  /** Read and parse JSON safely from localStorage. */
+  const state = {
+    initialized: false,
+    authenticated: false,
+    user: null,
+    demoLoginEnabled: false,
+    demoAccounts: [],
+    rooms: [],
+    roommates: [],
+    savedRoomIds: [],
+    connections: [],
+    plans: [],
+    entitlements: {
+      hasAllInOne: false,
+      hasExtraPosts: false,
+      hasUnlimitedMatch: false,
+      unlockedPrediction: false,
+      dailyPostLimit: 1
+    },
+    postQuota: { used: 0, dailyLimit: 1, remaining: 1 },
+    quizAnswers: null,
+    quizResult: null,
+    notifications: [],
+    paymentConfigured: false
+  };
+
   function readJSON(key, fallback) {
     try {
-      if (key === STORAGE_KEYS.QUIZ_ANSWERS || key === STORAGE_KEYS.QUIZ_RESULT) {
-        ensureQuizDataBelongsToCurrentUser();
-      }
       const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : fallback;
     } catch {
@@ -70,30 +93,15 @@
     }
   }
 
-  /** Serialize and store JSON safely in localStorage. */
   function writeJSON(key, value) {
     try {
-      if (key === STORAGE_KEYS.QUIZ_ANSWERS || key === STORAGE_KEYS.QUIZ_RESULT) {
-        ensureQuizDataBelongsToCurrentUser();
+      if (value === null || value === undefined) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify(value));
       }
-      localStorage.setItem(key, JSON.stringify(value));
     } catch {
       // Ignore storage quota errors in private browsing mode
-    }
-  }
-
-  function ensureQuizDataBelongsToCurrentUser() {
-    try {
-      const session = JSON.parse(localStorage.getItem(STORAGE_KEYS.AUTH_SESSION) || "null");
-      const userId = session?.loggedIn && session.user?.id ? String(session.user.id) : "guest";
-      const ownerId = localStorage.getItem(STORAGE_KEYS.QUIZ_USER_ID);
-      if (ownerId === userId) return;
-
-      localStorage.removeItem(STORAGE_KEYS.QUIZ_ANSWERS);
-      localStorage.removeItem(STORAGE_KEYS.QUIZ_RESULT);
-      localStorage.setItem(STORAGE_KEYS.QUIZ_USER_ID, userId);
-    } catch {
-      // Local storage may be unavailable in private browsing mode.
     }
   }
 
@@ -111,14 +119,6 @@
     return Number(String(str || "").replace(/[^\d]/g, "")) || 0;
   }
 
-  function getCurrentDemoUserId() {
-    const session = readJSON(STORAGE_KEYS.AUTH_SESSION, null);
-    return session?.loggedIn && session.user?.id
-      ? String(session.user.id)
-      : "guest";
-  }
-
-  /** Normalize Vietnamese text for accent-insensitive search matching. */
   function normalizeSearchText(value) {
     return String(value || "")
       .toLowerCase()
@@ -133,19 +133,177 @@
       .trim();
   }
 
+  // =========================================================================
+  // REAL HTTP API LAYER
+  // =========================================================================
+
+  async function apiFetch(endpoint, options = {}) {
+    const method = String(options.method || "GET").toUpperCase();
+    const fetchOpts = {
+      method,
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        ...(options.headers || {})
+      }
+    };
+    if (options.body !== undefined && options.body !== null) {
+      if (typeof options.body === "string") {
+        fetchOpts.body = options.body;
+      } else {
+        fetchOpts.body = JSON.stringify(options.body);
+      }
+      fetchOpts.headers["Content-Type"] = "application/json";
+    }
+
+    try {
+      const response = await fetch(endpoint, fetchOpts);
+      const data = await response.json().catch(() => null);
+      if (data && typeof data === "object") {
+        return { ...data, statusCode: response.status };
+      }
+      return {
+        ok: response.ok,
+        statusCode: response.status,
+        error: response.ok ? undefined : `Lỗi máy chủ (${response.status}).`
+      };
+    } catch {
+      return {
+        ok: false,
+        statusCode: 0,
+        error: "Không thể kết nối tới máy chủ backend."
+      };
+    }
+  }
+
+  function applyBootstrapPayload(data) {
+    if (!data || !data.ok) return;
+    state.initialized = true;
+    state.authenticated = Boolean(data.authenticated && data.user);
+    state.user = data.user || null;
+    state.demoLoginEnabled = Boolean(data.demoLoginEnabled);
+    state.demoAccounts = Array.isArray(data.demoAccounts) ? data.demoAccounts : [];
+    state.rooms = Array.isArray(data.rooms) ? data.rooms : [];
+    state.roommates = Array.isArray(data.roommates) ? data.roommates : [];
+    state.savedRoomIds = Array.isArray(data.savedRoomIds) ? data.savedRoomIds.map(String) : [];
+    state.connections = Array.isArray(data.connections) ? data.connections : [];
+    state.plans = Array.isArray(data.plans) ? data.plans : [];
+    state.entitlements = data.entitlements || {
+      hasAllInOne: false,
+      hasExtraPosts: false,
+      hasUnlimitedMatch: false,
+      unlockedPrediction: Boolean(data.unlockedPrediction),
+      dailyPostLimit: 1
+    };
+    state.postQuota = data.postQuota || { used: 0, dailyLimit: 1, remaining: 1 };
+    state.quizAnswers = data.quizAnswers || null;
+    state.quizResult = data.quizResult || null;
+    state.notifications = Array.isArray(data.notifications) ? data.notifications : [];
+    state.paymentConfigured = Boolean(data.paymentConfigured);
+
+    if (window.RoomieData) {
+      window.RoomieData.USER_PROFILE = state.user;
+      window.RoomieData.ROOMS = state.rooms;
+      window.RoomieData.ROOMMATES = state.roommates;
+      window.RoomieData.NOTIFICATIONS = state.notifications;
+      if (Array.isArray(data.quizQuestions)) {
+        window.RoomieData.QUIZ_QUESTIONS = data.quizQuestions;
+      }
+      if (Array.isArray(data.pricingPackages)) {
+        window.RoomieData.PRICING_PACKAGES = data.pricingPackages;
+      }
+    }
+
+    if (state.quizAnswers && state.authenticated) {
+      writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, state.quizAnswers);
+    }
+    if (state.quizResult && state.authenticated) {
+      writeJSON(STORAGE_KEYS.QUIZ_RESULT, state.quizResult);
+    } else if (!state.authenticated) {
+      writeJSON(STORAGE_KEYS.QUIZ_RESULT, null);
+    }
+
+    syncHeaderSlotBadge(state.connections);
+    window.dispatchEvent(new CustomEvent("roomie:auth-changed", { detail: { user: state.user } }));
+    window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: state.plans[0] || null } }));
+    window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
+    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    window.dispatchEvent(new CustomEvent("roomie:demo-ready", { detail: { user: state.user } }));
+  }
+
+  async function syncWithServer() {
+    const data = await apiFetch("/api/bootstrap");
+    if (data?.ok) {
+      applyBootstrapPayload(data);
+    }
+    return data;
+  }
+
+  const readyPromise = syncWithServer();
+
+  // =========================================================================
+  // AUTHENTICATION HELPERS
+  // =========================================================================
+
+  function isLoggedIn() {
+    return Boolean(state.authenticated && state.user);
+  }
+
+  function getCurrentUser() {
+    return state.user;
+  }
+
+  function getDemoAccounts() {
+    return state.demoLoginEnabled ? state.demoAccounts : [];
+  }
+
+  function onAuthStateChange(callback) {
+    window.addEventListener("roomie:auth-changed", callback);
+  }
+
+  async function loginUser(identifier, password) {
+    const res = await apiFetch("/api/auth/login", {
+      method: "POST",
+      body: { identifier, password }
+    });
+    if (!res?.ok) return res || { ok: false, error: "Đăng nhập thất bại." };
+    await syncWithServer();
+    return { ok: true, user: state.user };
+  }
+
+  async function loginDemoAccount(accountKey) {
+    const res = await apiFetch("/api/auth/demo-login", {
+      method: "POST",
+      body: { account: accountKey }
+    });
+    if (!res?.ok) return res || { ok: false, error: "Đăng nhập nhanh thất bại." };
+    await syncWithServer();
+    return { ok: true, user: state.user };
+  }
+
+  async function registerUser(payload = {}) {
+    const res = await apiFetch("/api/auth/register", {
+      method: "POST",
+      body: payload
+    });
+    if (!res?.ok) return res || { ok: false, error: "Đăng ký thất bại." };
+    await syncWithServer();
+    return { ok: true, user: state.user };
+  }
+
+  async function logoutUser() {
+    await apiFetch("/api/auth/logout", { method: "POST" });
+    writeJSON(STORAGE_KEYS.QUIZ_RESULT, null);
+    await syncWithServer();
+  }
+
+  // =========================================================================
+  // PLANS, ENTITLEMENTS & QUOTAS
+  // =========================================================================
+
   function getPurchasedPlans() {
-    const raw = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []);
-    const userId = getCurrentDemoUserId();
-    const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
-    return Array.isArray(raw)
-      ? raw.filter(
-          (p) =>
-            p &&
-            p.id &&
-            p.id !== "basic" &&
-            String(p.userId || defaultUserId) === userId &&
-            Number(p.expiresAt) > Date.now()
-        )
+    return Array.isArray(state.plans)
+      ? state.plans.filter((p) => p && p.id && p.id !== "basic" && Number(p.expiresAt) > Date.now())
       : [];
   }
 
@@ -154,58 +312,105 @@
   }
 
   function hasUnlockedPrediction() {
-    return hasPurchasedPlan("unlimited-matches-day") || hasPurchasedPlan("all-in-one");
+    return Boolean(
+      state.entitlements?.unlockedPrediction ||
+        hasPurchasedPlan("unlimited-matches-day") ||
+        hasPurchasedPlan("all-in-one")
+    );
   }
 
   function hasCompletedQuiz() {
-    const result = readJSON(STORAGE_KEYS.QUIZ_RESULT, null);
-    return Boolean(result && Number(result.answeredCount) >= 9);
+    return Boolean(state.quizResult && Number(state.quizResult.answeredCount) >= 9);
+  }
+
+  function getQuizResult() {
+    return state.quizResult;
+  }
+
+  function getQuizAnswers() {
+    return state.quizAnswers || readJSON(STORAGE_KEYS.QUIZ_ANSWERS, {});
   }
 
   function getLatestPurchasedPlan() {
     return getPurchasedPlans()[0] || null;
   }
 
-  function resetPurchasedPlans() {
-    const userId = getCurrentDemoUserId();
-    const plans = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []).filter(
-      (plan) => String(plan.userId || (DEFAULT_DEMO_USERS[0]?.id || "user-minhthu")) !== userId
-    );
-    writeJSON(STORAGE_KEYS.ACTIVE_PLANS, plans);
-    const orders = readJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, []).map((order) =>
-      order.userId === userId && order.status === "pending" ? { ...order, status: "cancelled" } : order
-    );
-    writeJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, orders);
-    const customListings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
-    writeJSON(
-      STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS,
-      customListings.map((listing) =>
-        listing.userId === userId ? { ...listing, isBoosted: false, boostExpiresAt: null } : listing
-      )
-    );
-    window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: null } }));
-    syncWithLocalDemo();
+  function applyRoommatesState(roommates, quota) {
+    if (Array.isArray(roommates)) {
+      state.roommates = roommates;
+      if (window.RoomieData) window.RoomieData.ROOMMATES = state.roommates;
+    }
+    if (quota) state.postQuota = quota;
+    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+  }
+
+  function applyPlanState(res) {
+    if (!res || !res.ok) return;
+    if (Array.isArray(res.plans)) state.plans = res.plans;
+    if (res.entitlements) {
+      state.entitlements = res.entitlements;
+    } else {
+      const hasAllInOne = hasPurchasedPlan("all-in-one");
+      const hasExtraPosts = hasAllInOne || hasPurchasedPlan("extra-posts-day");
+      const hasUnlimitedMatch = hasAllInOne || hasPurchasedPlan("unlimited-matches-day");
+      state.entitlements = {
+        hasAllInOne,
+        hasExtraPosts,
+        hasUnlimitedMatch,
+        unlockedPrediction: hasUnlimitedMatch,
+        dailyPostLimit: hasExtraPosts ? 4 : 1
+      };
+    }
+    if (res.postQuota) state.postQuota = res.postQuota;
+    if (state.quizResult) {
+      state.quizResult = {
+        ...state.quizResult,
+        locked: !Boolean(state.entitlements.unlockedPrediction)
+      };
+      writeJSON(STORAGE_KEYS.QUIZ_RESULT, state.quizResult);
+    }
+    if (Array.isArray(res.roommates)) {
+      state.roommates = res.roommates;
+      if (window.RoomieData) window.RoomieData.ROOMMATES = state.roommates;
+      window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    }
+    window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: state.plans[0] || null } }));
+  }
+
+  async function resetPurchasedPlans() {
+    if (!isLoggedIn()) {
+      openAuthModal("login", { subtitle: "Đăng nhập để quản lý gói dịch vụ" });
+      return { ok: false };
+    }
+    const res = await apiFetch("/api/plans/reset", { method: "POST" });
+    if (res?.ok) {
+      applyPlanState(res);
+      showToast("Đã đặt lại trạng thái gói về Cơ bản (0đ).", "info");
+    } else {
+      showToast(res?.error || "Không thể đặt lại gói.", "error");
+    }
+    return res;
   }
 
   function onPlanStateChange(callback) {
     window.addEventListener("roomie:plan-updated", callback);
-    window.addEventListener("storage", (event) => {
-      if (event.key === STORAGE_KEYS.ACTIVE_PLANS) callback();
-    });
   }
 
+  function getRoommatePostQuotaStatus() {
+    return state.postQuota || { used: 0, dailyLimit: 1, remaining: 1 };
+  }
+
+  // =========================================================================
+  // ROOMS & ROOMMATES READ/MUTATE
+  // =========================================================================
+
   function getAllRooms() {
-    const custom = readJSON(STORAGE_KEYS.CUSTOM_LISTINGS, []);
-    const base = Data.ROOMS || [];
-    const seen = new Set();
-    const merged = [];
-    [...custom, ...base].forEach((r) => {
-      if (r && r.id !== undefined && !seen.has(String(r.id))) {
-        seen.add(String(r.id));
-        merged.push(r);
-      }
-    });
-    return merged;
+    return Array.isArray(state.rooms) ? state.rooms : [];
+  }
+
+  function getMyRoommateListings() {
+    if (!state.user?.id) return [];
+    return (state.roommates || []).filter((rm) => String(rm.userId || "") === String(state.user.id));
   }
 
   function isPrivateRoom(room) {
@@ -213,75 +418,144 @@
   }
 
   function getSavedRoomIds() {
-    return readJSON(STORAGE_KEYS.SAVED_ROOMS, []);
+    return Array.isArray(state.savedRoomIds) ? state.savedRoomIds : [];
   }
 
   function toggleSavedRoom(id) {
     const strId = String(id);
-    const saved = getSavedRoomIds();
-    const exists = saved.includes(strId);
-    const next = exists ? saved.filter((x) => x !== strId) : [...saved, strId];
-    writeJSON(STORAGE_KEYS.SAVED_ROOMS, next);
+    if (!isLoggedIn()) {
+      openAuthModal("login", {
+        subtitle: "Đăng nhập để lưu phòng trọ vào tài khoản của bạn"
+      });
+      return false;
+    }
+    const exists = state.savedRoomIds.includes(strId);
+    const next = exists ? state.savedRoomIds.filter((x) => x !== strId) : [...state.savedRoomIds, strId];
+    state.savedRoomIds = next;
+
+    apiFetch(`/api/rooms/${encodeURIComponent(strId)}/save`, { method: "POST" }).then((res) => {
+      if (res?.ok && Array.isArray(res.savedRoomIds)) {
+        state.savedRoomIds = res.savedRoomIds.map(String);
+      } else if (!res?.ok) {
+        syncWithServer();
+        showToast(res?.error || "Không thể cập nhật trạng thái lưu tin.", "error");
+      }
+    });
     return !exists;
   }
 
-  function resolvePartnerContact(partnerId, partnerName, explicitContact) {
-    if (explicitContact && explicitContact.phone) return explicitContact;
-    const fromRm = (Data.ROOMMATES || []).find(
-      (r) => (partnerId && r.id === partnerId) || (partnerName && (r.shortName === partnerName || r.name === partnerName))
-    );
-    if (fromRm?.contact) return fromRm.contact;
-    const fromRoom = (Data.ROOMS || []).find(
-      (r) =>
-        r.roommate &&
-        ((partnerId && r.roommate.id === partnerId) || (partnerName && r.roommate.name === partnerName))
-    );
-    if (fromRoom?.roommate?.contact) return fromRoom.roommate.contact;
-    return { phone: CONTACT.phone, zalo: CONTACT.zalo, facebook: "fb.com/roomie.student" };
+  async function createRoommateListing(payload = {}) {
+    const res = await apiFetch("/api/roommates", {
+      method: "POST",
+      body: payload
+    });
+    if (res?.ok) {
+      applyRoommatesState(res.roommates, res.quota);
+    }
+    return res;
   }
 
-  function buildSeedIncomingConnection() {
-    const rm = (Data.ROOMMATES || [])[0];
-    if (!rm) return [];
-    const contact = resolvePartnerContact(rm.id, rm.name, rm.contact);
-    return [
-      {
-        id: `conn-${rm.id}`,
-        partnerId: rm.id,
-        name: rm.name,
-        meta: `${rm.school} • ${rm.matchScore}% Hợp gu`,
-        avatar: rm.avatar,
-        roomId: rm.linkedRoomId || "1",
-        status: "incoming",
-        note: "Chào Minh Thư! Tụi mình hợp 98% thói quen học đêm và gọn gàng. Bạn kết nối để mình gửi ảnh phòng qua Zalo nhé?",
-        phone: contact.phone,
-        zalo: contact.zalo,
-        facebook: contact.facebook,
-        revertedOnce: false,
-        createdAt: Date.now() - 3600000,
-        updatedAt: Date.now() - 3600000
-      }
-    ];
+  async function deleteRoommateListing(roommateId) {
+    const res = await apiFetch(`/api/roommates/${encodeURIComponent(roommateId)}`, {
+      method: "DELETE"
+    });
+    if (res?.ok) {
+      applyRoommatesState(res.roommates, res.quota);
+    }
+    return res;
   }
+
+  async function boostRoommateListing(roommateId, period) {
+    const res = await apiFetch(`/api/roommates/${encodeURIComponent(roommateId)}/boost`, {
+      method: "POST",
+      body: { period }
+    });
+    if (res?.ok && Array.isArray(res.roommates)) {
+      applyRoommatesState(res.roommates);
+    }
+    return res;
+  }
+
+  async function submitQuizResult(answers, result) {
+    if (!isLoggedIn()) {
+      return {
+        ok: false,
+        code: "AUTH_REQUIRED",
+        error: "Vui lòng đăng nhập để lưu hồ sơ 9 câu trắc nghiệm."
+      };
+    }
+    const res = await apiFetch("/api/quiz", {
+      method: "POST",
+      body: { answers, result }
+    });
+    if (res?.ok) {
+      if (res.answers) {
+        state.quizAnswers = res.answers;
+        writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, res.answers);
+      }
+      if (res.result) {
+        state.quizResult = res.result;
+        writeJSON(STORAGE_KEYS.QUIZ_RESULT, res.result);
+      }
+      if (typeof res.unlockedPrediction === "boolean") {
+        state.entitlements = {
+          ...(state.entitlements || {}),
+          unlockedPrediction: res.unlockedPrediction
+        };
+      }
+      if (Array.isArray(res.roommates)) {
+        applyRoommatesState(res.roommates);
+      }
+      window.dispatchEvent(new CustomEvent("roomie:quiz-results-updated"));
+    }
+    return res;
+  }
+
+  async function submitSafetyReport(payload = {}) {
+    return apiFetch("/api/reports", {
+      method: "POST",
+      body: payload
+    });
+  }
+
+  async function submitContactTicket(payload = {}) {
+    return apiFetch("/api/contacts", {
+      method: "POST",
+      body: payload
+    });
+  }
+
+  async function markAllNotificationsRead() {
+    if (!isLoggedIn()) return { ok: true, notifications: [] };
+    const res = await apiFetch("/api/notifications/read-all", { method: "POST" });
+    if (res?.ok && Array.isArray(res.notifications)) {
+      state.notifications = res.notifications;
+      if (window.RoomieData) window.RoomieData.NOTIFICATIONS = state.notifications;
+      window.dispatchEvent(new CustomEvent("roomie:demo-ready", { detail: { user: state.user } }));
+    }
+    return res;
+  }
+
+  // =========================================================================
+  // DOUBLE OPT-IN CONNECTIONS & SLOT MANAGEMENT
+  // =========================================================================
 
   function getConnections() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEYS.CONNECTIONS);
-      if (raw === null) {
-        const seeded = buildSeedIncomingConnection();
-        writeJSON(STORAGE_KEYS.CONNECTIONS, seeded);
-        return seeded;
-      }
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return [];
-      const rmMap = new Map((Data.ROOMMATES || []).map((r) => [r.id, r]));
-      return parsed.map((c) => {
-        const matchedRm = c?.partnerId ? rmMap.get(c.partnerId) : null;
-        return matchedRm?.avatar ? { ...c, avatar: matchedRm.avatar } : c;
-      });
-    } catch {
-      return [];
-    }
+    return Array.isArray(state.connections) ? state.connections : [];
+  }
+
+  function getActiveSlotConnections(list) {
+    const all = list || getConnections();
+    return all.filter((c) => c.status === "pending" || c.status === "accepted");
+  }
+
+  function getConnectionForPartner(partnerId, partnerName, list) {
+    const all = list || getConnections();
+    return all.find(
+      (c) =>
+        (partnerId && c.partnerId === partnerId) ||
+        (partnerName && c.name && (c.name === partnerName || c.name.endsWith(partnerName)))
+    );
   }
 
   function syncHeaderSlotBadge(list) {
@@ -302,71 +576,52 @@
     }
   }
 
-  function saveConnections(list) {
-    const clean = Array.isArray(list) ? list : [];
-    writeJSON(STORAGE_KEYS.CONNECTIONS, clean);
-    const activeIds = clean
-      .filter((c) => ["pending", "accepted", "matched"].includes(c.status) && c.partnerId)
-      .map((c) => c.partnerId);
-    writeJSON(STORAGE_KEYS.INVITED_ROOMMATES, activeIds);
-    syncHeaderSlotBadge(clean);
-    return clean;
-  }
-
-  function getActiveSlotConnections(list) {
-    const all = list || getConnections();
-    return all.filter((c) => c.status === "pending" || c.status === "accepted");
-  }
-
-  function getConnectionForPartner(partnerId, partnerName, list) {
-    const all = list || getConnections();
-    return all.find(
-      (c) =>
-        (partnerId && c.partnerId === partnerId) ||
-        (partnerName && c.name && (c.name === partnerName || c.name.endsWith(partnerName)))
-    );
-  }
-
-  function upsertConnectionRecord(target, status, extra = {}) {
-    const all = getConnections();
-    const contact = resolvePartnerContact(target.partnerId, target.name, target.contact);
-    const existing = getConnectionForPartner(target.partnerId, target.name, all);
-    const now = Date.now();
-    const nextRecord = {
-      id: existing?.id || `conn-${target.partnerId || now}`,
-      partnerId: target.partnerId || existing?.partnerId || "",
-      name: target.name || existing?.name || "Sinh viên Roomie",
-      meta: target.meta || existing?.meta || "Hồ sơ sinh viên Roomie",
-      avatar: target.avatar || existing?.avatar || "/assets/images/common/avatar-profile.jpg",
-      roomId: target.roomId || existing?.roomId || "",
-      status,
-      note: extra.note !== undefined ? extra.note : existing?.note || "",
-      releaseReason: extra.releaseReason || "",
-      revertedOnce: extra.revertedOnce ?? existing?.revertedOnce ?? false,
-      phone: contact.phone,
-      zalo: contact.zalo,
-      facebook: contact.facebook,
-      createdAt: existing?.createdAt || now,
-      updatedAt: now
-    };
-    const filtered = all.filter((c) => c.id !== nextRecord.id);
-    saveConnections([nextRecord, ...filtered]);
-    return nextRecord;
-  }
-
-  function updateConnectionStatus(connId, nextStatus, extra = {}) {
-    const all = getConnections();
-    let updated = null;
-    const nextList = all.map((c) => {
-      if (c.id !== connId) return c;
-      updated = { ...c, ...extra, status: nextStatus, updatedAt: Date.now() };
-      return updated;
+  async function upsertConnectionRecord(target, status, extra = {}) {
+    const res = await apiFetch("/api/connections", {
+      method: "POST",
+      body: { target, status, ...extra }
     });
-    saveConnections(nextList);
-    return updated;
+    if (res?.ok && Array.isArray(res.connections)) {
+      state.connections = res.connections;
+      syncHeaderSlotBadge(state.connections);
+      window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
+      return { ok: true, connection: res.connection };
+    }
+    if (res?.code === "SLOTS_FULL") {
+      openSlotFullModal();
+    } else if (res?.error) {
+      showToast(res.error, "error");
+    }
+    return null;
   }
 
-  /** Display a dismissible toast notification. */
+  async function updateConnectionStatus(connId, nextStatus, extra = {}) {
+    if (!isLoggedIn()) {
+      openAuthModal("login", { subtitle: "Đăng nhập để cập nhật kết nối" });
+      return null;
+    }
+    const res = await apiFetch(`/api/connections/${encodeURIComponent(connId)}`, {
+      method: "PATCH",
+      body: { status: nextStatus, ...extra }
+    });
+    if (res?.ok && Array.isArray(res.connections)) {
+      state.connections = res.connections;
+      syncHeaderSlotBadge(state.connections);
+      window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
+      return res.connection;
+    }
+    if (res?.code === "SLOTS_FULL") {
+      openSlotFullModal();
+    } else if (res?.error) {
+      showToast(res.error, "error");
+    }
+    return null;
+  }
+
+  // =========================================================================
+  // TOAST & SHARED MODALS
+  // =========================================================================
+
   function showToast(message, variant = "success") {
     let container = document.getElementById("rm-toast-container");
     if (!container) {
@@ -405,8 +660,18 @@
     }, 3600);
   }
 
+  function handleModalKeydown(event) {
+    if (event.key === "Escape") closeModal();
+  }
+
   function closeModal() {
-    document.getElementById("rm-modal-overlay")?.remove();
+    const existing = document.getElementById("rm-modal-overlay");
+    if (!existing) return;
+    existing.remove();
+    document.removeEventListener("keydown", handleModalKeydown);
+    if (!document.getElementById("rm-connections-overlay")) {
+      document.body.classList.remove("overflow-hidden");
+    }
   }
 
   function openModal({ title, subtitle = "", bodyHtml, maxWidth = "max-w-lg" }) {
@@ -435,6 +700,9 @@
     });
     overlay.querySelector("#rm-modal-close").addEventListener("click", closeModal);
     document.body.appendChild(overlay);
+    document.body.classList.add("overflow-hidden");
+    document.addEventListener("keydown", handleModalKeydown);
+    overlay.querySelector("#rm-modal-close")?.focus();
     return overlay;
   }
 
@@ -516,7 +784,7 @@
           ${buildSlotBarHtml(activeCount)}
           <div class="p-3.5 rounded-xl bg-error-container/40 text-on-error-container text-xs flex items-start gap-2 leading-relaxed">
             <span class="material-symbols-outlined text-[18px] shrink-0">info</span>
-            <span>Để chống spam và không phải đóng phí lại, hãy vào quản lý kết nối cập nhật <strong>"Không phù hợp"</strong> (kèm lý do) hoặc <strong>"Đã chốt Roommate"</strong> để giải phóng slot trống.</span>
+            <span>Để chống spam, hãy vào quản lý kết nối cập nhật <strong>"Không phù hợp"</strong> (kèm lý do) hoặc <strong>"Đã chốt Roommate"</strong> để giải phóng slot trống.</span>
           </div>
           <div class="flex gap-2.5">
             <button type="button" id="rm-open-drawer-from-full" class="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-1.5">
@@ -571,16 +839,18 @@
     modal.querySelectorAll("[data-copy-phone]").forEach((btn) => {
       btn.addEventListener("click", () => copyContactText(btn.dataset.copyPhone));
     });
-    modal.querySelector("#rm-unlocked-match-btn").addEventListener("click", () => {
-      updateConnectionStatus(conn.id, "matched");
+    modal.querySelector("#rm-unlocked-match-btn").addEventListener("click", async () => {
+      const updated = await updateConnectionStatus(conn.id, "matched");
+      if (!updated) return;
       closeModal();
       onUpdate?.();
       showToast(`Chúc mừng! Đã chốt ở ghép cùng ${conn.name} và giải phóng slot.`);
       openContractModal();
     });
-    modal.querySelector("#rm-unlocked-release-btn").addEventListener("click", () => {
+    modal.querySelector("#rm-unlocked-release-btn").addEventListener("click", async () => {
       const reason = modal.querySelector("#rm-release-reason-select")?.value || RELEASE_REASONS[0];
-      updateConnectionStatus(conn.id, "released", { releaseReason: reason });
+      const updated = await updateConnectionStatus(conn.id, "released", { releaseReason: reason });
+      if (!updated) return;
       closeModal();
       onUpdate?.();
       showToast(`Đã giải phóng 1 slot (${reason}). Bạn có thể mời người mới!`, "info");
@@ -598,7 +868,7 @@
         <div class="flex flex-col gap-4">
           <div class="p-3.5 rounded-xl bg-primary-fixed/40 text-on-primary-fixed-variant text-xs flex items-start gap-2 leading-relaxed">
             <span class="material-symbols-outlined text-[18px] text-primary shrink-0">lock_clock</span>
-            <span>SĐT &amp; Zalo của cả hai đang được ẩn. Ngay khi <strong>${escapeHTML(conn.name)}</strong> bấm <strong>Đồng ý kết nối</strong>, thông tin Zalo/SĐT sẽ mở khóa tức thì.</span>
+            <span>SĐT &amp; Zalo của cả hai đang được ẩn bởi máy chủ. Ngay khi <strong>${escapeHTML(conn.name)}</strong> bấm <strong>Đồng ý kết nối</strong>, thông tin Zalo/SĐT sẽ được trả về tức thì.</span>
           </div>
           ${
             conn.note
@@ -626,8 +896,9 @@
       `
     });
 
-    modal.querySelector("#rm-demo-accept-btn").addEventListener("click", () => {
-      const accepted = updateConnectionStatus(conn.id, "accepted");
+    modal.querySelector("#rm-demo-accept-btn").addEventListener("click", async () => {
+      const accepted = await updateConnectionStatus(conn.id, "accepted");
+      if (!accepted) return;
       closeModal();
       onUpdate?.();
       showToast(`${conn.name} đã đồng ý kết nối! Zalo & SĐT đã được mở khóa.`);
@@ -635,10 +906,11 @@
     });
     modal.querySelector("#rm-pending-drawer-btn").addEventListener("click", () => {
       closeModal();
-      openConnectionsDrawer();
+      openConnectionsDrawer(onUpdate);
     });
-    modal.querySelector("#rm-pending-cancel-btn").addEventListener("click", () => {
-      updateConnectionStatus(conn.id, "released", { releaseReason: "Chủ động rút lời mời" });
+    modal.querySelector("#rm-pending-cancel-btn").addEventListener("click", async () => {
+      const updated = await updateConnectionStatus(conn.id, "released", { releaseReason: "Chủ động rút lời mời" });
+      if (!updated) return;
       closeModal();
       onUpdate?.();
       showToast(`Đã hủy lời mời với ${conn.name} và giải phóng 1 slot.`, "info");
@@ -646,9 +918,17 @@
   }
 
   function openConnectInviteModal(opts = {}) {
+    if (!isLoggedIn()) {
+      openAuthModal("login", {
+        subtitle: "Đăng nhập để gửi lời mời kết nối 2 chiều (Double Opt-in)",
+        onSuccess: () => openConnectInviteModal(opts)
+      });
+      return;
+    }
+
     const partnerId = opts.partnerId || "";
-    const partnerName = opts.name || "Hoàng Nam";
-    const partnerMeta = opts.meta || "Sinh viên HCMUS • Hợp gu >85%";
+    const partnerName = opts.name || "Sinh viên Roomie";
+    const partnerMeta = opts.meta || "Hồ sơ sinh viên Roomie";
     const existing = getConnectionForPartner(partnerId, partnerName);
 
     if (existing && (existing.status === "accepted" || existing.status === "matched")) {
@@ -657,6 +937,11 @@
     }
     if (existing && existing.status === "pending") {
       openPendingInviteModal(existing, opts.onUpdate);
+      return;
+    }
+    if (existing && existing.status === "incoming") {
+      showToast(`${partnerName} đã gửi lời mời cho bạn — hãy xác nhận trong danh sách Kết nối.`, "info");
+      openConnectionsDrawer(opts.onUpdate);
       return;
     }
 
@@ -679,7 +964,7 @@
           ${buildSlotBarHtml(activeCount)}
           <div class="px-3.5 py-2.5 rounded-xl bg-secondary-container/40 text-on-secondary-fixed-variant text-xs flex items-start gap-2">
             <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5">shield</span>
-            <span>Không chat rác in-app: SĐT &amp; Zalo chỉ hiển thị khi <strong>${escapeHTML(partnerName)}</strong> bấm <strong>Đồng ý kết nối</strong>.</span>
+            <span>Không chat rác in-app: SĐT &amp; Zalo chỉ được máy chủ cấp phát khi <strong>${escapeHTML(partnerName)}</strong> bấm <strong>Đồng ý kết nối</strong>.</span>
           </div>
           <div class="flex flex-wrap gap-1.5">
             <button type="button" class="rm-greet-chip px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-primary-fixed text-xs text-on-surface font-medium transition-colors">Hẹn xem phòng ban ngày cuối tuần</button>
@@ -689,7 +974,7 @@
             <label for="rm-connect-note" class="block text-xs font-semibold text-on-surface-variant mb-1">Lời chào kèm lời mời kết nối:</label>
             <textarea id="rm-connect-note" rows="3" required class="w-full p-3 rounded-xl bg-surface-container-low text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">${escapeHTML(defaultNote)}</textarea>
           </div>
-          <button type="submit" class="w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
+          <button type="submit" id="rm-connect-submit-btn" class="w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
             <span class="material-symbols-outlined text-[18px]">handshake</span>
             <span>Gửi lời mời kết nối 2 chiều (Dùng 1 slot)</span>
           </button>
@@ -705,18 +990,23 @@
       });
     });
 
-    modal.querySelector("#rm-connect-invite-form").addEventListener("submit", (e) => {
+    modal.querySelector("#rm-connect-invite-form").addEventListener("submit", async (e) => {
       e.preventDefault();
+      const submitBtn = modal.querySelector("#rm-connect-submit-btn");
+      if (submitBtn) submitBtn.disabled = true;
       const note = noteInput.value.trim();
-      const saved = upsertConnectionRecord(opts, "pending", { note });
+      const res = await upsertConnectionRecord(opts, "pending", { note });
+      if (!res?.ok || !res.connection) {
+        if (submitBtn) submitBtn.disabled = false;
+        return;
+      }
       closeModal();
       opts.onUpdate?.();
       showToast(`Đã gửi lời mời kết nối tới ${partnerName} (Đang giữ ${getActiveSlotConnections().length}/${MAX_CONTACT_SLOTS} slot).`);
-      openPendingInviteModal(saved, opts.onUpdate);
+      openPendingInviteModal(res.connection, opts.onUpdate);
     });
   }
 
-  /** Support modal synced to canonical CONTACT_INFO (+84 777 639 593 / roomie2026@gmail.com). */
   function openSupportContactModal(
     title = "Ban Hỗ trợ Sinh viên Roomie",
     subtitle = "Sinh viên khóa trên HCMUS • Hỗ trợ qua Zalo & Hotline",
@@ -759,18 +1049,22 @@
         </div>
       `
     });
-    modal.querySelector("#rm-support-callback-form").addEventListener("submit", (e) => {
+    modal.querySelector("#rm-support-callback-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const phoneVal = modal.querySelector("#rm-support-phone")?.value.trim() || "";
       const topicVal = modal.querySelector("#rm-support-topic")?.value.trim() || title;
       const user = getCurrentUser();
-      submitContactTicket({
+      const res = await submitContactTicket({
         name: user?.name || "Sinh viên Roomie",
-        email: user?.email || "",
+        email: user?.email || "support-request@roomie.vn",
         phone: phoneVal,
         topic: topicVal,
         message: "Yêu cầu gọi lại hỗ trợ qua Zalo trong 15 phút"
       });
+      if (!res?.ok) {
+        showToast(res?.error || "Không thể gửi yêu cầu lúc này.", "error");
+        return;
+      }
       closeModal();
       showToast("Đã gửi yêu cầu! Ban Hỗ trợ Roomie sẽ liên hệ Zalo với bạn trong 15 phút.");
     });
@@ -792,6 +1086,13 @@
   }
 
   function openConnectionsDrawer(onExternalChange) {
+    if (!isLoggedIn()) {
+      openAuthModal("login", {
+        subtitle: "Đăng nhập để xem lời mời kết nối & quản lý Slot",
+        onSuccess: () => openConnectionsDrawer(onExternalChange)
+      });
+      return;
+    }
     if (document.getElementById("rm-connections-overlay")) return;
 
     const overlay = document.createElement("div");
@@ -837,7 +1138,7 @@
                 (c) => `
               <div class="p-3.5 rounded-2xl bg-secondary-container/25 border border-tertiary/20 flex flex-col gap-2.5">
                 <div class="flex items-center gap-3">
-                  <img src="${escapeHTML(c.avatar)}" alt="Ảnh đại diện ${escapeHTML(c.name)}" class="w-11 h-11 rounded-full object-cover shrink-0" />
+                  <img src="${escapeHTML(c.avatar || "/assets/images/common/avatar-profile.jpg")}" alt="Ảnh đại diện ${escapeHTML(c.name)}" class="w-11 h-11 rounded-full object-cover shrink-0" />
                   <div class="min-w-0 flex-1">
                     <div class="font-bold text-sm text-on-surface truncate">${escapeHTML(c.name)}</div>
                     <div class="text-xs text-on-surface-variant truncate">${escapeHTML(c.meta)}</div>
@@ -865,7 +1166,7 @@
           <div class="p-3.5 rounded-2xl bg-surface-container-lowest border border-tertiary/30 shadow-xs flex flex-col gap-2.5">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2.5 min-w-0">
-                <img src="${escapeHTML(c.avatar)}" alt="Ảnh đại diện ${escapeHTML(c.name)}" class="w-10 h-10 rounded-full object-cover shrink-0" />
+                <img src="${escapeHTML(c.avatar || "/assets/images/common/avatar-profile.jpg")}" alt="Ảnh đại diện ${escapeHTML(c.name)}" class="w-10 h-10 rounded-full object-cover shrink-0" />
                 <div class="min-w-0">
                   <div class="font-bold text-sm text-on-surface truncate">${escapeHTML(c.name)}</div>
                   <div class="text-[11.5px] text-on-surface-variant truncate">${escapeHTML(c.meta)}</div>
@@ -874,10 +1175,10 @@
               <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed text-[11px] font-bold shrink-0">Đã mở Zalo</span>
             </div>
             <div class="flex gap-2">
-              <a href="https://zalo.me/${escapeHTML(c.zalo)}" target="_blank" rel="noopener" class="flex-1 py-2 px-3 rounded-xl bg-primary text-on-primary text-xs font-semibold text-center hover:bg-on-primary-fixed-variant">
-                Mở Zalo (${escapeHTML(c.phone)})
+              <a href="https://zalo.me/${escapeHTML(c.zalo || CONTACT.zalo)}" target="_blank" rel="noopener" class="flex-1 py-2 px-3 rounded-xl bg-primary text-on-primary text-xs font-semibold text-center hover:bg-on-primary-fixed-variant">
+                Mở Zalo (${escapeHTML(c.phone || CONTACT.phone)})
               </a>
-              <button type="button" data-drawer-copy="${escapeHTML(c.phone)}" class="py-2 px-3 rounded-xl bg-surface-container-low text-primary text-xs font-semibold hover:bg-primary-fixed">
+              <button type="button" data-drawer-copy="${escapeHTML(c.phone || CONTACT.phone)}" class="py-2 px-3 rounded-xl bg-surface-container-low text-primary text-xs font-semibold hover:bg-primary-fixed">
                 Copy SĐT
               </button>
             </div>
@@ -905,7 +1206,7 @@
           <div class="p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 flex flex-col gap-2.5">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2.5 min-w-0">
-                <img src="${escapeHTML(c.avatar)}" alt="Ảnh đại diện ${escapeHTML(c.name)}" class="w-10 h-10 rounded-full object-cover shrink-0" />
+                <img src="${escapeHTML(c.avatar || "/assets/images/common/avatar-profile.jpg")}" alt="Ảnh đại diện ${escapeHTML(c.name)}" class="w-10 h-10 rounded-full object-cover shrink-0" />
                 <div class="min-w-0">
                   <div class="font-bold text-sm text-on-surface truncate">${escapeHTML(c.name)}</div>
                   <div class="text-[11.5px] text-on-surface-variant truncate">${escapeHTML(c.meta)}</div>
@@ -937,7 +1238,7 @@
                   <div class="font-bold text-sm text-on-surface">${escapeHTML(c.name)}</div>
                   <span class="px-2 py-0.5 rounded-full bg-primary text-on-primary text-[11px] font-bold">Đã chốt</span>
                 </div>
-                <div class="text-xs text-on-surface-variant">Zalo / SĐT: <strong class="text-on-surface">${escapeHTML(c.phone)}</strong></div>
+                <div class="text-xs text-on-surface-variant">Zalo / SĐT: <strong class="text-on-surface">${escapeHTML(c.phone || "")}</strong></div>
                 <div class="flex gap-2">
                   <button type="button" data-open-contract="1" class="flex-1 py-1.5 px-3 rounded-lg bg-surface-container-lowest text-primary text-xs font-semibold border border-primary/20">Hợp đồng mẫu</button>
                   ${
@@ -978,21 +1279,25 @@
 
     const bindDrawerEvents = () => {
       bodyEl.querySelectorAll("[data-accept-id]").forEach((btn) => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", async () => {
           if (getActiveSlotConnections().length >= MAX_CONTACT_SLOTS) {
             showToast(`Đã đầy ${MAX_CONTACT_SLOTS}/${MAX_CONTACT_SLOTS} slot! Hãy giải phóng 1 slot trước.`, "error");
             return;
           }
-          const updated = updateConnectionStatus(btn.dataset.acceptId, "accepted");
+          const updated = await updateConnectionStatus(btn.dataset.acceptId, "accepted");
+          if (!updated) return;
           renderBody();
           onExternalChange?.();
-          showToast(`Đã đồng ý kết nối! Mở khóa Zalo & SĐT của ${updated?.name || "bạn mới"}.`);
+          showToast(`Đã đồng ý kết nối! Mở khóa Zalo & SĐT của ${updated.name || "bạn mới"}.`);
         });
       });
 
       bodyEl.querySelectorAll("[data-decline-id]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          updateConnectionStatus(btn.dataset.declineId, "released", { releaseReason: "Từ chối lời mời đến" });
+        btn.addEventListener("click", async () => {
+          const updated = await updateConnectionStatus(btn.dataset.declineId, "released", {
+            releaseReason: "Từ chối lời mời đến"
+          });
+          if (!updated) return;
           renderBody();
           onExternalChange?.();
           showToast("Đã từ chối lời mời kết nối.", "info");
@@ -1000,20 +1305,22 @@
       });
 
       bodyEl.querySelectorAll("[data-demo-accept-id]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const updated = updateConnectionStatus(btn.dataset.demoAcceptId, "accepted");
+        btn.addEventListener("click", async () => {
+          const updated = await updateConnectionStatus(btn.dataset.demoAcceptId, "accepted");
+          if (!updated) return;
           renderBody();
           onExternalChange?.();
-          showToast(`${updated?.name || "Đối phương"} đã đồng ý! Zalo & SĐT đã được mở khóa.`);
+          showToast(`${updated.name || "Đối phương"} đã đồng ý! Zalo & SĐT đã được mở khóa.`);
         });
       });
 
       bodyEl.querySelectorAll("[data-release-id]").forEach((btn) => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", async () => {
           const id = btn.dataset.releaseId;
           const select = bodyEl.querySelector(`[data-reason-for="${id}"]`);
           const reason = select ? select.value : "Chủ động giải phóng slot";
-          updateConnectionStatus(id, "released", { releaseReason: reason });
+          const updated = await updateConnectionStatus(id, "released", { releaseReason: reason });
+          if (!updated) return;
           renderBody();
           onExternalChange?.();
           showToast(`Đã giải phóng 1 slot (${reason})!`, "info");
@@ -1021,11 +1328,12 @@
       });
 
       bodyEl.querySelectorAll("[data-match-id]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const updated = updateConnectionStatus(btn.dataset.matchId, "matched");
+        btn.addEventListener("click", async () => {
+          const updated = await updateConnectionStatus(btn.dataset.matchId, "matched");
+          if (!updated) return;
           closeConnectionsDrawer();
           onExternalChange?.();
-          showToast(`Đã chốt Roommate với ${updated?.name || ""}! Slot đã hoàn tất.`);
+          showToast(`Đã chốt Roommate với ${updated.name || ""}! Slot đã hoàn tất.`);
           openContractModal();
         });
       });
@@ -1042,12 +1350,13 @@
       });
 
       bodyEl.querySelectorAll("[data-revert-match]").forEach((btn) => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", async () => {
           if (getActiveSlotConnections().length >= MAX_CONTACT_SLOTS) {
             showToast("Cần trống ít nhất 1 slot để hoàn tác bảo hành 48h.", "error");
             return;
           }
-          updateConnectionStatus(btn.dataset.revertMatch, "accepted", { revertedOnce: true });
+          const updated = await updateConnectionStatus(btn.dataset.revertMatch, "accepted", { revertedOnce: true });
+          if (!updated) return;
           renderBody();
           onExternalChange?.();
           showToast("Đã kích hoạt bảo hành hủy kèo 48h (tối đa 1 lần) và mở lại slot.", "info");
@@ -1115,8 +1424,15 @@
           </div>
         `;
       }
+
+      const hasScore =
+        hasUnlockedPrediction() &&
+        rm.matchScore !== null &&
+        rm.matchScore !== undefined &&
+        !Number.isNaN(Number(rm.matchScore));
+
       const matchScoreHtml =
-        options.showMatchScore === false
+        options.showMatchScore === false || !hasScore
           ? ""
           : `
             <div class="text-center px-3.5 py-2 rounded-2xl bg-secondary-container text-on-secondary-container w-full">
@@ -1133,7 +1449,7 @@
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between gap-4 p-4 rounded-2xl bg-surface-container-low">
               <div class="flex items-center gap-3.5">
-                <img src="${escapeHTML(rm.avatar)}" alt="Ảnh đại diện ${escapeHTML(rm.name)}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-secondary-container" />
+                <img src="${escapeHTML(rm.avatar || "/assets/images/common/avatar-profile.jpg")}" alt="Ảnh đại diện ${escapeHTML(rm.name)}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-secondary-container" />
                 <div>
                   <div class="flex items-center gap-2">
                     <h4 class="font-title-md text-title-md font-bold text-on-surface">${escapeHTML(rm.name)}, ${escapeHTML(rm.age)}t</h4>
@@ -1175,9 +1491,13 @@
               </div>
             </div>
 
-            <blockquote class="p-3.5 rounded-xl bg-surface-container-low italic text-sm text-on-surface-variant border-l-4 border-primary">
-              ${escapeHTML(rm.quote || "")}
-            </blockquote>
+            ${
+              rm.quote
+                ? `<blockquote class="p-3.5 rounded-xl bg-surface-container-low italic text-sm text-on-surface-variant border-l-4 border-primary">
+                    ${escapeHTML(rm.quote)}
+                  </blockquote>`
+                : ""
+            }
 
             ${statusBannerHtml}
 
@@ -1221,20 +1541,22 @@
       modal.querySelectorAll("[data-copy-phone]").forEach((btn) => {
         btn.addEventListener("click", () => copyContactText(btn.dataset.copyPhone));
       });
-      modal.querySelector("#rm-profile-demo-accept")?.addEventListener("click", () => {
-        updateConnectionStatus(conn.id, "accepted");
+      modal.querySelector("#rm-profile-demo-accept")?.addEventListener("click", async () => {
+        const updated = await updateConnectionStatus(conn.id, "accepted");
+        if (!updated) return;
         closeModal();
         onUpdate?.();
         showToast(`${rm.name} đã đồng ý! Zalo & SĐT đã được mở khóa.`);
         renderProfile();
       });
-      modal.querySelector("#rm-profile-accept-in")?.addEventListener("click", () => {
+      modal.querySelector("#rm-profile-accept-in")?.addEventListener("click", async () => {
         if (getActiveSlotConnections().length >= MAX_CONTACT_SLOTS) {
           closeModal();
           openSlotFullModal();
           return;
         }
-        updateConnectionStatus(conn.id, "accepted");
+        const updated = await updateConnectionStatus(conn.id, "accepted");
+        if (!updated) return;
         closeModal();
         onUpdate?.();
         showToast(`Đã đồng ý kết nối với ${rm.name}!`);
@@ -1244,10 +1566,11 @@
         openConnectInviteModal({
           partnerId: rm.id,
           name: rm.name,
-          meta: `${rm.school} • ${rm.matchScore}% Hợp gu`,
+          meta: hasScore
+            ? `${rm.school} • ${rm.matchScore}% Hợp gu`
+            : `${rm.school} • ${rm.roomStatusTitle || "Sinh viên"}`,
           avatar: rm.avatar,
           roomId: rm.linkedRoomId,
-          contact: rm.contact,
           onUpdate
         });
       });
@@ -1264,7 +1587,10 @@
       return;
     }
     if (!isLoggedIn()) {
-      openAuthModal("login", { subtitle: "Đăng nhập để mua và kích hoạt gói Roomie" });
+      openAuthModal("login", {
+        subtitle: "Đăng nhập để mua và kích hoạt gói Roomie",
+        onSuccess: () => openPaymentModal(pkg)
+      });
       return;
     }
 
@@ -1274,13 +1600,13 @@
 
     const renderCheckoutForm = (errorMessage = "") => {
       const listingOptions = listings
-        .map(
-          (listing) =>
-            `<option value="${escapeHTML(listing.id)}">${escapeHTML(
-              listing.roomStatusTitle || listing.roomStatusDetail || listing.name
-            )}</option>`
-        )
+        .map((listing) => {
+          const typeLabel = listing.hasRoom ? "Có sẵn phòng" : "Tìm phòng";
+          const detail = listing.roomStatusDetail || listing.areaKey || listing.name;
+          return `<option value="${escapeHTML(listing.id)}">${escapeHTML(`${typeLabel} · ${detail}`)}</option>`;
+        })
         .join("");
+
       const modal = openModal({
         title: `Mua ${packageName}`,
         subtitle: `${pkg.price || ""} ${pkg.period || ""}`.trim(),
@@ -1304,9 +1630,7 @@
             }
             ${
               errorMessage
-                ? `<p role="alert" class="rounded-xl bg-error-container px-3.5 py-3 text-sm text-on-error-container">${escapeHTML(
-                    errorMessage
-                  )}</p>`
+                ? `<p role="alert" class="rounded-xl bg-error-container px-3.5 py-3 text-sm text-on-error-container">${escapeHTML(errorMessage)}</p>`
                 : ""
             }
             <button type="button" id="rm-plan-create-order" ${
@@ -1315,7 +1639,7 @@
               Tạo mã QR
             </button>
             <p class="text-xs leading-relaxed text-on-surface-variant">
-              Đây là chế độ demo: mã QR không thể thanh toán. Xác nhận ở cửa sổ tiếp theo chỉ mô phỏng việc kích hoạt gói.
+              Đơn thanh toán được lưu trực tiếp vào Supabase PostgreSQL; mã QR hiển thị mô phỏng quy trình kích hoạt gói.
             </p>
           </div>
         `
@@ -1361,23 +1685,19 @@
               <p><strong>Số tiền:</strong> ${formatVND(order.amountVnd)}</p>
               <p><strong>Nội dung:</strong> <code class="font-bold">${escapeHTML(order.transferCode)}</code></p>
             </div>
-            <p class="text-center text-xs text-on-surface-variant">Mã QR hết hạn lúc ${expiresAt.toLocaleTimeString(
-              "vi-VN"
-            )}.</p>
+            <p class="text-center text-xs text-on-surface-variant">Mã QR hết hạn lúc ${expiresAt.toLocaleTimeString("vi-VN")}.</p>
             <p class="w-full rounded-xl ${
               isDemo ? "bg-error-container text-on-error-container" : "bg-tertiary-container/40 text-on-surface"
             } p-3 text-xs leading-relaxed">
               ${
                 isDemo
-                  ? "Đây là mã QR giả để demo, không chứa thông tin ngân hàng và không thể dùng để chuyển tiền. Bấm xác nhận bên dưới chỉ để kiểm thử kích hoạt gói."
-                  : "Khi bấm xác nhận, gói sẽ được mở ngay. Roomie chưa tự kiểm tra khoản tiền đã vào tài khoản hay chưa."
+                  ? "Đây là mã QR giả để demo cho đồ án, không thể dùng chuyển tiền thật. Bấm xác nhận bên dưới để kích hoạt gói trên cơ sở dữ liệu."
+                  : "Khi bấm xác nhận, gói sẽ được kích hoạt ngay trong cơ sở dữ liệu."
               }
             </p>
             ${
               errorMessage
-                ? `<p role="alert" class="w-full rounded-xl bg-error-container px-3.5 py-3 text-sm text-on-error-container">${escapeHTML(
-                    errorMessage
-                  )}</p>`
+                ? `<p role="alert" class="w-full rounded-xl bg-error-container px-3.5 py-3 text-sm text-on-error-container">${escapeHTML(errorMessage)}</p>`
                 : ""
             }
             <button type="button" id="rm-plan-confirm-payment" class="w-full rounded-xl bg-primary px-4 py-3 font-semibold text-on-primary">
@@ -1399,20 +1719,7 @@
           renderPaymentQr(order, payment, result?.error || "Không thể kích hoạt gói. Vui lòng thử lại.");
           return;
         }
-
-        const userId = getCurrentDemoUserId();
-        const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
-        const otherUsersPlans = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []).filter(
-          (plan) => String(plan.userId || defaultUserId) !== userId
-        );
-        writeJSON(STORAGE_KEYS.ACTIVE_PLANS, [...result.plans, ...otherUsersPlans]);
-        window.dispatchEvent(
-          new CustomEvent("roomie:plan-updated", { detail: { pkg: result.plans[0] || null } })
-        );
-        if (Array.isArray(result.roommates)) {
-          Data.ROOMMATES = result.roommates;
-          window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
-        }
+        applyPlanState(result);
         closeModal();
         showToast(`Đã kích hoạt ${packageName}.`);
       });
@@ -1428,10 +1735,7 @@
         renderCheckoutForm(result?.error || "Không thể tải bài đăng của bạn. Vui lòng thử lại.");
         return;
       }
-      const userId = getCurrentUser()?.id;
-      listings = result.roommates.filter(
-        (listing) => userId && String(listing.userId) === String(userId)
-      );
+      listings = result.roommates;
       renderCheckoutForm();
     };
 
@@ -1552,7 +1856,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     thumbs.forEach((t) => t.addEventListener("click", () => updateIdx(Number(t.dataset.idx))));
   }
 
-  function openReportModal(targetTitle = "Tin đăng phòng trọ") {
+  function openReportModal(targetTitle = "Tin đăng phòng trọ", roomId = null) {
     const modal = openModal({
       title: "Báo cáo tin giả / dấu hiệu lừa đảo",
       subtitle: `Đối tượng: ${targetTitle}`,
@@ -1579,261 +1883,22 @@ Chữ ký Bên A                                                    Chữ ký B�
       `
     });
 
-    modal.querySelector("#rm-report-form").addEventListener("submit", (e) => {
+    modal.querySelector("#rm-report-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const reasonVal = modal.querySelector("select")?.value || "Báo cáo tin giả / phòng ma";
       const descVal = modal.querySelector("textarea")?.value.trim() || "";
-      submitSafetyReport({
+      const res = await submitSafetyReport({
         targetTitle,
+        roomId,
         reason: reasonVal,
         description: descVal
       });
+      if (!res?.ok) {
+        showToast(res?.error || "Không thể gửi báo cáo.", "error");
+        return;
+      }
       closeModal();
-      showToast("Đã ghi nhận báo cáo! Ban An toàn Roomie sẽ kiểm tra ngay.");
-    });
-  }
-
-  // =========================================================================
-  // AUTHENTICATION SYSTEM (Sign Up, Login, Sign Out)
-  // =========================================================================
-
-  const DEFAULT_DEMO_USERS = [
-    {
-      id: "user-minhthu",
-      name: "Minh Thư",
-      email: "minhthu@student.hcmus.edu.vn",
-      altEmail: "22120***@student.hcmus.edu.vn",
-      password: "123",
-      shortSchool: "HCMUS",
-      school: "ĐH Khoa học Tự nhiên (HCMUS)",
-      major: "Khoa CNTT • K22",
-      gender: "Nữ",
-      idCode: "#SV-8924",
-      avatar: "/assets/images/common/avatar-profile.jpg",
-      budgetRange: "1.8 - 2.5 tr/tháng",
-      preferredAreas: "Làng ĐHQG / Quận 5",
-      moveInTime: "Đầu tháng tới",
-      verifiedStudent: true
-    },
-    {
-      id: "user-hoangnam",
-      name: "Hoàng Nam",
-      email: "hoangnam@student.hcmus.edu.vn",
-      altEmail: "22120512@student.hcmus.edu.vn",
-      password: "123",
-      shortSchool: "HCMUS",
-      school: "ĐH Khoa học Tự nhiên (HCMUS)",
-      major: "Khoa CNTT • K22",
-      gender: "Nam",
-      idCode: "#SV-5120",
-      avatar: "/assets/images/phong-chi-tiet/avatar-1.jpg",
-      budgetRange: "2.0 - 2.6 tr/tháng",
-      preferredAreas: "Làng ĐHQG Thủ Đức",
-      moveInTime: "Sẵn sàng ở ngay",
-      verifiedStudent: true
-    }
-  ];
-
-  const AUTH_SCHOOL_OPTIONS = [
-    { code: "HCMUS", name: "ĐH Khoa học Tự nhiên (HCMUS)", area: "Làng ĐHQG / Quận 5" },
-    { code: "HCMUT", name: "ĐH Bách khoa - ĐHQG TP.HCM (HCMUT)", area: "Làng ĐHQG / Quận 10" },
-    { code: "UIT", name: "ĐH Công nghệ Thông tin (UIT)", area: "Làng ĐHQG Thủ Đức" },
-    { code: "USSH", name: "ĐH KHXH & Nhân văn (HCMUSSH)", area: "Làng ĐHQG / Quận 1" },
-    { code: "UEL", name: "ĐH Kinh tế - Luật (UEL)", area: "Làng ĐHQG Thủ Đức" },
-    { code: "IU", name: "ĐH Quốc tế - ĐHQG TP.HCM (HCMIU)", area: "Làng ĐHQG Thủ Đức" },
-    { code: "UEH", name: "ĐH Kinh tế TP.HCM (UEH)", area: "Quận 10 / Quận 3" },
-    { code: "HUTECH", name: "ĐH Công nghệ TP.HCM (HUTECH)", area: "Bình Thạnh / Thủ Đức" },
-    { code: "FTU2", name: "ĐH Ngoại thương CS2 (FTU2)", area: "Bình Thạnh" },
-    { code: "RMIT", name: "ĐH RMIT Việt Nam", area: "Quận 7" },
-    { code: "HUST", name: "ĐH Bách khoa Hà Nội (HUST)", area: "Hai Bà Trưng, Hà Nội" },
-    { code: "VNU", name: "ĐH Quốc gia Hà Nội (VNU)", area: "Cầu Giấy, Hà Nội" },
-    { code: "NEU", name: "ĐH Kinh tế Quốc dân (NEU)", area: "Hai Bà Trưng, Hà Nội" }
-  ];
-
-  function getRegisteredUsers() {
-    const stored = readJSON(STORAGE_KEYS.AUTH_USERS, null);
-    if (!Array.isArray(stored) || stored.length === 0) {
-      writeJSON(STORAGE_KEYS.AUTH_USERS, DEFAULT_DEMO_USERS);
-      return [...DEFAULT_DEMO_USERS];
-    }
-    const merged = [...stored];
-    DEFAULT_DEMO_USERS.forEach((demo) => {
-      if (!merged.some((u) => u && u.email && u.email.toLowerCase() === demo.email.toLowerCase())) {
-        merged.push(demo);
-      }
-    });
-    return merged;
-  }
-
-  function getAuthSession() {
-    const raw = readJSON(STORAGE_KEYS.AUTH_SESSION, null);
-    if (!raw || typeof raw !== "object") {
-      const defaultUser = DEFAULT_DEMO_USERS[0];
-      const initial = { loggedIn: true, user: defaultUser };
-      writeJSON(STORAGE_KEYS.AUTH_SESSION, initial);
-      return initial;
-    }
-    return raw;
-  }
-
-  function syncGlobalUserProfile(user) {
-    if (!window.RoomieData) window.RoomieData = {};
-    if (user) {
-      window.RoomieData.USER_PROFILE = {
-        ...DEFAULT_DEMO_USERS[0],
-        ...user
-      };
-    } else {
-      window.RoomieData.USER_PROFILE = null;
-    }
-  }
-
-  function isLoggedIn() {
-    const session = getAuthSession();
-    return Boolean(session && session.loggedIn && session.user);
-  }
-
-  function getCurrentUser() {
-    const session = getAuthSession();
-    const user = session && session.loggedIn ? session.user : null;
-    ensureQuizDataBelongsToCurrentUser();
-    syncGlobalUserProfile(user);
-    return user;
-  }
-
-  function emitAuthChange(user) {
-    syncGlobalUserProfile(user);
-    window.dispatchEvent(
-      new CustomEvent("roomie:auth-changed", {
-        detail: { loggedIn: Boolean(user), user }
-      })
-    );
-  }
-
-  function setLoggedInUser(user, token = "") {
-    const cleanUser = { ...user };
-    delete cleanUser.password;
-    const prevSession = readJSON(STORAGE_KEYS.AUTH_SESSION, {});
-    writeJSON(STORAGE_KEYS.AUTH_SESSION, {
-      loggedIn: true,
-      user: cleanUser,
-      token: token || prevSession?.token || "",
-      updatedAt: Date.now()
-    });
-    ensureQuizDataBelongsToCurrentUser();
-    emitAuthChange(cleanUser);
-    return cleanUser;
-  }
-
-  function logoutUser() {
-    writeJSON(STORAGE_KEYS.AUTH_SESSION, {
-      loggedIn: false,
-      user: null,
-      token: "",
-      updatedAt: Date.now()
-    });
-    ensureQuizDataBelongsToCurrentUser();
-    emitAuthChange(null);
-    syncWithLocalDemo();
-  }
-
-  function loginUser(identifier, password) {
-    const cleanId = String(identifier || "").trim().toLowerCase();
-    const cleanPass = String(password || "").trim();
-    if (!cleanId) {
-      return { ok: false, error: "Vui lòng nhập email sinh viên hoặc tên đăng nhập." };
-    }
-    const users = getRegisteredUsers();
-    const matched = users.find(
-      (u) =>
-        u.email?.toLowerCase() === cleanId ||
-        u.altEmail?.toLowerCase() === cleanId ||
-        u.id?.toLowerCase() === cleanId ||
-        u.name?.toLowerCase() === cleanId
-    );
-    if (!matched) {
-      return {
-        ok: false,
-        error: "Không tìm thấy tài khoản với email này. Bạn có thể chuyển qua tab Đăng ký để tạo mới!"
-      };
-    }
-    if (matched.password && cleanPass && matched.password !== cleanPass && cleanPass !== "123456") {
-      return { ok: false, error: "Mật khẩu chưa chính xác. Vui lòng kiểm tra lại." };
-    }
-    const activeUser = setLoggedInUser(matched);
-    syncWithLocalDemo();
-    return { ok: true, user: activeUser };
-  }
-
-  function registerUser(payload = {}) {
-    const name = String(payload.name || "").trim();
-    const email = String(payload.email || "").trim().toLowerCase();
-    const password = String(payload.password || "");
-    const confirmPassword = String(payload.confirmPassword || "");
-    const schoolCode = String(payload.schoolCode || "HCMUS").trim();
-    const major = String(payload.major || "Sinh viên • K23").trim() || "Sinh viên • K23";
-    const gender = payload.gender === "Nam" ? "Nam" : "Nữ";
-
-    if (name.length < 2) {
-      return { ok: false, error: "Vui lòng nhập họ và tên hợp lệ (tối thiểu 2 ký tự)." };
-    }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return { ok: false, error: "Vui lòng nhập địa chỉ email hợp lệ." };
-    }
-    if (password.length < 6) {
-      return { ok: false, error: "Mật khẩu cần có tối thiểu 6 ký tự." };
-    }
-    if (confirmPassword && password !== confirmPassword) {
-      return { ok: false, error: "Mật khẩu xác nhận không khớp." };
-    }
-
-    const users = getRegisteredUsers();
-    if (users.some((u) => u.email?.toLowerCase() === email)) {
-      return { ok: false, error: "Email này đã được đăng ký. Vui lòng chuyển sang Đăng nhập." };
-    }
-
-    const schoolObj =
-      AUTH_SCHOOL_OPTIONS.find((s) => s.code === schoolCode) || {
-        code: schoolCode || "SV",
-        name: schoolCode || "Sinh viên Đại học",
-        area: "TP.HCM"
-      };
-    const isEduEmail = /\.edu(\.vn)?$/i.test(email);
-    const randomCode = "#SV-" + Math.floor(1000 + Math.random() * 9000);
-    const avatar =
-      gender === "Nam"
-        ? "/assets/images/phong-chi-tiet/avatar-1.jpg"
-        : "/assets/images/common/avatar-profile.jpg";
-
-    const newUser = {
-      id: "user-" + Date.now(),
-      name,
-      email,
-      password,
-      shortSchool: schoolObj.code,
-      school: schoolObj.name,
-      major,
-      gender,
-      idCode: randomCode,
-      avatar,
-      budgetRange: "1.8 - 2.5 tr/tháng",
-      preferredAreas: schoolObj.area,
-      moveInTime: "Đầu tháng tới",
-      verifiedStudent: isEduEmail
-    };
-
-    writeJSON(STORAGE_KEYS.AUTH_USERS, [newUser, ...users]);
-    const activeUser = setLoggedInUser(newUser);
-    syncWithLocalDemo();
-    return { ok: true, user: activeUser };
-  }
-
-  function onAuthStateChange(callback) {
-    window.addEventListener("roomie:auth-changed", callback);
-    window.addEventListener("storage", (event) => {
-      if (event.key === STORAGE_KEYS.AUTH_SESSION || event.key === STORAGE_KEYS.AUTH_USERS) {
-        callback();
-      }
+      showToast("Đã ghi nhận báo cáo vào hệ thống! Ban An toàn Roomie sẽ kiểm tra ngay.");
     });
   }
 
@@ -1843,6 +1908,30 @@ Chữ ký Bên A                                                    Chữ ký B�
       (s) => `<option value="${escapeHTML(s.code)}">${escapeHTML(s.name)}</option>`
     ).join("");
 
+    const demoAccounts = getDemoAccounts();
+    const demoButtonsHtml = demoAccounts.length
+      ? `
+        <div class="pt-3 border-t border-surface-container flex flex-col gap-2">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Đăng nhập nhanh để chấm điểm &amp; trải nghiệm:</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            ${demoAccounts
+              .map(
+                (acc) => `
+              <button type="button" data-demo-account="${escapeHTML(acc.key)}" class="p-2.5 rounded-xl bg-surface-container-low hover:bg-primary-fixed/60 border border-outline-variant/25 flex items-center gap-2.5 text-left transition-colors">
+                <img src="${escapeHTML(acc.avatar || "/assets/images/common/avatar-profile.jpg")}" alt="${escapeHTML(acc.name)}" class="w-8 h-8 rounded-full object-cover ring-1 ring-secondary-container shrink-0" />
+                <div class="min-w-0">
+                  <div class="text-xs font-bold text-on-surface truncate">${escapeHTML(acc.name)}</div>
+                  <div class="text-[10.5px] ${acc.role === "landlord" ? "text-primary" : "text-tertiary"} font-semibold truncate">${escapeHTML(acc.shortSchool)} • ${escapeHTML(acc.gender || "")}</div>
+                </div>
+              </button>
+            `
+              )
+              .join("")}
+          </div>
+        </div>
+      `
+      : "";
+
     const modal = openModal({
       title: activeTab === "login" ? "Đăng nhập Roomie" : "Đăng ký tài khoản sinh viên",
       subtitle:
@@ -1851,7 +1940,6 @@ Chữ ký Bên A                                                    Chữ ký B�
       maxWidth: "max-w-md",
       bodyHtml: `
         <div class="flex flex-col gap-4">
-          <!-- Tab Switcher -->
           <div class="grid grid-cols-2 p-1 rounded-2xl bg-surface-container-low border border-outline-variant/25">
             <button type="button" data-auth-tab="login" class="rm-auth-tab-btn py-2.5 px-4 rounded-xl text-xs font-bold transition-all">
               Đăng nhập
@@ -1861,13 +1949,11 @@ Chữ ký Bên A                                                    Chữ ký B�
             </button>
           </div>
 
-          <!-- Error / Feedback Banner -->
           <div id="rm-auth-error" class="hidden p-3 rounded-xl bg-error-container text-on-error-container text-xs font-medium flex items-start gap-2">
             <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5">error</span>
             <span id="rm-auth-error-text"></span>
           </div>
 
-          <!-- LOGIN PANEL -->
           <form id="rm-auth-login-form" class="flex flex-col gap-3.5" novalidate>
             <div>
               <label for="rm-login-email" class="block text-xs font-semibold text-on-surface mb-1">Email sinh viên hoặc tài khoản</label>
@@ -1878,7 +1964,7 @@ Chữ ký Bên A                                                    Chữ ký B�
                   type="email"
                   required
                   autocomplete="username"
-                  placeholder="vd: minhthu@student.hcmus.edu.vn"
+                  placeholder="vd: email@student.hcmus.edu.vn"
                   class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -1899,40 +1985,20 @@ Chữ ký Bên A                                                    Chữ ký B�
                   placeholder="Nhập mật khẩu của bạn"
                   class="w-full h-11 pl-10 pr-10 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
-                <button type="button" data-toggle-pw="rm-login-password" aria-label="Hiện hoặc ẩn mật khẩu" class=" absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface">
+                <button type="button" data-toggle-pw="rm-login-password" aria-label="Hiện hoặc ẩn mật khẩu" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface">
                   <span class="material-symbols-outlined text-[18px]">visibility</span>
                 </button>
               </div>
             </div>
 
-            <button type="submit" class="mt-1 w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
+            <button type="submit" id="rm-login-submit-btn" class="mt-1 w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
               <span class="material-symbols-outlined text-[18px]">login</span>
               <span>Đăng nhập vào Roomie</span>
             </button>
 
-            <!-- Quick Demo Accounts -->
-            <div class="pt-3 border-t border-surface-container flex flex-col gap-2">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Đăng nhập nhanh tài khoản sinh viên mẫu:</span>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button type="button" data-demo-login="minhthu@student.hcmus.edu.vn" class="p-2.5 rounded-xl bg-surface-container-low hover:bg-primary-fixed/60 border border-outline-variant/25 flex items-center gap-2.5 text-left transition-colors">
-                  <img src="/assets/images/common/avatar-profile.jpg" alt="Minh Thư" class="w-8 h-8 rounded-full object-cover ring-1 ring-secondary-container shrink-0" />
-                  <div class="min-w-0">
-                    <div class="text-xs font-bold text-on-surface truncate">Minh Thư</div>
-                    <div class="text-[10.5px] text-tertiary font-semibold truncate">HCMUS • Nữ</div>
-                  </div>
-                </button>
-                <button type="button" data-demo-login="hoangnam@student.hcmus.edu.vn" class="p-2.5 rounded-xl bg-surface-container-low hover:bg-primary-fixed/60 border border-outline-variant/25 flex items-center gap-2.5 text-left transition-colors">
-                  <img src="/assets/images/phong-chi-tiet/avatar-1.jpg" alt="Hoàng Nam" class="w-8 h-8 rounded-full object-cover ring-1 ring-secondary-container shrink-0" />
-                  <div class="min-w-0">
-                    <div class="text-xs font-bold text-on-surface truncate">Hoàng Nam</div>
-                    <div class="text-[10.5px] text-primary font-semibold truncate">HCMUS • Nam</div>
-                  </div>
-                </button>
-              </div>
-            </div>
+            ${demoButtonsHtml}
           </form>
 
-          <!-- SIGN UP PANEL -->
           <form id="rm-auth-signup-form" class="hidden flex-col gap-3" novalidate>
             <div>
               <label for="rm-signup-name" class="block text-xs font-semibold text-on-surface mb-1">Họ và tên sinh viên</label>
@@ -2025,7 +2091,7 @@ Chữ ký Bên A                                                    Chữ ký B�
               <span>Tôi đồng ý với <a href="/roomie/an-toan" class="text-primary font-semibold hover:underline">Quy chuẩn cộng đồng &amp; Nguyên tắc an toàn</a> của Roomie.</span>
             </label>
 
-            <button type="submit" class="mt-1 w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
+            <button type="submit" id="rm-signup-submit-btn" class="mt-1 w-full py-3 px-4 rounded-xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
               <span class="material-symbols-outlined text-[18px]">person_add</span>
               <span>Đăng ký tài khoản Roomie</span>
             </button>
@@ -2089,30 +2155,37 @@ Chữ ký Bên A                                                    Chữ ký B�
       const emailVal = modal.querySelector("#rm-login-email")?.value.trim();
       showToast(
         emailVal
-          ? `Đã gửi hướng dẫn đặt lại mật khẩu tới ${emailVal}!`
-          : "Hãy nhập email sinh viên hoặc chọn tài khoản mẫu bên dưới để đăng nhập nhanh.",
+          ? `Vui lòng kiểm tra email ${emailVal} hoặc dùng nút Đăng nhập nhanh demo bên dưới.`
+          : "Hãy nhập email sinh viên hoặc chọn tài khoản demo bên dưới để đăng nhập nhanh.",
         "info"
       );
     });
 
-    modal.querySelectorAll("[data-demo-login]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const res = loginUser(btn.dataset.demoLogin, "123");
-        if (res.ok) {
-          closeModal();
-          options.onSuccess?.(res.user);
-          showToast(`Chào mừng trở lại, ${res.user.name} (${res.user.shortSchool})!`);
+    modal.querySelectorAll("[data-demo-account]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        const res = await loginDemoAccount(btn.dataset.demoAccount);
+        if (!res?.ok) {
+          btn.disabled = false;
+          showError(res?.error || "Đăng nhập nhanh không thành công.");
+          return;
         }
+        closeModal();
+        options.onSuccess?.(res.user);
+        showToast(`Chào mừng trở lại, ${res.user.name} (${res.user.shortSchool})!`);
       });
     });
 
-    loginForm.addEventListener("submit", (e) => {
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const submitBtn = modal.querySelector("#rm-login-submit-btn");
+      if (submitBtn) submitBtn.disabled = true;
       const email = modal.querySelector("#rm-login-email")?.value;
       const password = modal.querySelector("#rm-login-password")?.value;
-      const res = loginUser(email, password);
-      if (!res.ok) {
-        showError(res.error);
+      const res = await loginUser(email, password);
+      if (!res?.ok) {
+        if (submitBtn) submitBtn.disabled = false;
+        showError(res?.error || "Đăng nhập không thành công.");
         return;
       }
       closeModal();
@@ -2120,14 +2193,16 @@ Chữ ký Bên A                                                    Chữ ký B�
       showToast(`Đăng nhập thành công! Xin chào ${res.user.name}.`);
     });
 
-    signupForm.addEventListener("submit", (e) => {
+    signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const termsChecked = modal.querySelector("#rm-signup-terms")?.checked;
       if (!termsChecked) {
         showError("Vui lòng đồng ý với Quy chuẩn cộng đồng & Nguyên tắc an toàn.");
         return;
       }
-      const res = registerUser({
+      const submitBtn = modal.querySelector("#rm-signup-submit-btn");
+      if (submitBtn) submitBtn.disabled = true;
+      const res = await registerUser({
         name: modal.querySelector("#rm-signup-name")?.value,
         email: modal.querySelector("#rm-signup-email")?.value,
         schoolCode: modal.querySelector("#rm-signup-school")?.value,
@@ -2136,8 +2211,9 @@ Chữ ký Bên A                                                    Chữ ký B�
         password: modal.querySelector("#rm-signup-password")?.value,
         confirmPassword: modal.querySelector("#rm-signup-confirm")?.value
       });
-      if (!res.ok) {
-        showError(res.error);
+      if (!res?.ok) {
+        if (submitBtn) submitBtn.disabled = false;
+        showError(res?.error || "Đăng ký không thành công.");
         return;
       }
       closeModal();
@@ -2146,585 +2222,22 @@ Chữ ký Bên A                                                    Chữ ký B�
     });
   }
 
-  // =========================================================================
-  // BACKEND API & SQLITE DATABASE SYNC LAYER
-  // =========================================================================
-
-  function getVietnamDayStart(timestamp = Date.now()) {
-    const vietnamOffset = 7 * 60 * 60 * 1000;
-    return Math.floor((timestamp + vietnamOffset) / 86400000) * 86400000 - vietnamOffset;
-  }
-
-  function getAllLocalRoommates() {
-    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
-    const byId = new Map();
-    [...SEED_ROOMMATES, ...(Array.isArray(listings) ? listings : [])].forEach((roommate) => {
-      if (roommate?.id) byId.set(String(roommate.id), roommate);
-    });
-    const now = Date.now();
-    return [...byId.values()].sort((a, b) => {
-      const aBoosted = Number(a.boostExpiresAt) > now;
-      const bBoosted = Number(b.boostExpiresAt) > now;
-      if (aBoosted !== bBoosted) return aBoosted ? -1 : 1;
-      return Number(b.createdAt || 0) - Number(a.createdAt || 0);
-    });
-  }
-
-  function getMyRoommateListings() {
-    const userId = getCurrentDemoUserId();
-    if (userId === "guest") return [];
-    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
-    return (Array.isArray(listings) ? listings : [])
-      .filter((listing) => String(listing?.userId) === userId)
-      .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
-  }
-
-  function hasDemoPlanFeature(packageId) {
-    return (
-      hasPurchasedPlan(packageId) ||
-      (packageId !== "all-in-one" && hasPurchasedPlan("all-in-one"))
-    );
-  }
-
-  function getDemoQrDataUrl(seed) {
-    const size = 29;
-    const matrix = Array.from({ length: size }, () => Array(size).fill(false));
-    const reserved = Array.from({ length: size }, () => Array(size).fill(false));
-    let randomState = String(seed).split("").reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 7);
-    const nextBit = () => {
-      randomState ^= randomState << 13;
-      randomState ^= randomState >>> 17;
-      randomState ^= randomState << 5;
-      return randomState & 1;
-    };
-
-    [[0, 0], [size - 7, 0], [0, size - 7]].forEach(([left, top]) => {
-      for (let y = -1; y <= 7; y += 1) {
-        for (let x = -1; x <= 7; x += 1) {
-          const px = left + x;
-          const py = top + y;
-          if (px < 0 || py < 0 || px >= size || py >= size) continue;
-          reserved[py][px] = true;
-          matrix[py][px] =
-            x >= 0 &&
-            x < 7 &&
-            y >= 0 &&
-            y < 7 &&
-            (x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4));
-        }
-      }
-    });
-
-    for (let y = 0; y < size; y += 1) {
-      for (let x = 0; x < size; x += 1) {
-        if (!reserved[y][x]) matrix[y][x] = nextBit() === 1;
-      }
-    }
-
-    const cell = 8;
-    const margin = 4;
-    const cells = [];
-    matrix.forEach((row, y) => {
-      row.forEach((isDark, x) => {
-        if (isDark) cells.push(`<rect x="${margin + x * cell}" y="${margin + y * cell}" width="${cell}" height="${cell}"/>`);
-      });
-    });
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240"><rect width="240" height="240" fill="#fff"/><g fill="#111">${cells.join("")}</g></svg>`;
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-  }
-
-  function getLocalPlanOrders() {
-    const orders = readJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, []);
-    return Array.isArray(orders) ? orders : [];
-  }
-
-  function getLocalPlansForCurrentUser() {
-    const userId = getCurrentDemoUserId();
-    const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
-    return readJSON(STORAGE_KEYS.ACTIVE_PLANS, []).filter(
-      (plan) =>
-        String(plan.userId || defaultUserId) === userId &&
-        Number(plan.expiresAt) > Date.now()
-    );
-  }
-
-  function createLocalPlanOrder(body) {
-    const packageId = String(body.packageId || "");
-    const plan = (Data.PRICING_PACKAGES || []).find((item) => item.id === packageId);
-    if (!plan || plan.id === "basic" || plan.available !== true) {
-      return { ok: false, error: "Gói dịch vụ không hợp lệ hoặc hiện chưa mở bán." };
-    }
-
-    const userId = getCurrentDemoUserId();
-    const targetId = String(body.targetId || "");
-    const isBoostPlan = packageId === "boost-24h" || packageId === "boost-7d";
-    if (isBoostPlan) {
-      const target = getAllLocalRoommates().find(
-        (roommate) => String(roommate.id) === targetId && String(roommate.userId) === userId
-      );
-      if (!targetId || !target) {
-        return { ok: false, error: "Không tìm thấy bài đăng của bạn để đẩy." };
-      }
-    }
-
-    const now = Date.now();
-    const order = {
-      id: `demo-order-${now}-${Math.random().toString(36).slice(2, 10)}`,
-      userId,
-      packageId,
-      packageName: plan.name,
-      amountVnd: Number(plan.priceVnd) || 0,
-      transferCode: `RMDEMO${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-      targetId: targetId || null,
-      status: "pending",
-      createdAt: now,
-      expiresAt: now + 30 * 60 * 1000
-    };
-    writeJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, [order, ...getLocalPlanOrders()]);
-    return {
-      ok: true,
-      order,
-      payment: {
-        qrDataUrl: getDemoQrDataUrl(order.transferCode),
-        bank: "QR demo",
-        accountNumber: "Không áp dụng",
-        accountName: "Không thể nhận tiền",
-        isDemo: true
-      }
-    };
-  }
-
-  function confirmLocalPlanOrder(orderId) {
-    const userId = getCurrentDemoUserId();
-    const orders = getLocalPlanOrders();
-    const order = orders.find(
-      (item) => item.id === String(orderId) && item.userId === userId
-    );
-    if (!order) return { ok: false, error: "Không tìm thấy đơn demo." };
-    if (order.status === "confirmed") {
-      return { ok: true, alreadyConfirmed: true, plans: getLocalPlansForCurrentUser() };
-    }
-    if (order.status !== "pending" || Number(order.expiresAt) <= Date.now()) {
-      return { ok: false, error: "Đơn demo đã hết hạn. Vui lòng tạo đơn mới." };
-    }
-
-    const plan = (Data.PRICING_PACKAGES || []).find((item) => item.id === order.packageId);
-    if (!plan) return { ok: false, error: "Không tìm thấy gói demo." };
-    const now = Date.now();
-    const dailyPackage = ["extra-posts-day", "unlimited-matches-day"].includes(plan.id);
-    const durationMs = dailyPackage
-      ? getVietnamDayStart(now) + 86400000 - now
-      : Number(plan.durationMs);
-    if (!Number.isFinite(durationMs) || durationMs <= 0) {
-      return { ok: false, error: "Thời hạn gói demo không hợp lệ." };
-    }
-
-    const isBoostPlan = plan.id === "boost-24h" || plan.id === "boost-7d";
-    let expiresAt = now + durationMs;
-    const allPlans = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []);
-    const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
-    const currentPlans = allPlans.filter(
-      (item) => String(item.userId || defaultUserId) === userId
-    );
-
-    if (isBoostPlan) {
-      const boostDuration = durationMs;
-      let foundTarget = false;
-      const customListings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
-      const updatedListings = customListings.map((listing) => {
-        if (String(listing.id) !== String(order.targetId) || String(listing.userId) !== userId) return listing;
-        foundTarget = true;
-        const currentExpiry = Number(listing.boostExpiresAt) > now ? Number(listing.boostExpiresAt) : now;
-        expiresAt = currentExpiry + boostDuration;
-        return { ...listing, isBoosted: true, boostExpiresAt: expiresAt };
-      });
-      if (!foundTarget) return { ok: false, error: "Bài đăng không còn tồn tại để đẩy." };
-      writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, updatedListings);
-    } else {
-      const previousPlan = currentPlans.find(
-        (item) => item.id === plan.id && Number(item.expiresAt) > now
-      );
-      if (previousPlan) expiresAt = Number(previousPlan.expiresAt) + durationMs;
-    }
-
-    const activePlan = {
-      id: plan.id,
-      recordId: `demo-plan-${order.id}`,
-      userId,
-      name: plan.name,
-      price: plan.price,
-      period: plan.period,
-      paymentCode: order.transferCode,
-      purchasedAt: now,
-      expiresAt,
-      targetId: order.targetId
-    };
-    const otherPlans = allPlans.filter(
-      (item) =>
-        String(item.userId || defaultUserId) !== userId ||
-        item.id !== plan.id
-    );
-    writeJSON(STORAGE_KEYS.ACTIVE_PLANS, [activePlan, ...otherPlans]);
-    writeJSON(
-      STORAGE_KEYS.DEMO_PLAN_ORDERS,
-      orders.map((item) => item.id === order.id ? { ...item, status: "confirmed", confirmedAt: now } : item)
-    );
-    Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), readJSON(STORAGE_KEYS.QUIZ_ANSWERS, {}));
-    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
-    window.dispatchEvent(
-      new CustomEvent("roomie:plan-updated", { detail: { pkg: activePlan } })
-    );
-    return {
-      ok: true,
-      plans: getLocalPlansForCurrentUser(),
-      roommates: Data.ROOMMATES
-    };
-  }
-
-  async function apiFetch(endpoint, options = {}) {
-    const requestUrl = new URL(endpoint, window.location.origin);
-    const pathname = requestUrl.pathname.startsWith("/roomie/api/")
-      ? requestUrl.pathname.slice("/roomie".length)
-      : requestUrl.pathname;
-    const method = String(options.method || "GET").toUpperCase();
-    let body = options.body || {};
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch {
-        return { ok: false, error: "Dữ liệu demo không đúng định dạng." };
-      }
-    }
-
-    if (pathname === "/api/plans" && method === "GET") {
-      return {
-        ok: true,
-        packages: Data.PRICING_PACKAGES || [],
-        activePlans: getLocalPlansForCurrentUser(),
-        paymentConfigured: false
-      };
-    }
-    if (pathname === "/api/plans/checkout" && method === "POST") {
-      return createLocalPlanOrder(body);
-    }
-    if (pathname === "/api/plans/confirm" && method === "POST") {
-      return confirmLocalPlanOrder(body.orderId);
-    }
-    if (pathname === "/api/plans/reset" && method === "POST") {
-      resetPurchasedPlans();
-      return { ok: true, plans: getLocalPlansForCurrentUser() };
-    }
-    if (pathname === "/api/roommates" && method === "GET") {
-      const roommates = getAllLocalRoommates();
-      return {
-        ok: true,
-        roommates: requestUrl.searchParams.get("mine") === "1"
-          ? roommates.filter((roommate) => String(roommate.userId) === getCurrentDemoUserId())
-          : roommates
-      };
-    }
-
-    const boostMatch = pathname.match(/^\/api\/roommates\/([^/]+)\/boost$/);
-    if (boostMatch && method === "POST") {
-      const userId = getCurrentDemoUserId();
-      if (!hasPurchasedPlan("all-in-one")) {
-        return { ok: false, error: "Tính năng đẩy tin trong Gói trọn bộ chưa được kích hoạt." };
-      }
-      const durationMs = body.period === "24h" ? 86400000 : body.period === "7d" ? 7 * 86400000 : 0;
-      if (!durationMs) return { ok: false, error: "Thời hạn đẩy tin không hợp lệ." };
-      const targetId = decodeURIComponent(boostMatch[1]);
-      let foundTarget = false;
-      const now = Date.now();
-      const customListings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
-      const updatedListings = customListings.map((listing) => {
-        if (String(listing.id) !== targetId || String(listing.userId) !== userId) return listing;
-        foundTarget = true;
-        const currentExpiry = Number(listing.boostExpiresAt) > now ? Number(listing.boostExpiresAt) : now;
-        return { ...listing, isBoosted: true, boostExpiresAt: currentExpiry + durationMs };
-      });
-      if (!foundTarget) return { ok: false, error: "Không tìm thấy bài đăng của bạn để đẩy." };
-      writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, updatedListings);
-      Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), readJSON(STORAGE_KEYS.QUIZ_ANSWERS, {}));
-      window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
-      return { ok: true, roommates: Data.ROOMMATES };
-    }
-
-    return {
-      ok: false,
-      error: `Chức năng ${method} ${pathname} chưa được triển khai trong chế độ demo.`
-    };
-  }
-
-  function syncWithLocalDemo() {
-    const user = getCurrentUser();
-    const quizAnswers = readJSON(STORAGE_KEYS.QUIZ_ANSWERS, {});
-    Data.ROOMS = getAllRooms();
-    Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), quizAnswers);
-    const readNotifications = new Set(readJSON(STORAGE_KEYS.NOTIFICATIONS_READ, []));
-    Data.NOTIFICATIONS = (Data.NOTIFICATIONS || []).map((notification) => ({
-      ...notification,
-      unread: notification.unread && !readNotifications.has(notification.id)
-    }));
-    window.dispatchEvent(new CustomEvent("roomie:demo-ready", { detail: { user } }));
-    window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
-    return { ok: true, user, rooms: Data.ROOMS, roommates: Data.ROOMMATES };
-  }
-
-  async function createRoomListing(newRoom) {
-    const existing = readJSON(STORAGE_KEYS.CUSTOM_LISTINGS, []);
-    const listing = { ...newRoom, createdAt: newRoom.createdAt || Date.now() };
-    writeJSON(STORAGE_KEYS.CUSTOM_LISTINGS, [listing, ...existing.filter((room) => room.id !== listing.id)]);
-    Data.ROOMS = getAllRooms();
-    window.dispatchEvent(new CustomEvent("roomie:demo-ready", { detail: { rooms: Data.ROOMS } }));
-    return listing;
-  }
-
-  async function createRoommateListing(payload = {}) {
-    const user = getCurrentUser();
-    if (!user || String(user.role || "student").toLowerCase() !== "student") {
-      return { ok: false, error: "Chỉ tài khoản sinh viên mới được đăng tin tìm roommate." };
-    }
-
-    const postType = String(payload.postType || "");
-    const hasRoom = postType === "has-room";
-    const area = String(payload.area || "").trim().slice(0, 180);
-    const areaKey = String(payload.areaKey || "");
-    const budgetAmount = Number(payload.budget);
-    const allowedAreaKeys = ["thu-duc", "binh-thanh", "quan-5", "go-vap", "quan-10"];
-    if (
-      (!hasRoom && postType !== "find-room") ||
-      !area ||
-      !allowedAreaKeys.includes(areaKey) ||
-      !Number.isFinite(budgetAmount) ||
-      budgetAmount <= 0 ||
-      !user.gender
-    ) {
-      return { ok: false, error: "Thông tin tin đăng chưa hợp lệ." };
-    }
-
-    const now = Date.now();
-    const usage = readJSON(STORAGE_KEYS.DEMO_POST_USAGE, {});
-    const usageKey = `${user.id}:${getVietnamDayStart(now)}`;
-    const used = Number(usage[usageKey]) || 0;
-    const dailyLimit = hasDemoPlanFeature("extra-posts-day") ? 4 : 1;
-    if (used >= dailyLimit) {
-      return {
-        ok: false,
-        code: "daily_limit",
-        error: dailyLimit > 1
-          ? "Bạn đã dùng hết 4 lượt đăng roommate hôm nay."
-          : "Gói miễn phí cho phép đăng 1 tin roommate mỗi ngày. Mua Gói 1 để đăng thêm tối đa 3 tin."
-      };
-    }
-    usage[usageKey] = used + 1;
-    writeJSON(STORAGE_KEYS.DEMO_POST_USAGE, usage);
-
-    const budget = `${(budgetAmount / 1000000).toFixed(1)} tr/tháng/người`;
-    const roomType = String(payload.roomType || "").trim();
-    const schoolPreference = String(payload.schoolPreference || "").trim();
-    const school = String(user.school || user.shortSchool || "Sinh viên").trim();
-    const shortSchool = String(user.shortSchool || school).trim();
-    const bundlePlan = getPurchasedPlans().find((plan) => plan.id === "all-in-one");
-    const autoBoostExpiresAt = bundlePlan ? Number(bundlePlan.expiresAt) : null;
-    const roommate = {
-      id: `roommate-${now}-${Math.random().toString(36).slice(2, 10)}`,
-      userId: String(user.id),
-      name: String(user.name || "Sinh viên Roomie").trim(),
-      shortName: String(user.name || "Sinh viên Roomie").trim(),
-      age: Number(user.age) || 20,
-      gender: String(user.gender),
-      school,
-      shortSchool,
-      major: String(user.major || "").trim(),
-      matchScore: 90,
-      matchLabel: "Chưa có điểm hợp gu",
-      hasPersonalizedMatchScore: false,
-      createdAt: now,
-      vnuMember: /HCMUS|HCMUT|UIT|UEL|HCMUSSH|HCMIU|ĐHQG/i.test(`${school} ${shortSchool}`),
-      hasRoom,
-      roomStatusTitle: hasRoom ? "Đang tìm bạn ở ghép:" : "Đang tìm bạn cùng đi tìm phòng:",
-      roomStatusDetail: hasRoom
-        ? `${area}${roomType ? ` • ${roomType}` : ""}${schoolPreference ? ` • Gần ${schoolPreference}` : ""} • ${budget}`
-        : `Mong muốn tìm phòng tại ${area}${roomType ? ` • ${roomType}` : ""}${schoolPreference ? ` • Ưu tiên ${schoolPreference}` : ""} • Ngân sách ${budget}`,
-      linkedRoomId: null,
-      areaKey,
-      city: String(payload.city || "TP.HCM"),
-      budget,
-      avatar: String(user.avatar || "/assets/images/common/avatar-profile.jpg"),
-      quote: String(payload.note || "").trim().slice(0, 500),
-      criteria: Array.isArray(payload.criteria) ? payload.criteria.slice(0, 12) : [],
-      tags: Array.isArray(payload.criteria) ? payload.criteria.slice(0, 12) : [],
-      contact: { phone: CONTACT.phone, zalo: CONTACT.zalo, facebook: "fb.com/roomie.student" },
-      quizProfile: {},
-      isBoosted: Boolean(autoBoostExpiresAt && autoBoostExpiresAt > now),
-      boostExpiresAt: autoBoostExpiresAt && autoBoostExpiresAt > now ? autoBoostExpiresAt : null
-    };
-    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
-    writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, [roommate, ...listings]);
-    Data.ROOMMATES = getAllLocalRoommates();
-    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
-    return { ok: true, roommate, roommates: Data.ROOMMATES };
-  }
-
-  async function deleteRoommateListing(roommateId) {
-    const userId = getCurrentDemoUserId();
-    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
-    const nextListings = listings.filter(
-      (listing) => !(String(listing.id) === String(roommateId) && String(listing.userId) === userId)
-    );
-    if (nextListings.length === listings.length) {
-      return { ok: false, error: "Không tìm thấy bài đăng của bạn để xóa." };
-    }
-    writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, nextListings);
-    Data.ROOMMATES = getAllLocalRoommates();
-    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
-    return { ok: true, roommates: Data.ROOMMATES };
-  }
-
-  async function submitQuizResult(answers, result) {
-    const userId = getCurrentDemoUserId();
-    const completed = Number(result?.answeredCount) >= (Data.QUIZ_QUESTIONS || []).length;
-    if (completed && !hasDemoPlanFeature("unlimited-matches-day")) {
-      const usage = readJSON(STORAGE_KEYS.DEMO_MATCH_USAGE, {});
-      const usageKey = `${userId}:${getVietnamDayStart()}`;
-      if ((Number(usage[usageKey]) || 0) >= 1) {
-        return {
-          ok: false,
-          code: "daily_match_limit",
-          error: "Bạn đã dùng lượt xem kết quả hôm nay. Mua Gói 4 để xem kết quả ghép không giới hạn trong ngày."
-        };
-      }
-      usage[usageKey] = (Number(usage[usageKey]) || 0) + 1;
-      writeJSON(STORAGE_KEYS.DEMO_MATCH_USAGE, usage);
-    }
-
-    writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers || {});
-    const quizResult = { ...result, answers: answers || {} };
-    writeJSON(STORAGE_KEYS.QUIZ_RESULT, quizResult);
-    Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), answers || {});
-    window.dispatchEvent(new CustomEvent("roomie:quiz-results-updated"));
-    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
-    return { ok: true, quizResult, roommates: Data.ROOMMATES };
-  }
-
-  function markPersonalizedRoommateScores(roommates, answers) {
-    const questionCount = (Data.QUIZ_QUESTIONS || []).length;
-    const hasCompleteAnswers = questionCount > 0 && Object.keys(answers || {}).length === questionCount;
-    const genderOption = answers?.[1] || answers?.["1"];
-    const weights = { 2: 20, 3: 15, 4: 10, 5: 25, 6: 15, 7: 10, 8: 10, 9: 15 };
-
-    const compareOptions = (question, userOption, targetOption) => {
-      if (!userOption || !targetOption) return 0.9;
-      if (userOption === targetOption) return 1;
-      const pair = [userOption, targetOption].sort().join("");
-      if (question === 2) {
-        if (pair.includes("D")) return 0.92;
-        if (pair === "AB" || pair === "BC") return 0.88;
-        if (pair === "AC") return 0.72;
-      }
-      if (question === 5) {
-        if (pair === "AB" || pair === "AC" || pair === "BC") return 0.92;
-        return 0.78;
-      }
-      if (question === 6) {
-        if (pair === "AB" || pair === "AD") return 0.86;
-        return 0.74;
-      }
-      return ["AB", "BC", "CD", "AD"].includes(pair) ? 0.88 : 0.8;
-    };
-
-    return roommates.map((roommate) => {
-      const genderCompatible =
-        (genderOption === "A" && roommate.gender === "Nam") ||
-        (genderOption === "B" && roommate.gender === "Nữ") ||
-        genderOption === "C" ||
-        genderOption === "D";
-      let weightedSum = 0;
-      let totalWeight = 0;
-      Object.entries(weights).forEach(([questionText, weight]) => {
-        const question = Number(questionText);
-        const userOption = answers?.[question] || answers?.[questionText];
-        const targetOption =
-          roommate.quizProfile?.[question] || roommate.quizProfile?.[questionText];
-        if (userOption && targetOption) {
-          weightedSum += compareOptions(question, userOption, targetOption) * weight;
-          totalWeight += weight;
-        }
-      });
-      const score =
-        genderCompatible && totalWeight > 0
-          ? Math.round(Math.min(99, Math.max(84, (weightedSum / totalWeight) * 98)))
-          : null;
-      const matchLabel =
-        !genderCompatible
-          ? "Không phù hợp giới tính"
-          : score === null
-          ? "Chưa đủ dữ liệu lối sống"
-          : score >= 96
-          ? `${score}% Cực hợp gu`
-          : score >= 91
-          ? `${score}% Rất hợp gu`
-          : `${score}% Hòa hợp`;
-      return {
-        ...roommate,
-        matchScore: hasCompleteAnswers ? score : null,
-        matchLabel,
-        hasPersonalizedMatchScore: Boolean(hasCompleteAnswers && genderCompatible && totalWeight > 0)
-      };
-    });
-  }
-
-  async function submitSafetyReport(payload) {
-    const report = {
-      ...payload,
-      id: `demo-report-${Date.now()}`,
-      userId: getCurrentDemoUserId(),
-      createdAt: Date.now(),
-      status: "pending"
-    };
-    writeJSON(STORAGE_KEYS.DEMO_REPORTS, [report, ...readJSON(STORAGE_KEYS.DEMO_REPORTS, [])]);
-    return { ok: true, report };
-  }
-
-  async function submitContactTicket(payload) {
-    const ticket = {
-      ...payload,
-      id: `demo-contact-${Date.now()}`,
-      userId: getCurrentDemoUserId(),
-      createdAt: Date.now()
-    };
-    writeJSON(
-      STORAGE_KEYS.DEMO_CONTACT_TICKETS,
-      [ticket, ...readJSON(STORAGE_KEYS.DEMO_CONTACT_TICKETS, [])]
-    );
-    return { ok: true, ticket };
-  }
-
-  async function markAllNotificationsRead() {
-    const readIds = (Data.NOTIFICATIONS || []).map((notification) => notification.id);
-    writeJSON(STORAGE_KEYS.NOTIFICATIONS_READ, readIds);
-    Data.NOTIFICATIONS = (Data.NOTIFICATIONS || []).map((notification) => ({
-      ...notification,
-      unread: false
-    }));
-    return { ok: true, notifications: Data.NOTIFICATIONS };
-  }
-
-  // Initialize the local demo state without making an API or database connection.
-  getCurrentUser();
-  syncWithLocalDemo();
-
   window.RoomieCore = {
     CONTACT,
     STORAGE_KEYS,
     MAX_CONTACT_SLOTS,
     FALLBACK_SVG,
+    ready: readyPromise,
+    whenReady: () => readyPromise,
     apiFetch,
-    syncWithLocalDemo,
-    createRoomListing,
+    syncWithServer,
     createRoommateListing,
     deleteRoommateListing,
+    boostRoommateListing,
+    getRoommatePostQuotaStatus,
     submitQuizResult,
+    getQuizResult,
+    getQuizAnswers,
     submitSafetyReport,
     submitContactTicket,
     markAllNotificationsRead,
@@ -2743,6 +2256,8 @@ Chữ ký Bên A                                                    Chữ ký B�
     onPlanStateChange,
     isLoggedIn,
     getCurrentUser,
+    getDemoAccounts,
+    loginDemoAccount,
     loginUser,
     registerUser,
     logoutUser,

@@ -15,36 +15,58 @@ const QUESTION_WEIGHTS = {
   9: 15  // Chia hóa đơn & đồ dùng
 };
 
+const ORD_INDEX = { A: 0, B: 1, C: 2, D: 3 };
+
 /**
  * Compute similarity between two option keys ('A', 'B', 'C', 'D') for a specific question.
- * Returns a score between 0.72 and 1.0 so compatible students range realistically between 84% and 99%.
+ * Applies deal-breaker sensitivity for smoking/pets (Q6) and budget tiers (Q8).
  */
 function compareOptionPair(qNum, userOpt, targetOpt) {
-  if (!userOpt || !targetOpt) return 0.9;
+  if (!userOpt || !targetOpt) return null;
   if (userOpt === targetOpt) return 1.0;
 
-  // Adjacent or compatible lifestyle pairs
   const pair = [userOpt, targetOpt].sort().join('');
   if (qNum === 2) {
-    // Sleep schedule: A (early) & B (balanced) or B & C (night owl with headphones) or D (flexible)
-    if (pair.includes('D')) return 0.92;
-    if (pair === 'AB' || pair === 'BC') return 0.88;
-    if (pair === 'AC') return 0.72; // Early bird vs Night owl
+    if (pair.includes('D')) return 0.9;
+    if (pair === 'AB' || pair === 'BC') return 0.82;
+    if (pair === 'AC') return 0.52;
+  }
+  if (qNum === 3) {
+    if (pair.includes('D')) return 0.86;
+    if (pair === 'AB' || pair === 'BC') return 0.8;
+    if (pair === 'AC') return 0.48;
+  }
+  if (qNum === 4) {
+    if (pair === 'AB' || pair === 'BD' || pair === 'AD') return 0.85;
+    if (pair === 'BC' || pair === 'CD') return 0.72;
+    return 0.62;
   }
   if (qNum === 5) {
-    // Cleanliness: A (strict weekly) & B (self-disciplined) or C (eat out, neat)
-    if (pair === 'AB' || pair === 'AC' || pair === 'BC') return 0.92;
-    return 0.78;
+    if (pair === 'AB' || pair === 'AC' || pair === 'BC') return 0.86;
+    if (pair === 'BD') return 0.76;
+    return 0.56;
   }
   if (qNum === 6) {
-    // Smoking & Pets
-    if (pair === 'AB' || pair === 'AD') return 0.86;
-    return 0.74;
+    if (pair === 'BD') return 0.9;
+    if (pair === 'AD' || pair === 'CD') return 0.62;
+    if (pair === 'AB') return 0.45;
+    if (pair === 'AC' || pair === 'BC') return 0.35;
   }
-  if (pair === 'AB' || pair === 'BC' || pair === 'CD' || pair === 'AD') {
-    return 0.88;
+  if (qNum === 7) {
+    if (pair === 'AC' || pair === 'CD') return 0.55;
+    if (pair === 'AB' || pair === 'AD' || pair === 'BD') return 0.84;
+    return 0.78;
   }
-  return 0.8;
+  if (qNum === 8) {
+    const diff = Math.abs((ORD_INDEX[userOpt] ?? 1) - (ORD_INDEX[targetOpt] ?? 1));
+    if (diff === 1) return 0.78;
+    if (diff === 2) return 0.48;
+    return 0.25;
+  }
+  if (qNum === 9) {
+    return ['AB', 'BC', 'CD'].includes(pair) ? 0.84 : 0.66;
+  }
+  return ['AB', 'BC', 'CD', 'AD'].includes(pair) ? 0.84 : 0.72;
 }
 
 /**
@@ -103,13 +125,13 @@ function evaluateQuizSubmission(answers = {}) {
 }
 
 /**
- * Calculate compatibility percentage (84 - 99%) between user's quiz answers and a roommate profile.
+ * Calculate realistic compatibility percentage between user's quiz answers and a roommate profile.
  */
 function computeRoommateMatchScore(userAnswers, roommate) {
   if (!userAnswers || Object.keys(userAnswers).length === 0) {
     return {
-      matchScore: roommate.matchScore || 90,
-      matchLabel: roommate.matchLabel || `${roommate.matchScore || 90}% Hợp gu`,
+      matchScore: null,
+      matchLabel: 'Chưa làm trắc nghiệm hợp gu',
       isGenderCompatible: false,
       hasLifestyleData: false
     };
@@ -129,29 +151,40 @@ function computeRoommateMatchScore(userAnswers, roommate) {
   const targetProfile = roommate.quizProfile || {};
   let weightedSum = 0;
   let totalWeight = 0;
+  let dealBreakerCap = 99;
 
   Object.entries(QUESTION_WEIGHTS).forEach(([qStr, weight]) => {
     const qNum = Number(qStr);
     const uAns = userAnswers[qNum] || userAnswers[qStr];
     const tAns = targetProfile[qNum] || targetProfile[qStr];
-    if (uAns && tAns) {
-      weightedSum += compareOptionPair(qNum, uAns, tAns) * weight;
+    const sim = compareOptionPair(qNum, uAns, tAns);
+    if (sim !== null) {
+      weightedSum += sim * weight;
       totalWeight += weight;
+      if (qNum === 6 && sim < 0.5) {
+        dealBreakerCap = Math.min(dealBreakerCap, 72);
+      }
+      if (qNum === 8 && sim <= 0.3) {
+        dealBreakerCap = Math.min(dealBreakerCap, 75);
+      }
     }
   });
 
+  const rawScore = totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 100) : null;
   const score =
-    totalWeight > 0
-      ? Math.round(Math.min(99, Math.max(84, (weightedSum / totalWeight) * 98)))
+    rawScore !== null
+      ? Math.max(35, Math.min(dealBreakerCap, rawScore))
       : null;
   const label =
     score === null
       ? 'Chưa đủ dữ liệu lối sống'
-      : score >= 96
+      : score >= 92
       ? `${score}% Cực hợp gu`
-      : score >= 91
+      : score >= 82
       ? `${score}% Rất hợp gu`
-      : `${score}% Hòa hợp`;
+      : score >= 70
+      ? `${score}% Hòa hợp`
+      : `${score}% Cần trao đổi thêm`;
 
   return {
     matchScore: score,

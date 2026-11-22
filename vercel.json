@@ -2,6 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "outputDirectory": "src",
+  "functions": {
+    "api/handler.js": {
+      "includeFiles": "backend/**"
+    }
+  },
   "cleanUrls": false,
   "trailingSlash": false,
   "redirects": [
@@ -11,6 +16,7 @@
     { "source": "/tim-phong", "destination": "/roomie/tim-phong", "permanent": false },
     { "source": "/khu-vuc-lang-dai-hoc", "destination": "/roomie/tim-phong", "permanent": false },
     { "source": "/phong-chi-tiet", "destination": "/roomie/phong-chi-tiet", "permanent": false },
+    { "source": "/phong-chi-tiet-:id(\\d+)", "destination": "/roomie/phong-chi-tiet-:id", "permanent": false },
     { "source": "/trac-nghiem", "destination": "/roomie/trac-nghiem", "permanent": false },
     { "source": "/trac-nghiem-hop-gu", "destination": "/roomie/trac-nghiem", "permanent": false },
     { "source": "/trac-nghiem-tinh-cach", "destination": "/roomie/trac-nghiem", "permanent": false },
@@ -18,6 +24,7 @@
     { "source": "/ket-qua-match", "destination": "/roomie/tim-roommate", "permanent": false },
     { "source": "/dang-tin", "destination": "/roomie/dang-tin", "permanent": false },
     { "source": "/dang-tin-mien-phi", "destination": "/roomie/dang-tin", "permanent": false },
+    { "source": "/tin-da-dang", "destination": "/roomie/tin-da-dang", "permanent": false },
     { "source": "/dich-vu", "destination": "/roomie/bang-gia", "permanent": false },
     { "source": "/bang-gia", "destination": "/roomie/bang-gia", "permanent": false },
     { "source": "/ve-chung-toi", "destination": "/roomie/ve-chung-toi", "permanent": false },
@@ -29,6 +36,10 @@
     { "source": "/quy-chuan-cong-dong", "destination": "/roomie/an-toan", "permanent": false }
   ],
   "rewrites": [
+    { "source": "/api", "destination": "/api/handler?__route=/api" },
+    { "source": "/api/:path*", "destination": "/api/handler?__route=/api/:path*" },
+    { "source": "/roomie/api", "destination": "/api/handler?__route=/api" },
+    { "source": "/roomie/api/:path*", "destination": "/api/handler?__route=/api/:path*" },
     { "source": "/roomie", "destination": "/index.html" },
     { "source": "/roomie/index.html", "destination": "/index.html" },
     { "source": "/roomie/trang-chu", "destination": "/index.html" },
@@ -57,5 +68,33 @@
     { "source": "/roomie/styles/:path*", "destination": "/styles/:path*" },
     { "source": "/roomie/scripts/:path*", "destination": "/scripts/:path*" },
     { "source": "/roomie/favicon.ico", "destination": "/favicon.ico" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/(api|roomie/api)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/(assets|scripts|styles)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }
+      ]
+    },
+    {
+      "source": "/roomie/(assets|scripts|styles)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }
+      ]
+    }
   ]
 }

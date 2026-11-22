@@ -47,11 +47,11 @@
 
   /** Build right-side header action pill content depending on authentication state. */
   function buildHeaderRightInnerHtml() {
-    const loggedIn = Core.isLoggedIn ? Core.isLoggedIn() : true;
+    const loggedIn = Core.isLoggedIn ? Core.isLoggedIn() : false;
     const profile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
     const avatarUrl = profile.avatar || "/assets/images/common/avatar-profile.jpg";
-    const profileName = profile.name || "Minh Thư";
-    const shortSchool = profile.shortSchool || "HCMUS";
+    const profileName = profile.name || "Sinh viên";
+    const shortSchool = profile.shortSchool || "SV";
 
     if (!loggedIn) {
       return `
@@ -68,6 +68,8 @@
       `.trim();
     }
 
+    const hasUnreadNotifications = (Data.NOTIFICATIONS || []).some((n) => Boolean(n && n.unread));
+
     return `
         <a class="hidden sm:inline-flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full bg-secondary-container/80 text-on-secondary-container hover:bg-primary hover:text-on-primary font-label-md text-[12.5px] xl:text-[13px] font-semibold transition-all whitespace-nowrap" data-path="dang-tin" href="/roomie/dang-tin">
           <span class="material-symbols-outlined text-[15px] xl:text-[16px]">add_circle</span>
@@ -75,7 +77,7 @@
         </a>
         <button aria-label="Thông báo" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
           <span class="material-symbols-outlined text-[19px] xl:text-[20px]">notifications</span>
-          <span class="absolute top-1.5 right-1.5 xl:top-2 xl:right-2 w-2 h-2 rounded-full bg-primary"></span>
+          <span id="rm-notif-unread-dot" class="${hasUnreadNotifications ? "" : "hidden "}absolute top-1.5 right-1.5 xl:top-2 xl:right-2 w-2 h-2 rounded-full bg-primary"></span>
         </button>
         <button aria-label="Kết nối" title="Quản lý kết nối 2 chiều &amp; Slot liên hệ" class="w-8 h-8 xl:w-9 xl:h-9 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors relative flex items-center justify-center" type="button">
           <span class="material-symbols-outlined text-[19px] xl:text-[20px]">handshake</span>
@@ -247,14 +249,13 @@
 
     syncHeaderScroll();
     window.addEventListener("scroll", syncHeaderScroll, { passive: true });
-    document.addEventListener("scroll", syncHeaderScroll, { passive: true });
     window.addEventListener("load", syncHeaderScroll, { passive: true });
     window.addEventListener("hashchange", syncHeaderScroll, { passive: true });
   }
 
   function buildMobileDrawerInnerHtml() {
     const navItems = Array.isArray(Data.NAV_ITEMS) ? Data.NAV_ITEMS : [];
-    const loggedIn = Core.isLoggedIn ? Core.isLoggedIn() : true;
+    const loggedIn = Core.isLoggedIn ? Core.isLoggedIn() : false;
     const profile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
 
     const authFooterHtml = loggedIn
@@ -292,6 +293,9 @@
           )}</a>`
       ),
       `<a href="/roomie/an-toan" data-path="nguyen-tac-an-toan" class="px-4 py-2.5 rounded-xl font-label-md text-on-surface hover:bg-surface-container-low">An toàn &amp; Hỗ trợ</a>`,
+      ...(loggedIn
+        ? [`<a href="/roomie/tin-da-dang" data-path="tin-da-dang" class="px-4 py-2.5 rounded-xl font-label-md text-on-surface hover:bg-surface-container-low">Tin đăng của tôi</a>`]
+        : []),
       `<a href="/roomie/dang-tin" data-path="dang-tin" class="mt-1 px-4 py-3 rounded-xl bg-secondary-container text-on-secondary-container font-label-md text-center font-semibold">Đăng tin miễn phí</a>`,
       authFooterHtml
     ].join("\n        ");
@@ -313,9 +317,9 @@
       closeDrawer();
       Core.openAuthModal?.("signup");
     });
-    drawer.querySelector("#rm-mobile-signout-btn")?.addEventListener("click", () => {
+    drawer.querySelector("#rm-mobile-signout-btn")?.addEventListener("click", async () => {
       closeDrawer();
-      Core.logoutUser?.();
+      await Core.logoutUser?.();
       Core.showToast?.("Đã đăng xuất khỏi tài khoản Roomie.", "info");
     });
   }
@@ -377,13 +381,14 @@
 
     notifBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+      document.getElementById("rm-profile-popover")?.remove();
       const existing = document.getElementById("rm-notif-popover");
       if (existing) {
         existing.remove();
         return;
       }
 
-      const readIds = Core.readJSON(Core.STORAGE_KEYS.NOTIFICATIONS_READ, []);
+      const notifs = Array.isArray(Data.NOTIFICATIONS) ? Data.NOTIFICATIONS : [];
       const pop = document.createElement("div");
       pop.id = "rm-notif-popover";
       pop.className =
@@ -394,50 +399,53 @@
           <button type="button" id="rm-mark-all-read" class="text-xs font-semibold text-primary hover:underline">Đánh dấu đã đọc</button>
         </div>
         <div class="divide-y divide-surface-container max-h-80 overflow-y-auto">
-          ${(Data.NOTIFICATIONS || [])
-            .map((n) => {
-              const isUnread = n.unread && !readIds.includes(n.id);
-              return `<a href="${escapeHTML(n.href)}" class="flex items-start gap-3 p-3.5 hover:bg-surface-container-low transition-colors ${
-                isUnread ? "bg-primary-fixed/20" : ""
-              }">
-                <span class="mt-1.5 w-2 h-2 rounded-full shrink-0 ${isUnread ? "bg-primary" : "bg-outline-variant"}"></span>
-                <div>
-                  <p class="text-sm font-medium text-on-surface leading-snug">${escapeHTML(n.title)}</p>
-                  <span class="text-xs text-on-surface-variant">${escapeHTML(n.time)}</span>
-                </div>
-              </a>`;
-            })
-            .join("")}
+          ${
+            notifs.length
+              ? notifs
+                  .map((n) => {
+                    const isUnread = Boolean(n.unread);
+                    return `<a href="${escapeHTML(n.href)}" class="flex items-start gap-3 p-3.5 hover:bg-surface-container-low transition-colors ${
+                      isUnread ? "bg-primary-fixed/20" : ""
+                    }">
+                      <span class="mt-1.5 w-2 h-2 rounded-full shrink-0 ${isUnread ? "bg-primary" : "bg-outline-variant"}"></span>
+                      <div>
+                        <p class="text-sm font-medium text-on-surface leading-snug">${escapeHTML(n.title)}</p>
+                        <span class="text-xs text-on-surface-variant">${escapeHTML(n.time)}</span>
+                      </div>
+                    </a>`;
+                  })
+                  .join("")
+              : `<div class="p-6 text-center text-xs text-on-surface-variant">Chưa có thông báo mới.</div>`
+          }
         </div>
       `;
       document.body.appendChild(pop);
 
-      pop.querySelector("#rm-mark-all-read").addEventListener("click", () => {
-        if (Core.markAllNotificationsRead) {
-          Core.markAllNotificationsRead();
-        } else {
-          Core.writeJSON(
-            Core.STORAGE_KEYS.NOTIFICATIONS_READ,
-            (Data.NOTIFICATIONS || []).map((n) => n.id)
-          );
-        }
+      const closeNotifPop = () => {
         pop.remove();
-        const dot = notifBtn.querySelector("span.bg-primary, span.bg-error");
+        document.removeEventListener("click", handleOutside, true);
+        document.removeEventListener("keydown", handleEsc);
+      };
+      function handleOutside(ev) {
+        if (!pop.contains(ev.target) && !notifBtn.contains(ev.target)) {
+          closeNotifPop();
+        }
+      }
+      function handleEsc(ev) {
+        if (ev.key === "Escape") closeNotifPop();
+      }
+
+      pop.querySelector("#rm-mark-all-read").addEventListener("click", async () => {
+        await Core.markAllNotificationsRead?.();
+        closeNotifPop();
+        const dot = document.getElementById("rm-notif-unread-dot") || notifBtn.querySelector("span.bg-primary, span.bg-error");
         if (dot) dot.classList.add("hidden");
         Core.showToast("Đã đánh dấu tất cả thông báo đã đọc.", "info");
       });
 
       setTimeout(() => {
-        document.addEventListener(
-          "click",
-          function handler(ev) {
-            if (!pop.contains(ev.target)) {
-              pop.remove();
-              document.removeEventListener("click", handler);
-            }
-          },
-          true
-        );
+        document.addEventListener("click", handleOutside, true);
+        document.addEventListener("keydown", handleEsc);
       }, 10);
     });
   }
@@ -457,6 +465,7 @@
 
     trigger.addEventListener("click", (e) => {
       e.stopPropagation();
+      document.getElementById("rm-notif-popover")?.remove();
       const existing = document.getElementById("rm-profile-popover");
       if (existing) {
         existing.remove();
@@ -465,6 +474,7 @@
 
       const currentProfile = (Core.getCurrentUser ? Core.getCurrentUser() : Data.USER_PROFILE) || {};
       const savedCount = Core.getSavedRoomIds().length;
+      const roommatesCount = (Data.ROOMMATES || []).length;
       const customCount = (Data.ROOMMATES || []).filter(
         (roommate) => roommate.userId && String(roommate.userId) === String(currentProfile.id)
       ).length;
@@ -506,8 +516,8 @@
         </div>
         <div class="p-2 flex flex-col gap-0.5 text-sm">
           <a href="/roomie/tim-roommate" class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-surface-container-low text-on-surface">
-            <span>Hồ sơ &amp; Kết quả Match</span>
-            <span class="text-xs text-primary font-semibold">42</span>
+            <span>Danh bạ tìm roommate</span>
+            <span class="text-xs text-primary font-semibold">${roommatesCount}</span>
           </a>
           <a href="/roomie/tim-phong?saved=1" class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-surface-container-low text-on-surface">
             <span>Phòng đã lưu</span>
@@ -518,7 +528,7 @@
             <span class="text-xs text-on-surface-variant font-semibold">${customCount}</span>
           </a>
           <a href="/roomie/trac-nghiem" class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-surface-container-low text-on-surface">
-            <span>Làm lại bài test hợp gu</span>
+            <span>Trắc nghiệm hợp gu</span>
             <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
           </a>
           <a href="/roomie/an-toan" class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-surface-container-low text-on-surface">
@@ -544,34 +554,39 @@
       `;
       document.body.appendChild(pop);
 
-      pop.querySelector("#rm-reset-plans-btn")?.addEventListener("click", () => {
-        Core.resetPurchasedPlans();
+      const closeProfilePop = () => {
         pop.remove();
-        Core.showToast("Đã đặt lại về Gói Cơ bản miễn phí.", "info");
+        document.removeEventListener("click", handleOutside, true);
+        document.removeEventListener("keydown", handleEsc);
+      };
+      function handleOutside(ev) {
+        if (!pop.contains(ev.target) && !trigger.contains(ev.target)) {
+          closeProfilePop();
+        }
+      }
+      function handleEsc(ev) {
+        if (ev.key === "Escape") closeProfilePop();
+      }
+
+      pop.querySelector("#rm-reset-plans-btn")?.addEventListener("click", async () => {
+        closeProfilePop();
+        await Core.resetPurchasedPlans?.();
       });
 
       pop.querySelector("#rm-switch-account-btn")?.addEventListener("click", () => {
-        pop.remove();
+        closeProfilePop();
         Core.openAuthModal?.("login");
       });
 
-      pop.querySelector("#rm-signout-btn")?.addEventListener("click", () => {
-        pop.remove();
-        Core.logoutUser?.();
+      pop.querySelector("#rm-signout-btn")?.addEventListener("click", async () => {
+        closeProfilePop();
+        await Core.logoutUser?.();
         Core.showToast?.("Đã đăng xuất khỏi tài khoản Roomie.", "info");
       });
 
       setTimeout(() => {
-        document.addEventListener(
-          "click",
-          function handler(ev) {
-            if (!pop.contains(ev.target)) {
-              pop.remove();
-              document.removeEventListener("click", handler);
-            }
-          },
-          true
-        );
+        document.addEventListener("click", handleOutside, true);
+        document.addEventListener("keydown", handleEsc);
       }, 10);
     });
   }
@@ -626,6 +641,11 @@
 
   function showDemoStorageNotice() {
     if (document.getElementById("roomie-demo-storage-notice")) return;
+    try {
+      if (sessionStorage.getItem("rm_demo_notice_dismissed") === "1") return;
+    } catch {
+      // Ignore storage errors
+    }
     const notice = document.createElement("aside");
     notice.id = "roomie-demo-storage-notice";
     notice.className =
@@ -633,7 +653,7 @@
     notice.setAttribute("role", "status");
 
     const message = document.createElement("span");
-    message.textContent = "Chế độ demo: dữ liệu chỉ lưu trên trình duyệt này.";
+    message.textContent = "Phiên bản đồ án NMCNTT · Dữ liệu lưu trữ trên Supabase PostgreSQL.";
     notice.appendChild(message);
 
     const dismiss = document.createElement("button");
@@ -641,7 +661,14 @@
     dismiss.className = "rounded-md px-1 text-on-surface-variant hover:bg-surface-container";
     dismiss.setAttribute("aria-label", "Ẩn thông báo demo");
     dismiss.textContent = "×";
-    dismiss.addEventListener("click", () => notice.remove());
+    dismiss.addEventListener("click", () => {
+      try {
+        sessionStorage.setItem("rm_demo_notice_dismissed", "1");
+      } catch {
+        // Ignore storage errors
+      }
+      notice.remove();
+    });
     notice.appendChild(dismiss);
     document.body.appendChild(notice);
   }

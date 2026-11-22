@@ -60,7 +60,8 @@
       if (params.get("budget")) {
         const b = params.get("budget");
         if (b === "1-2" || b === "2-3") state.priceRange = "1.5-2.5";
-        else if (b === "3-4") state.priceRange = ">3.5";
+        else if (b === "3-4") state.priceRange = "2.5-3.5";
+        else if (["<1.5", "1.5-2.5", "2.5-3.5", ">3.5", "all"].includes(b)) state.priceRange = b;
       }
       if (params.get("type")) {
         const t = params.get("type");
@@ -210,7 +211,7 @@
 
       let list = all.filter((r) => {
         if (state.savedOnly && !saved.includes(String(r.id))) return false;
-        if (state.areaCity && getRoomCity(r) !== state.areaCity) return false;
+        if (!state.savedOnly && state.areaCity && getRoomCity(r) !== state.areaCity) return false;
         if (state.selectedUniversity) {
           const uni = state.selectedUniversity;
           if (getRoomCity(r) !== uni.city) return false;
@@ -234,7 +235,15 @@
         return true;
       });
 
-      if (state.sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
+      if (state.sort === "price-asc") {
+        list = [...list].sort((a, b) => a.price - b.price);
+      } else if (state.sort === "newest") {
+        list = [...list].sort(
+          (a, b) =>
+            (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0) ||
+            (Number(b.id) || 0) - (Number(a.id) || 0)
+        );
+      }
       return list;
     }
 
@@ -321,6 +330,12 @@
       const pageItems = filtered.slice(start, start + state.perPage);
       const saved = Core.getSavedRoomIds();
 
+      const totalBadge = document.getElementById("tim-phong-total-badge");
+      if (totalBadge) {
+        totalBadge.textContent = `${Core.getAllRooms().length} phòng trọ đã kiểm duyệt`;
+      }
+      const savedChip = document.getElementById("rm-saved-filter-chip");
+      savedChip?.classList.toggle("hidden", !state.savedOnly);
       if (countLabel) {
         countLabel.textContent = state.savedOnly ? `${total} phòng đã lưu` : `${total} phòng trọ phù hợp`;
       }
@@ -342,7 +357,7 @@
             return `
               <article class="flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 group border border-surface-container">
                 <div class="relative w-full aspect-[16/10] bg-surface-container overflow-hidden cursor-pointer" data-room-nav="${escapeHTML(room.id)}">
-                  <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${escapeHTML(cover)}" alt="${escapeHTML(room.title)}" />
+                  <img loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${escapeHTML(cover)}" alt="${escapeHTML(room.title)}" />
                   <div class="absolute top-3 left-3 flex items-center gap-1.5">
                     <span class="px-2.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface font-label-sm text-label-sm font-medium">${escapeHTML(room.shortAddress)}</span>
                     ${room.isNewUserPost ? `<span class="px-2 py-0.5 rounded-full bg-primary text-on-primary text-[10px] font-bold">MỚI ĐĂNG</span>` : ""}
@@ -388,7 +403,16 @@
         grid.querySelectorAll("[data-save-room]").forEach((btn) => {
           btn.addEventListener("click", (e) => {
             e.stopPropagation();
+            if (!Core.isLoggedIn?.()) {
+              Core.toggleSavedRoom(btn.dataset.saveRoom);
+              return;
+            }
             const nowSaved = Core.toggleSavedRoom(btn.dataset.saveRoom);
+            if (state.savedOnly && !nowSaved) {
+              Core.showToast("Đã bỏ lưu tin.", "info");
+              render();
+              return;
+            }
             const icon = btn.querySelector(".material-symbols-outlined");
             btn.classList.toggle("text-error", nowSaved);
             if (icon) icon.style.fontVariationSettings = nowSaved ? "'FILL' 1" : "'FILL' 0";
@@ -417,9 +441,22 @@
       uniAutocomplete.close();
       renderAreaOptions();
       amenityCheckboxes.forEach((cb) => (cb.checked = false));
+      if (window.location.search) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
       render();
       Core.showToast("Đã đặt lại toàn bộ bộ lọc.", "info");
     }
+
+    document.getElementById("rm-saved-filter-clear")?.addEventListener("click", () => {
+      state.savedOnly = false;
+      state.page = 1;
+      const params = new URLSearchParams(window.location.search);
+      params.delete("saved");
+      const nextSearch = params.toString();
+      window.history.replaceState(null, "", nextSearch ? `${window.location.pathname}?${nextSearch}` : window.location.pathname);
+      render();
+    });
 
     areaCityBtns.forEach((btn) => {
       btn.addEventListener("click", () => setAreaCity(btn.dataset.areaCity || "TP.HCM"));
@@ -479,6 +516,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (document.body.dataset.page === "tim-phong") initFindRoomsPage();
+    if (document.body.dataset.page === "tim-phong") {
+      (Core.ready || Promise.resolve()).then(initFindRoomsPage);
+    }
   });
 })();

@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roomie - Dịch vụ &amp; Bảng giá | Ở cùng người hợp gu</title>
+  <meta name="description" content="Bảng giá các gói dịch vụ Roomie dành cho sinh viên: tăng lượt đăng tin, đẩy tin nổi bật và mở khóa Match không giới hạn qua VietQR." />
   <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
   <link rel="shortcut icon" href="/favicon.ico?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -39,7 +40,7 @@
 
             <!-- Concise Subtitle -->
             <p class="font-body-md sm:font-body-lg text-[14px] sm:text-[16px] text-[#c7c4d8] max-w-2xl mt-2.5 leading-relaxed">
-              Chọn gói, quét mã VietQR chuyển khoản rồi xác nhận để kích hoạt quyền lợi.
+              Chọn gói, quét VietQR chuyển khoản rồi xác nhận để kích hoạt ngay.
             </p>
 
           </div>
@@ -52,19 +53,19 @@
               </div>
               <div>
                 <div id="pricing-active-plan-title" class="font-bold text-[14.5px]">Đã kích hoạt gói dịch vụ</div>
-                <div class="text-[12.5px] text-on-secondary-fixed-variant">Phần Dự đoán gợi ý bạn cùng phòng tại trang Trắc nghiệm đã được mở khóa.</div>
+                <div id="pricing-active-plan-desc" class="text-[12.5px] text-on-secondary-fixed-variant">Phần Dự đoán gợi ý bạn cùng phòng tại trang Trắc nghiệm đã được mở khóa.</div>
               </div>
             </div>
-            <a href="/roomie/trac-nghiem#quiz-prediction-section" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-on-secondary-fixed text-white hover:bg-primary font-label-md text-[13px] font-bold whitespace-nowrap transition-colors shrink-0">
-              <span>Xem Dự đoán gợi ý</span>
+            <a id="pricing-active-plan-cta" href="/roomie/trac-nghiem#quiz-prediction-section" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-on-secondary-fixed text-white hover:bg-primary font-label-md text-[13px] font-bold whitespace-nowrap transition-colors shrink-0">
+              <span>Sử dụng quyền lợi ngay</span>
               <span class="material-symbols-outlined text-[17px]">arrow_forward</span>
             </a>
           </div>
 
-          <!-- Free plan and five upcoming student packages -->
+          <!-- Free plan and five student packages -->
           <div class="mt-9 sm:mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 xl:gap-6 items-stretch">
             <!-- CARD 1: Gói Cơ bản -->
-            <article class="rm-halftone-card relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+            <article id="pkg-basic" class="scroll-mt-24 rm-halftone-card relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-top pointer-events-none absolute inset-0 opacity-45"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c3c0ff]/45 to-transparent"></div>
 
@@ -96,11 +97,11 @@
                 <ul class="mt-6 pt-5 border-t border-white/10 flex flex-col gap-3 text-[13.5px] text-[#eef0fa]/90">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Đăng tối đa 01 tin roommate mỗi ngày</span>
+                    <span class="font-medium text-white">Đăng tối đa 01 tin roommate/ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Gửi lời mời kết nối 2 chiều miễn phí</span>
+                    <span class="font-medium text-white">Kết nối 2 chiều miễn phí (3 slot)</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim shrink-0 mt-0.5">check_circle</span>
@@ -108,18 +109,18 @@
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Làm bài trắc nghiệm hợp gu 8 chỉ số</span>
+                    <span class="text-[#c7c4d8]">Làm trắc nghiệm hợp gu 9 câu</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Dự toán tổng chi phí phòng minh bạch</span>
+                    <span class="text-[#c7c4d8]">Xem chi phí phòng minh bạch</span>
                   </li>
                 </ul>
               </div>
             </article>
 
             <!-- CARD 2: Thêm 3 tin trong ngày -->
-            <article class="rm-halftone-card-mint-soft relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+            <article id="pkg-extra-posts-day" class="scroll-mt-24 rm-halftone-card-mint-soft relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-mint pointer-events-none absolute inset-0 opacity-45"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#93f5d3]/55 to-transparent"></div>
 
@@ -131,7 +132,7 @@
                   </span>
                 </div>
                 <p class="text-[13.5px] text-[#c7c4d8] mt-1.5 leading-snug lg:min-h-[38px]">
-                  Thêm tối đa 3 lượt đăng ngoài tin miễn phí mỗi ngày
+                  Thêm tối đa 3 lượt đăng tin mỗi ngày
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
@@ -140,8 +141,8 @@
                   </span>
                   <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-tertiary-fixed/85 mt-1.5 min-h-[18px]" data-note-std="Tối đa 4 tin trong ngày, gồm 1 tin miễn phí" data-note-sv="Tối đa 4 tin trong ngày, gồm 1 tin miễn phí">
-                  Tối đa 4 tin trong ngày, gồm 1 tin miễn phí
+                <p class="pricing-subnote text-[12px] text-tertiary-fixed/85 mt-1.5 min-h-[18px]" data-note-std="Tối đa 4 tin/ngày (gồm 1 tin miễn phí)" data-note-sv="Tối đa 4 tin/ngày (gồm 1 tin miễn phí)">
+                  Tối đa 4 tin/ngày (gồm 1 tin miễn phí)
                 </p>
 
                 <button data-pkg="extra-posts-day" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white/95 text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
@@ -151,30 +152,30 @@
                 <ul class="mt-6 pt-5 border-t border-white/10 flex flex-col gap-3 text-[13.5px] text-[#eef0fa]/90">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Thêm tối đa 03 lượt đăng mỗi ngày</span>
+                    <span class="font-medium text-white">Thêm tối đa 03 lượt đăng/ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Tổng cộng tối đa 04 tin trong ngày</span>
+                    <span class="font-medium text-white">Tổng tối đa 04 tin trong ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Mỗi ngày tính theo giờ Việt Nam</span>
+                    <span class="text-[#c7c4d8]">Tính theo ngày (giờ Việt Nam)</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Không bao gồm quyền lợi đẩy tin</span>
+                    <span class="text-[#c7c4d8]">Không bao gồm đẩy tin nổi bật</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Tổng cộng tối đa 04 tin trong ngày</span>
+                    <span class="text-[#c7c4d8]">Quản lý tại "Tin đăng của tôi"</span>
                   </li>
                 </ul>
               </div>
             </article>
 
             <!-- CARD 3: Đẩy tin 24 giờ -->
-            <article class="rm-halftone-card-violet-soft relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+            <article id="pkg-boost-24h" class="scroll-mt-24 rm-halftone-card-violet-soft relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-top pointer-events-none absolute inset-0 opacity-65"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c3c0ff]/65 to-transparent"></div>
 
@@ -195,8 +196,8 @@
                   </span>
                   <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ 24 giờ</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Đẩy một tin bạn chọn trong đúng 24 giờ" data-note-sv="Đẩy một tin bạn chọn trong đúng 24 giờ">
-                  Đẩy một tin bạn chọn trong đúng 24 giờ
+                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Đẩy 1 tin lên đầu trong 24 giờ" data-note-sv="Đẩy 1 tin lên đầu trong 24 giờ">
+                  Đẩy 1 tin lên đầu trong 24 giờ
                 </p>
 
                 <button data-pkg="boost-24h" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white/95 text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
@@ -214,22 +215,22 @@
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim shrink-0 mt-0.5">check_circle</span>
-                    <span>Không cam kết số lượt xem hay kết quả ghép</span>
+                    <span>Không cam kết lượt xem hay ghép đôi</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Thời hạn đẩy tin là 24 giờ</span>
+                    <span class="text-[#c7c4d8]">Gắn nhãn "Tin đang được đẩy"</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Không bao gồm quyền lợi đẩy tin 7 ngày</span>
+                    <span class="text-[#c7c4d8]">Không gồm quyền lợi đẩy 7 ngày</span>
                   </li>
                 </ul>
               </div>
             </article>
 
             <!-- CARD 4: Đẩy tin 7 ngày -->
-            <article class="rm-halftone-card-mint relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+            <article id="pkg-boost-7d" class="scroll-mt-24 rm-halftone-card-mint relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-mint pointer-events-none absolute inset-0"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-tertiary-fixed to-transparent"></div>
 
@@ -250,8 +251,8 @@
                   </span>
                   <span class="text-[13.5px] text-white/85 font-medium">/ 7 ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-tertiary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Đẩy một tin bạn chọn trong 07 ngày" data-note-sv="Đẩy một tin bạn chọn trong 07 ngày">
-                  Đẩy một tin bạn chọn trong 07 ngày
+                <p class="pricing-subnote text-[12px] text-tertiary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Đẩy 1 tin lên đầu trong 07 ngày" data-note-sv="Đẩy 1 tin lên đầu trong 07 ngày">
+                  Đẩy 1 tin lên đầu trong 07 ngày
                 </p>
 
                 <button data-pkg="boost-7d" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white text-on-tertiary-fixed-variant font-bold text-[14px] shadow-[0_0_22px_rgba(147,245,211,0.38)] transition-all">
@@ -269,22 +270,22 @@
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Không cam kết số lượt xem hay kết quả ghép</span>
+                    <span class="text-white/95">Không cam kết lượt xem hay ghép đôi</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Thời hạn đẩy tin là 07 ngày</span>
+                    <span class="text-white/95">Ưu tiên đầu danh bạ suốt 7 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
-                    <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Không cam kết số lượt xem hay kết quả ghép</span>
+                    <span class="material-symbols-outlined text-secondary-container text-[18px] shrink-0 mt-0.5">check_circle</span>
+                    <span class="text-white/95">Hợp nhu cầu tìm gấp đầu học kỳ</span>
                   </li>
                 </ul>
               </div>
             </article>
 
             <!-- CARD 5: Match không giới hạn trong ngày -->
-            <article class="rm-halftone-card-featured relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+            <article id="pkg-unlimited-matches-day" class="scroll-mt-24 rm-halftone-card-featured relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-hero pointer-events-none absolute inset-0"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"></div>
 
@@ -297,7 +298,7 @@
                   </span>
                 </div>
                 <p class="text-[13.5px] text-white/90 mt-1.5 leading-snug lg:min-h-[38px]">
-                  Không giới hạn lượt xem kết quả ghép roommate trong ngày
+                  Xem không giới hạn kết quả ghép trong ngày
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
@@ -306,8 +307,8 @@
                   </span>
                   <span class="text-[13.5px] text-white/85 font-medium">/ ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-primary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Không giới hạn lượt xem kết quả ghép trong ngày" data-note-sv="Không giới hạn lượt xem kết quả ghép trong ngày">
-                  Không giới hạn lượt xem kết quả ghép trong ngày
+                <p class="pricing-subnote text-[12px] text-primary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Mở toàn bộ lượt xem ghép trong ngày" data-note-sv="Mở toàn bộ lượt xem ghép trong ngày">
+                  Mở toàn bộ lượt xem ghép trong ngày
                 </p>
 
                 <button data-pkg="unlimited-matches-day" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white text-on-primary-fixed font-extrabold text-[14px] shadow-[0_0_28px_rgba(226,223,255,0.55)] transition-all">
@@ -317,30 +318,30 @@
                 <ul class="mt-6 pt-5 border-t border-white/20 flex flex-col gap-3 text-[13.5px] text-white">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-semibold">Không giới hạn lượt xem kết quả ghép mỗi ngày</span>
+                    <span class="font-semibold">Xem kết quả ghép không giới hạn/ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-semibold">Dùng trong ngày, không cộng dồn sang ngày tiếp theo</span>
+                    <span class="font-semibold">Dùng trong ngày, không cộng dồn</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium">Kết quả tùy thuộc dữ liệu hồ sơ hiện có</span>
+                    <span class="font-medium">Kết quả theo dữ liệu hồ sơ hiện có</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Không bao gồm lượt đăng thêm hay đẩy tin</span>
+                    <span class="text-white/95">Không gồm thêm lượt đăng hay đẩy tin</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Quyền lợi có thời hạn trong ngày</span>
+                    <span class="text-white/95">Mở khóa toàn bộ điểm % hợp gu</span>
                   </li>
                 </ul>
               </div>
             </article>
 
             <!-- CARD 6: Gói trọn bộ 30 ngày -->
-            <article class="rm-halftone-card-indigo relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+            <article id="pkg-all-in-one" class="scroll-mt-24 rm-halftone-card-indigo relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-top pointer-events-none absolute inset-0 opacity-60"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-fixed-dim/65 to-transparent"></div>
 
@@ -352,7 +353,7 @@
                   </span>
                 </div>
                 <p class="text-[13.5px] text-[#c7c4d8] mt-1.5 leading-snug lg:min-h-[38px]">
-                  Gồm toàn bộ quyền lợi của gói 1–4 trong 30 ngày
+                  Toàn bộ quyền lợi gói 1–4 trong 30 ngày
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
@@ -361,8 +362,8 @@
                   </span>
                   <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ 30 ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Gồm toàn bộ quyền lợi các gói 1–4" data-note-sv="Gồm toàn bộ quyền lợi các gói 1–4">
-                  Gồm toàn bộ quyền lợi các gói 1–4
+                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Trọn bộ quyền lợi các gói 1–4" data-note-sv="Trọn bộ quyền lợi các gói 1–4">
+                  Trọn bộ quyền lợi các gói 1–4
                 </p>
 
                 <button data-pkg="all-in-one" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
@@ -372,15 +373,15 @@
                 <ul class="mt-6 pt-5 border-t border-white/15 flex flex-col gap-3 text-[13.5px] text-[#eef0fa]/90">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Thêm tối đa 3 tin mỗi ngày</span>
+                    <span class="font-medium text-white">Thêm tối đa 3 tin/ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Đẩy tin trong 24 giờ và 7 ngày</span>
+                    <span class="font-medium text-white">Đẩy tin 24 giờ và 7 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim shrink-0 mt-0.5">check_circle</span>
-                    <span>Match không giới hạn mỗi ngày trong 30 ngày</span>
+                    <span>Match không giới hạn suốt 30 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
@@ -388,7 +389,7 @@
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Quét mã VietQR và xác nhận sau khi chuyển khoản</span>
+                    <span class="text-[#c7c4d8]">Thanh toán nhanh qua VietQR</span>
                   </li>
                 </ul>
               </div>
@@ -408,7 +409,7 @@
               So sánh gói miễn phí và 5 gói roommate
             </h2>
             <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-              Giá hiển thị đã gồm mức thanh toán cho từng gói.
+              So sánh quyền lợi giữa gói miễn phí và 5 gói dịch vụ.
             </p>
           </div>
           <div class="overflow-x-auto rounded-3xl shadow-sm bg-surface-container-lowest border border-outline-variant/25">
@@ -489,7 +490,7 @@
                   <td class="p-4 sm:p-space-md font-medium">
                     Lượt xem kết quả ghép roommate
                   </td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Theo quyền lợi hiện có</td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Khóa cho tới Gói 4/5</td>
                   <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Không đổi</td>
                   <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 text-on-surface-variant">Không đổi</td>
                   <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Không đổi</td>
@@ -524,7 +525,7 @@
               Câu hỏi thường gặp
             </h2>
             <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-              Những điều sinh viên hay hỏi trước khi kích hoạt các gói dịch vụ Roomie.
+              Giải đáp nhanh trước khi kích hoạt gói dịch vụ.
             </p>
           </div>
           <div class="max-w-3xl mx-auto flex flex-col gap-space-md">
@@ -538,7 +539,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Có. Tài khoản miễn phí được đăng tối đa 01 tin roommate mỗi ngày và có 01 lượt làm mới kết quả trắc nghiệm mỗi ngày. Các gói trả phí mở thêm lượt đăng, đẩy tin hoặc lượt xem kết quả ghép.
+                Có. Tài khoản miễn phí đăng được 01 tin roommate và làm mới trắc nghiệm 01 lần mỗi ngày.
               </p>
             </details>
 
@@ -552,7 +553,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Chọn gói, quét mã VietQR và chuyển đúng số tiền kèm nội dung. Sau đó bấm xác nhận để mở gói.
+                Chọn gói, quét mã VietQR đúng số tiền &amp; nội dung, rồi bấm xác nhận để kích hoạt ngay.
               </p>
             </details>
             <!-- FAQ Item 3 -->
@@ -560,12 +561,12 @@
               <summary class="flex items-center justify-between gap-3 font-title-md text-[16px] sm:text-title-md text-on-surface list-none">
                 <span class="flex items-center gap-space-sm">
                   <span class="material-symbols-outlined text-primary">payments</span>
-                  Nền tảng hỗ trợ các hình thức thanh toán nào?
+                  Nền tảng hỗ trợ hình thức thanh toán nào?
                 </span>
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Mã VietQR hiển thị số tiền và nội dung chuyển khoản. Sau khi chuyển, bấm xác nhận để kích hoạt ngay; hệ thống chưa tự đối soát với ngân hàng.
+                Chuyển khoản qua mã VietQR rồi bấm xác nhận trên màn hình để mở gói ngay.
               </p>
             </details>
 
@@ -579,7 +580,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Lời mời kết nối chỉ được thiết lập khi hai người đồng ý. Các gói mới không thay đổi quy trình kết nối này.
+                Chỉ khi hai người cùng đồng ý mới mở khóa Zalo/SĐT. Cơ chế này áp dụng cho mọi gói.
               </p>
             </details>
           </div>
@@ -591,10 +592,10 @@
         <div class="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[820px] h-[340px] rounded-full bg-[#7c75ff]/45 blur-3xl"></div>
         <div class="max-w-[1280px] mx-auto px-margin md:px-margin-md lg:px-margin-lg text-center relative z-10 flex flex-col items-center">
           <h2 class="font-headline-lg text-[26px] sm:text-headline-lg max-w-2xl tracking-tight text-white font-bold">
-            Chưa chắc chắn gói nào phù hợp với nhu cầu của bạn?
+            Chưa chắc chắn nên chọn gói nào?
           </h2>
           <p class="font-body-md sm:font-body-lg text-white max-w-xl mt-3 mb-7 leading-relaxed">
-            Nhắn ngay cho Ban Hỗ trợ sinh viên Roomie để được tư vấn gói tiết kiệm nhất hoặc làm bài trắc nghiệm hợp gu hoàn toàn miễn phí.
+            Nhắn cho đội ngũ Roomie để được tư vấn hoặc làm trắc nghiệm 9 câu miễn phí ngay.
           </p>
           <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <a id="pricing-support-chat" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-surface-container-lowest hover:bg-primary-fixed text-primary font-bold text-[14.5px] shadow-lg transition-all flex items-center justify-center gap-2 whitespace-nowrap" href="#">
@@ -623,11 +624,11 @@
   </main>
 
   <div id="rm-footer-root"></div>
-  <script src="/scripts/data.js"></script>
-  <script src="/scripts/core.js"></script>
-  <script src="/scripts/layout.js"></script>
-  <script src="/scripts/pricing-widget.js"></script>
-  <script src="/scripts/pages/pricing.js"></script>
+  <script defer src="/scripts/data.js"></script>
+  <script defer src="/scripts/core.js"></script>
+  <script defer src="/scripts/layout.js"></script>
+  <script defer src="/scripts/pricing-widget.js"></script>
+  <script defer src="/scripts/pages/pricing.js"></script>
 
 </body>
 </html>

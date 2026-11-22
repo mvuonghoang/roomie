@@ -287,7 +287,7 @@
       riseEl: cfg.riseEl || null,
       delay: cfg.delay ?? 0,
       span: cfg.span ?? 0.65,
-      baseOpacity: cfg.baseOpacity ?? 0.14,
+      baseOpacity: cfg.baseOpacity ?? 0.42,
       windowWidth: cfg.windowWidth ?? 0.3,
       startY: cfg.startY ?? 9
     };
@@ -302,12 +302,12 @@
       const ctaLink = header.querySelector("a[data-path]");
       units.push({
         anchorEl: header,
-        startVh: 0.94,
-        endVh: 0.44,
+        startVh: 0.96,
+        endVh: 0.68,
         delay: 0,
         tracks: [
-          createTextTrack(h2, { delay: 0, span: 0.72, baseOpacity: 0.14, startY: 11, windowWidth: 0.34 }),
-          createTextTrack(ctaText, { wrapWords: false, riseEl: ctaLink, delay: 0.28, span: 0.62, baseOpacity: 0.18, startY: 7, windowWidth: 0.32 })
+          createTextTrack(h2, { delay: 0, span: 0.72, baseOpacity: 0.42, startY: 11, windowWidth: 0.34 }),
+          createTextTrack(ctaText, { wrapWords: false, riseEl: ctaLink, delay: 0.28, span: 0.62, baseOpacity: 0.45, startY: 7, windowWidth: 0.32 })
         ].filter(Boolean),
         fades: []
       });
@@ -327,16 +327,16 @@
         anchorEl: card,
         cardEl: card,
         cardIdx: idx,
-        startVh: 0.96,
-        endVh: 0.48,
+        startVh: 0.98,
+        endVh: 0.72,
         tracks: [
-          createTextTrack(locSpan, { delay: 0.06, span: 0.56, baseOpacity: 0.16, startY: 7, windowWidth: 0.3 }),
-          createTextTrack(h3, { wrapWords: false, riseEl: h3, delay: 0.14, span: 0.62, baseOpacity: 0.14, startY: 8, windowWidth: 0.32 }),
-          createTextTrack(specText, { wrapWords: false, riseEl: specRow, delay: 0.24, span: 0.62, baseOpacity: 0.16, startY: 7, windowWidth: 0.3 }),
-          createTextTrack(priceVal, { wrapWords: false, riseEl: priceRow, delay: 0.34, span: 0.52, baseOpacity: 0.16, startY: 6, windowWidth: 0.28 }),
-          createTextTrack(priceUnit, { wrapWords: false, delay: 0.44, span: 0.46, baseOpacity: 0.18, windowWidth: 0.28 })
+          createTextTrack(locSpan, { delay: 0.06, span: 0.56, baseOpacity: 0.45, startY: 7, windowWidth: 0.3 }),
+          createTextTrack(h3, { wrapWords: false, riseEl: h3, delay: 0.14, span: 0.62, baseOpacity: 0.42, startY: 8, windowWidth: 0.32 }),
+          createTextTrack(specText, { wrapWords: false, riseEl: specRow, delay: 0.24, span: 0.62, baseOpacity: 0.45, startY: 7, windowWidth: 0.3 }),
+          createTextTrack(priceVal, { wrapWords: false, riseEl: priceRow, delay: 0.34, span: 0.52, baseOpacity: 0.45, startY: 6, windowWidth: 0.28 }),
+          createTextTrack(priceUnit, { wrapWords: false, delay: 0.44, span: 0.46, baseOpacity: 0.48, windowWidth: 0.28 })
         ].filter(Boolean),
-        fades: pills.map((p, pIdx) => ({ el: p, delay: 0.1 + pIdx * 0.08, span: 0.48, baseOpacity: 0.35, startY: 5 }))
+        fades: pills.map((p, pIdx) => ({ el: p, delay: 0.1 + pIdx * 0.08, span: 0.48, baseOpacity: 0.55, startY: 5 }))
       });
     });
 
@@ -354,13 +354,13 @@
       const ctaLink = header.querySelector("a[data-path]");
       units.push({
         anchorEl: header,
-        startVh: 0.94,
-        endVh: 0.44,
+        startVh: 0.96,
+        endVh: 0.68,
         delay: 0,
         tracks: [
-          createTextTrack(h2, { delay: 0, span: 0.68, baseOpacity: 0.14, startY: 11, windowWidth: 0.34 }),
-          createTextTrack(subtitle, { delay: 0.14, span: 0.72, baseOpacity: 0.16, startY: 8, windowWidth: 0.3 }),
-          createTextTrack(ctaText, { wrapWords: false, riseEl: ctaLink, delay: 0.28, span: 0.62, baseOpacity: 0.18, startY: 7, windowWidth: 0.32 })
+          createTextTrack(h2, { delay: 0, span: 0.68, baseOpacity: 0.42, startY: 11, windowWidth: 0.34 }),
+          createTextTrack(subtitle, { delay: 0.14, span: 0.72, baseOpacity: 0.45, startY: 8, windowWidth: 0.3 }),
+          createTextTrack(ctaText, { wrapWords: false, riseEl: ctaLink, delay: 0.28, span: 0.62, baseOpacity: 0.48, startY: 7, windowWidth: 0.32 })
         ].filter(Boolean),
         fades: []
       });
@@ -379,19 +379,19 @@
         anchorEl: card,
         cardEl: card,
         cardIdx: idx,
-        startVh: 0.96,
-        endVh: 0.48,
+        startVh: 0.98,
+        endVh: 0.72,
         tracks: [
-          createTextTrack(nameEl, { wrapWords: false, riseEl: nameEl, delay: 0.08, span: 0.56, baseOpacity: 0.14, startY: 8, windowWidth: 0.34 }),
-          createTextTrack(uniEl, { wrapWords: false, riseEl: uniEl, delay: 0.16, span: 0.56, baseOpacity: 0.16, startY: 6, windowWidth: 0.3 }),
-          createTextTrack(bioEl, { delay: 0.22, span: 0.64, baseOpacity: 0.15, startY: 8, windowWidth: 0.32 }),
+          createTextTrack(nameEl, { wrapWords: false, riseEl: nameEl, delay: 0.08, span: 0.56, baseOpacity: 0.42, startY: 8, windowWidth: 0.34 }),
+          createTextTrack(uniEl, { wrapWords: false, riseEl: uniEl, delay: 0.16, span: 0.56, baseOpacity: 0.45, startY: 6, windowWidth: 0.3 }),
+          createTextTrack(bioEl, { delay: 0.22, span: 0.64, baseOpacity: 0.44, startY: 8, windowWidth: 0.32 }),
           ...chips.map((chip, cIdx) =>
-            createTextTrack(chip, { wrapWords: false, riseEl: chip, delay: 0.36 + cIdx * 0.08, span: 0.48, baseOpacity: 0.18, startY: 6, windowWidth: 0.3 })
+            createTextTrack(chip, { wrapWords: false, riseEl: chip, delay: 0.36 + cIdx * 0.08, span: 0.48, baseOpacity: 0.46, startY: 6, windowWidth: 0.3 })
           )
         ].filter(Boolean),
         fades: [
-          badgeCol ? { el: badgeCol, delay: 0.14, span: 0.5, baseOpacity: 0.32, startY: 6 } : null,
-          actionWrap ? { el: actionWrap, delay: 0.42, span: 0.5, baseOpacity: 0.42, startY: 8 } : null
+          badgeCol ? { el: badgeCol, delay: 0.14, span: 0.5, baseOpacity: 0.5, startY: 6 } : null,
+          actionWrap ? { el: actionWrap, delay: 0.42, span: 0.5, baseOpacity: 0.58, startY: 8 } : null
         ].filter(Boolean)
       };
       cardUnits.push(unit);
@@ -476,7 +476,7 @@
           if (u.cardEl.style.transitionProperty !== "") u.cardEl.style.transitionProperty = "";
         } else {
           const cardLift = easeOutCubic(clamp(p / 0.55, 0, 1));
-          const cardOp = 0.58 + 0.42 * easeOutCubic(clamp(p / 0.45, 0, 1));
+          const cardOp = 0.72 + 0.28 * easeOutCubic(clamp(p / 0.45, 0, 1));
           u.cardEl.style.transitionProperty = "box-shadow";
           u.cardEl.style.opacity = cardOp.toFixed(3);
           u.cardEl.style.transform = `translate3d(0, ${(20 * (1 - cardLift)).toFixed(2)}px, 0)`;
@@ -543,74 +543,231 @@
     window.addEventListener("resize", scheduleUpdate, { passive: true });
   }
 
+  function renderFeaturedRooms() {
+    const grid = document.getElementById("featured-rooms-grid");
+    if (!grid) return;
+    const rooms = (Core.getAllRooms?.() || Data.ROOMS || []).slice(0, 4);
+    const escapeHTML = Core.escapeHTML || ((v) => String(v || ""));
+    if (!rooms.length) {
+      grid.innerHTML = `<div class="col-span-full p-8 rounded-2xl bg-surface-container-lowest text-center text-sm text-on-surface-variant">Đang tải danh sách phòng trọ từ hệ thống...</div>`;
+      return;
+    }
+
+    const saved = Core.getSavedRoomIds?.() || [];
+    grid.innerHTML = rooms
+      .map((room) => {
+        const roomId = String(room.id);
+        const isSaved = saved.includes(roomId);
+        const isPrivate = Core.isPrivateRoom?.(room);
+        const targetHref = `/roomie/phong-chi-tiet?id=${encodeURIComponent(roomId)}`;
+        const thumb = (Array.isArray(room.images) && room.images[0]) || "/assets/images/trang-chu/room-1.jpg";
+        const topLeftBadge = room.isBoosted
+          ? `<span class="px-2.5 py-1 rounded-full bg-primary text-on-primary text-[12px] xl:text-[12.5px] leading-none font-bold tracking-wide shadow-sm whitespace-nowrap">NỔI BẬT</span>`
+          : `<span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">${escapeHTML(room.city || "TP.HCM")}</span>`;
+        const secondBadge = `<span class="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-semibold whitespace-nowrap">${escapeHTML(
+          room.badgeText || (isPrivate ? "Phòng riêng" : "Ở ghép")
+        )}</span>`;
+
+        return `
+          <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group will-change-transform border border-outline-variant/15">
+            <div class="relative aspect-[5/4] w-full overflow-hidden bg-surface-container">
+              <img loading="lazy" decoding="async" alt="${escapeHTML(room.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer" data-home-room-nav="${escapeHTML(
+          targetHref
+        )}" src="${escapeHTML(thumb)}">
+              <div class="absolute top-3.5 left-3.5 right-12 flex flex-wrap items-center gap-1.5">
+                ${topLeftBadge}
+                ${secondBadge}
+              </div>
+              <button aria-label="Lưu bài" data-home-save="${escapeHTML(
+          roomId
+        )}" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-surface-container-lowest/85 backdrop-blur ${
+          isSaved ? "text-error" : "text-on-surface"
+        } hover:text-error transition-colors flex items-center justify-center shadow-xs" type="button">
+                <span class="material-symbols-outlined text-[19px]" ${
+                  isSaved ? "style=\"font-variation-settings: 'FILL' 1;\"" : ""
+                }>bookmark</span>
+              </button>
+            </div>
+            <div class="p-5 xl:p-space-lg flex flex-col flex-1 justify-between gap-4">
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center gap-1.5 text-tertiary">
+                  <span class="material-symbols-outlined text-[17px]">near_me</span>
+                  <span class="text-[13px] xl:text-[13.5px] font-semibold truncate">${escapeHTML(
+                    room.distanceLabel || room.districtLabel
+                  )}</span>
+                </div>
+                <h3 class="font-title-md text-[18px] xl:text-[19px] leading-snug text-on-surface font-bold group-hover:text-primary transition-colors line-clamp-1 cursor-pointer" data-home-room-nav="${escapeHTML(
+          targetHref
+        )}">
+                  ${escapeHTML(room.shortTitle || room.title)}
+                </h3>
+                <p class="font-body-sm text-[13.5px] xl:text-[14px] text-on-surface-variant flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[17px] shrink-0">square_foot</span>
+                  <span class="truncate">${escapeHTML(room.summarySpecs || `${room.areaSqm}m²`)}</span>
+                </p>
+              </div>
+              <div class="pt-3 border-t border-surface-container flex items-center justify-between gap-2">
+                <div class="flex items-baseline gap-1 whitespace-nowrap min-w-0">
+                  <span class="font-currency-md text-[19px] xl:text-[20px] text-primary font-bold">${escapeHTML(
+                    room.priceFormatted
+                  )}</span>
+                  <span class="font-body-sm text-[12px] xl:text-[13px] text-on-surface-variant">${
+                    isPrivate ? "/tháng" : "/tháng/người"
+                  }</span>
+                </div>
+                <a class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors shrink-0" href="${escapeHTML(
+                  targetHref
+                )}">
+                  <span class="material-symbols-outlined text-[19px]">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+
+    grid.querySelectorAll("[data-home-save]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const roomId = btn.dataset.homeSave;
+        const nowSaved = Core.toggleSavedRoom?.(roomId);
+        if (!Core.isLoggedIn?.()) return;
+        const icon = btn.querySelector(".material-symbols-outlined");
+        if (icon) icon.style.fontVariationSettings = nowSaved ? "'FILL' 1" : "'FILL' 0";
+        btn.classList.toggle("text-error", Boolean(nowSaved));
+        Core.showToast(
+          nowSaved ? "Đã lưu phòng vào danh sách yêu thích!" : "Đã bỏ lưu phòng.",
+          nowSaved ? "success" : "info"
+        );
+      });
+    });
+
+    grid.querySelectorAll("[data-home-room-nav]").forEach((el) => {
+      el.addEventListener("click", () => {
+        window.location.href = el.dataset.homeRoomNav;
+      });
+    });
+  }
+
+  function renderFeaturedRoommates() {
+    const grid = document.getElementById("home-roommates-grid");
+    if (!grid) return;
+    const roommates = (Data.ROOMMATES || []).slice(0, 4);
+    const escapeHTML = Core.escapeHTML || ((v) => String(v || ""));
+    if (!roommates.length) {
+      grid.innerHTML = `<div class="col-span-full p-8 rounded-2xl bg-surface-container-lowest text-center text-sm text-on-surface-variant">Đang tải hồ sơ roommate từ hệ thống...</div>`;
+      return;
+    }
+
+    const canShowScore = Boolean(Core.hasUnlockedPrediction?.() && Core.hasCompletedQuiz?.());
+
+    grid.innerHTML = roommates
+      .map((rm) => {
+        const isMale = rm.gender === "Nam";
+        const tags = (Array.isArray(rm.tags) && rm.tags.length ? rm.tags : rm.criteria || []).slice(0, 2);
+        const topBadge =
+          canShowScore && rm.hasPersonalizedMatchScore && rm.matchScore
+            ? `<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[12px] xl:text-[12.5px] leading-none font-bold whitespace-nowrap shadow-xs">${escapeHTML(
+                rm.matchScore
+              )}% Hợp</span>`
+            : `<span class="px-2.5 py-1 rounded-full bg-surface-container-low text-on-surface-variant text-[11.5px] leading-none font-semibold whitespace-nowrap">${escapeHTML(
+                rm.city || "TP.HCM"
+              )}</span>`;
+
+        return `
+          <div class="p-5 xl:p-6 rounded-3xl bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-outline-variant/15 flex flex-col justify-between gap-5">
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-3 min-w-0">
+                  <img loading="lazy" decoding="async" alt="Ảnh đại diện ${escapeHTML(rm.shortName || rm.name)} trên Roomie" class="w-14 h-14 xl:w-[60px] xl:h-[60px] rounded-full object-cover ring-2 ring-primary-fixed shrink-0" src="${escapeHTML(
+          rm.avatar || "/assets/images/common/avatar-profile.jpg"
+        )}">
+                  <div class="min-w-0">
+                    <h3 class="font-title-md text-[17px] xl:text-[18.5px] leading-snug text-on-surface font-bold truncate">${escapeHTML(
+                      rm.shortName || rm.name
+                    )}</h3>
+                    <span class="font-body-sm text-[13px] xl:text-[13.5px] text-on-surface-variant whitespace-nowrap">${escapeHTML(
+                      rm.shortSchool || "SV"
+                    )} • ${escapeHTML(rm.age || 20)} tuổi</span>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-1.5 shrink-0">
+                  ${topBadge}
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${
+                    isMale ? "bg-sky-100 text-sky-700 border border-sky-200" : "bg-pink-100 text-pink-700 border border-pink-200"
+                  } text-[11.5px] xl:text-[12px] leading-none font-semibold whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[14px]">${isMale ? "male" : "female"}</span>
+                    ${escapeHTML(rm.gender || "SV")}
+                  </span>
+                </div>
+              </div>
+              <p class="font-body-sm text-[14px] xl:text-[14.5px] text-on-surface-variant font-medium leading-snug min-h-[2.75rem]">
+                <span class="block line-clamp-1">${escapeHTML(rm.roomStatusDetail || rm.school || "")}</span>
+                <span class="block mt-1">${escapeHTML(rm.budget || "")}</span>
+              </p>
+              <div class="flex flex-wrap gap-1.5">
+                ${tags
+                  .map(
+                    (tag) =>
+                      `<span class="px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[12px] xl:text-[12.5px] leading-none font-medium">${escapeHTML(
+                        tag
+                      )}</span>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+            <div class="pt-1">
+              <button data-home-profile="${escapeHTML(
+                rm.id
+              )}" class="w-full py-2.5 xl:py-3 rounded-2xl bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-[14.5px] xl:text-[15px] font-semibold shadow-sm shadow-primary/20 transition-colors" type="button">
+                Xem hồ sơ
+              </button>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    grid.querySelectorAll("[data-home-profile]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const rm = (Data.ROOMMATES || []).find((r) => r.id === btn.dataset.homeProfile);
+        if (rm) {
+          Core.openProfileModal?.(rm, null, {
+            showMatchScore: canShowScore && Boolean(rm.hasPersonalizedMatchScore)
+          });
+        }
+      });
+    });
+  }
+
   function initHomePage() {
     initHeroCursorMotion();
     initHeroStatCounters();
     initEditorialSectionsScrollReveal();
 
-    const form = document.querySelector("main form");
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const loc = document.getElementById("search-location")?.value || "";
-        const budget = document.getElementById("search-budget")?.value || "";
-        const type = document.getElementById("search-type")?.value || "";
-        const params = new URLSearchParams();
-        if (loc) params.set("area", loc);
-        if (budget) params.set("budget", budget);
-        if (type) params.set("type", type);
-        window.location.href = `/roomie/tim-phong?${params.toString()}`;
+    let homeRefreshQueued = false;
+    const scheduleRefreshHomeCards = () => {
+      if (homeRefreshQueued) return;
+      homeRefreshQueued = true;
+      queueMicrotask(() => {
+        homeRefreshQueued = false;
+        renderFeaturedRooms();
+        renderFeaturedRoommates();
       });
-    }
-
-    const saved = Core.getSavedRoomIds();
-    document.querySelectorAll("main article").forEach((article, idx) => {
-      const roomId = String(idx + 1);
-      const btn = article.querySelector('button[aria-label="Lưu bài"]');
-      if (btn) {
-        const icon = btn.querySelector(".material-symbols-outlined");
-        if (saved.includes(roomId) && icon) {
-          icon.style.fontVariationSettings = "'FILL' 1";
-          btn.classList.add("text-error");
-        }
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const nowSaved = Core.toggleSavedRoom(roomId);
-          if (icon) {
-            icon.style.fontVariationSettings = nowSaved ? "'FILL' 1" : "'FILL' 0";
-            btn.classList.toggle("text-error", nowSaved);
-          }
-          Core.showToast(nowSaved ? "Đã lưu phòng vào danh sách yêu thích!" : "Đã bỏ lưu phòng.", nowSaved ? "success" : "info");
-        });
-      }
-
-      const link = article.querySelector("a[data-path]");
-      if (link) {
-        const targetHref = link.getAttribute("href");
-        [article.querySelector("img"), article.querySelector("h3")].forEach((el) => {
-          if (el && targetHref) {
-            el.classList.add("cursor-pointer");
-            el.addEventListener("click", () => {
-              window.location.href = targetHref;
-            });
-          }
-        });
-      }
-    });
-
-    const homeRoommateMap = ["minh-anh", "quoc-bao", "thao-vy", "gia-huy"];
-    Array.from(document.querySelectorAll("main button"))
-      .filter((b) => b.textContent.trim() === "Xem hồ sơ")
-      .forEach((btn, idx) => {
-        const rm = (Data.ROOMMATES || []).find((r) => r.id === homeRoommateMap[idx]);
-        if (rm) btn.addEventListener("click", () => Core.openProfileModal(rm));
-      });
+    };
+    renderFeaturedRooms();
+    renderFeaturedRoommates();
+    Core.ready?.then(scheduleRefreshHomeCards);
+    window.addEventListener("roomie:demo-ready", scheduleRefreshHomeCards);
+    window.addEventListener("roomie:plan-updated", scheduleRefreshHomeCards);
+    window.addEventListener("roomie:roommates-updated", scheduleRefreshHomeCards);
 
     const servicesSection = document.getElementById("services-preview");
     if (servicesSection && window.RoomiePricingWidget) {
       window.RoomiePricingWidget.initBillingWidget({
-        toggleContainer: servicesSection.querySelector("#service-billing-toggle"),
+        toggleContainer: null,
         priceSelector: "#services-preview .plan-price",
         ctaButtons: Array.from(servicesSection.querySelectorAll(".plan-select-btn[data-plan-id]")),
         pkgAttr: "planId",

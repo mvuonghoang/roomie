@@ -89,6 +89,19 @@ const MIME_TYPES = {
   '.pdf': 'application/pdf',
 };
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (ch) => {
+    switch (ch) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#39;';
+      default: return ch;
+    }
+  });
+}
+
 function sendFile(res, filePath, statusCode = 200) {
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
@@ -96,6 +109,7 @@ function sendFile(res, filePath, statusCode = 200) {
     if (err) {
       res.writeHead(err.code === 'ENOENT' ? 404 : 500, {
         'Content-Type': 'text/plain; charset=utf-8',
+        'X-Content-Type-Options': 'nosniff',
       });
       res.end(err.code === 'ENOENT' ? '404 Not Found' : '500 Internal Server Error');
       return;
@@ -103,6 +117,9 @@ function sendFile(res, filePath, statusCode = 200) {
     res.writeHead(statusCode, {
       'Content-Type': contentType,
       'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     });
     res.end(content);
   });
@@ -115,7 +132,12 @@ function resolveSafePath(baseDir, relPath) {
   return fullPath;
 }
 
-const server = http.createServer((req, res) => {
+const { handleApiRequest } = require('./backend/routes/api');
+
+const server = http.createServer(async (req, res) => {
+  if (await handleApiRequest(req, res)) {
+    return;
+  }
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(reqUrl.pathname);
 
@@ -173,8 +195,13 @@ const server = http.createServer((req, res) => {
   }
 
   // 5. Fallback 404 page
-  res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
-  res.end(`<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>404 - Roomie</title><link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" /><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-[#f9f9ff] min-h-screen flex items-center justify-center p-6 font-sans"><div class="max-w-md w-full bg-white rounded-2xl p-8 text-center shadow-lg"><div class="text-5xl font-bold text-[#493ee5] mb-3">404</div><h1 class="text-xl font-bold text-[#181c23] mb-2">Không tìm thấy trang này</h1><p class="text-sm text-[#464555] mb-6">Đường dẫn <code>${pathname}</code> chưa tồn tại trên Roomie.</p><a href="/roomie" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#493ee5] text-white font-semibold text-sm hover:bg-[#635bff]">Về trang chủ</a></div></body></html>`);
+  res.writeHead(404, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'SAMEORIGIN',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+  });
+  res.end(`<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>404 - Roomie</title><link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" /><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-[#f9f9ff] min-h-screen flex items-center justify-center p-6 font-sans"><div class="max-w-md w-full bg-white rounded-2xl p-8 text-center shadow-lg"><div class="text-5xl font-bold text-[#493ee5] mb-3">404</div><h1 class="text-xl font-bold text-[#181c23] mb-2">Không tìm thấy trang này</h1><p class="text-sm text-[#464555] mb-6">Đường dẫn <code>${escapeHtml(pathname)}</code> chưa tồn tại trên Roomie.</p><a href="/roomie" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#493ee5] text-white font-semibold text-sm hover:bg-[#635bff]">Về trang chủ</a></div></body></html>`);
 });
 
 function startServer(port, attemptsLeft = 5) {
@@ -188,11 +215,13 @@ function startServer(port, attemptsLeft = 5) {
     }
   });
 
-  server.listen(port, '127.0.0.1', () => {
+  const host = process.env.HOST || '0.0.0.0';
+  server.listen(port, host, () => {
     console.log(`\n========================================`);
-    console.log(`  Roomie frontend demo dang chay!`);
+    console.log(`  Roomie Client-Server dang chay!`);
     console.log(`  Web URL : http://localhost:${port}/roomie`);
-    console.log(`  Storage : localStorage trong trinh duyet`);
+    console.log(`  API URL : http://localhost:${port}/api/health`);
+    console.log(`  Storage : Supabase PostgreSQL`);
     console.log(`========================================\n`);
   });
 }

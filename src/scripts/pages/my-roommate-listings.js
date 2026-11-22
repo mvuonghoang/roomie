@@ -29,6 +29,7 @@
       return;
     }
 
+    const now = Date.now();
     container.innerHTML = listings
       .map((listing) => {
         const hasRoom = Boolean(listing.hasRoom);
@@ -43,7 +44,8 @@
         const note = listing.quote
           ? `<p class="text-sm text-on-surface-variant mt-3">${Core.escapeHTML(listing.quote)}</p>`
           : "";
-        const boostStatus = listing.isBoosted && listing.boostExpiresAt
+        const isCurrentlyBoosted = listing.isBoosted && Number(listing.boostExpiresAt) > now;
+        const boostStatus = isCurrentlyBoosted
           ? `<p class="mt-3 rounded-lg bg-primary-fixed/60 px-3 py-2 text-xs font-semibold text-primary">Tin đang được đẩy đến ${new Date(
               Number(listing.boostExpiresAt)
             ).toLocaleString("vi-VN")}</p>`
@@ -63,9 +65,18 @@
                   hasRoom ? "bg-primary-fixed text-primary" : "bg-secondary-container text-on-secondary-container"
                 }">${hasRoom ? "home" : "search"}</span>
                 <div>
-                  <h2 class="font-title-md text-title-md font-bold text-on-surface">${Core.escapeHTML(
-                    listing.roomStatusTitle || (hasRoom ? "Đang tìm bạn ở ghép" : "Cùng đi tìm phòng")
-                  )}</h2>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="font-title-md text-title-md font-bold text-on-surface">${Core.escapeHTML(
+                      listing.roomStatusTitle || (hasRoom ? "Đang tìm bạn ở ghép" : "Cùng đi tìm phòng")
+                    )}</h2>
+                    ${
+                      listing.city
+                        ? `<span class="px-2 py-0.5 rounded-full bg-surface-container-low text-on-surface-variant text-[11px] font-semibold">${Core.escapeHTML(
+                            listing.city
+                          )}</span>`
+                        : ""
+                    }
+                  </div>
                   <p class="text-sm text-on-surface-variant mt-1">${Core.escapeHTML(listing.roomStatusDetail || "")}</p>
                   <p class="text-xs text-outline mt-1">${formatDate(listing.createdAt)}</p>
                 </div>
@@ -83,6 +94,34 @@
         `;
       })
       .join("");
+  }
+
+  function confirmDeleteListing(listingId, onConfirm) {
+    const modal = Core.openModal({
+      title: "Xác nhận xóa bài đăng",
+      subtitle: "Tin sau khi xóa sẽ biến mất khỏi danh sách tìm roommate",
+      maxWidth: "max-w-sm",
+      bodyHtml: `
+        <div class="flex flex-col gap-4">
+          <p class="text-sm text-on-surface-variant">Bạn chắc chắn muốn xóa bài đăng này? Hành động này không thể hoàn tác.</p>
+          <div class="flex gap-2.5">
+            <button type="button" id="rm-cancel-delete-btn" class="flex-1 py-2.5 px-4 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface font-semibold text-sm">
+              Hủy
+            </button>
+            <button type="button" id="rm-confirm-delete-btn" class="flex-1 py-2.5 px-4 rounded-xl bg-error hover:opacity-90 text-on-error font-semibold text-sm">
+              Xóa tin
+            </button>
+          </div>
+        </div>
+      `
+    });
+
+    modal.querySelector("#rm-cancel-delete-btn")?.addEventListener("click", Core.closeModal);
+    modal.querySelector("#rm-confirm-delete-btn")?.addEventListener("click", async (e) => {
+      e.currentTarget.disabled = true;
+      Core.closeModal();
+      await onConfirm(listingId);
+    });
   }
 
   async function loadMyListings() {
@@ -105,24 +144,26 @@
 
   function bindListingActions(container, currentUser) {
     container.querySelectorAll("[data-delete-roommate]").forEach((button) => {
-      button.addEventListener("click", async () => {
+      button.addEventListener("click", () => {
         const listingId = button.dataset.deleteRoommate;
-        if (!listingId || !window.confirm("Bạn chắc chắn muốn xóa bài đăng này?")) return;
+        if (!listingId) return;
 
-        button.disabled = true;
-        const deleted = await Core.deleteRoommateListing?.(listingId);
-        if (!deleted?.ok || !Array.isArray(deleted.roommates)) {
-          button.disabled = false;
-          Core.showToast(deleted?.error || "Không thể xóa tin lúc này. Vui lòng thử lại.", "error");
-          return;
-        }
+        confirmDeleteListing(listingId, async (targetId) => {
+          button.disabled = true;
+          const deleted = await Core.deleteRoommateListing?.(targetId);
+          if (!deleted?.ok || !Array.isArray(deleted.roommates)) {
+            button.disabled = false;
+            Core.showToast(deleted?.error || "Không thể xóa tin lúc này. Vui lòng thử lại.", "error");
+            return;
+          }
 
-        Core.showToast("Đã xóa bài đăng của bạn.", "success");
-        const remainingListings = deleted.roommates.filter(
-          (listing) => currentUser?.id && String(listing.userId) === String(currentUser.id)
-        );
-        renderListings(container, remainingListings);
-        bindListingActions(container, currentUser);
+          Core.showToast("Đã xóa bài đăng của bạn.", "success");
+          const remainingListings = deleted.roommates.filter(
+            (listing) => currentUser?.id && String(listing.userId) === String(currentUser.id)
+          );
+          renderListings(container, remainingListings);
+          bindListingActions(container, currentUser);
+        });
       });
     });
 
@@ -134,10 +175,12 @@
 
         button.disabled = true;
         button.textContent = "Đang đẩy...";
-        const result = await Core.apiFetch(
-          `/api/roommates/${encodeURIComponent(listingId)}/boost`,
-          { method: "POST", body: { period } }
-        );
+        const result = Core.boostRoommateListing
+          ? await Core.boostRoommateListing(listingId, period)
+          : await Core.apiFetch(
+              `/api/roommates/${encodeURIComponent(listingId)}/boost`,
+              { method: "POST", body: { period } }
+            );
         if (!result?.ok || !Array.isArray(result.roommates)) {
           button.disabled = false;
           button.textContent = period === "24h" ? "Đẩy 24 giờ" : "Đẩy 7 ngày";
@@ -155,11 +198,22 @@
     });
   }
 
+  let listingsRenderQueued = false;
+  function scheduleLoadMyListings() {
+    if (listingsRenderQueued) return;
+    listingsRenderQueued = true;
+    queueMicrotask(() => {
+      listingsRenderQueued = false;
+      loadMyListings();
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     if (document.body.dataset.page === "tin-da-dang") {
-      loadMyListings();
-      window.addEventListener("roomie:demo-ready", loadMyListings);
-      window.addEventListener("roomie:plan-updated", loadMyListings);
+      (Core.ready || Promise.resolve()).then(scheduleLoadMyListings);
+      window.addEventListener("roomie:demo-ready", scheduleLoadMyListings);
+      window.addEventListener("roomie:plan-updated", scheduleLoadMyListings);
+      window.addEventListener("roomie:roommates-updated", scheduleLoadMyListings);
     }
   });
 })();

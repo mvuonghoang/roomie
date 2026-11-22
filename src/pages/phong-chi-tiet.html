@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roomie - Chi tiết phòng trọ | Ở cùng người hợp gu</title>
+  <meta name="description" content="Xem thông tin chi tiết phòng trọ sinh viên, điện nước minh bạch, vị trí gần trường và gửi lời mời kết nối Double Opt-in trên Roomie." />
   <link rel="icon" type="image/png" href="/assets/images/common/favicon.png?v=3" />
   <link rel="shortcut icon" href="/favicon.ico?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -58,7 +59,7 @@
               </li>
             </ol>
             <div class="flex items-center gap-space-xs">
-              <button class="flex items-center gap-1.5 px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all shadow-[0_1px_4px_rgba(0,0,0,0.04)] font-label-md text-label-md" id="bookmarkBtn">
+              <button type="button" class="flex items-center gap-1.5 px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all shadow-[0_1px_4px_rgba(0,0,0,0.04)] font-label-md text-label-md" id="bookmarkBtn">
                 <span class="material-symbols-outlined text-[18px]">
                   favorite
                 </span>
@@ -138,38 +139,38 @@
               </span>
             </p>
           </div>
-          <!-- Gallery: Bento Mosaic 5 Photos -->
+          <!-- Gallery: Bento Mosaic Photos -->
           <section class="w-full relative rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(32,36,43,0.06)] bg-surface-container-lowest">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-2 h-[340px] md:h-[460px] p-2">
               <!-- Main Hero Image (Spans 2 cols) -->
-              <div class="md:col-span-2 relative group overflow-hidden rounded-xl h-full">
-                <img alt="Không gian phòng trọ studio đầy đủ ánh sáng tự nhiên với giường tầng gỗ, góc học tập gọn gàng và ban công thoáng mát tại TP.HCM" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" id="rd-gallery-hero" src="/assets/images/phong-chi-tiet/room-1.jpg" />
-                <div class="absolute bottom-3 left-3 px-space-sm py-1 rounded-md bg-inverse-surface/80 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm flex items-center gap-1">
+              <div id="rd-gallery-hero-wrap" class="md:col-span-2 relative group overflow-hidden rounded-xl h-full cursor-pointer">
+                <img alt="Không gian phòng trọ studio đầy đủ ánh sáng tự nhiên với giường tầng gỗ, góc học tập gọn gàng và ban công thoáng mát tại TP.HCM" fetchpriority="high" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" id="rd-gallery-hero" src="/assets/images/phong-chi-tiet/room-1.jpg" />
+                <div class="rd-gallery-caption absolute bottom-3 left-3 px-space-sm py-1 rounded-md bg-inverse-surface/80 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm flex items-center gap-1">
                   <span class="material-symbols-outlined text-[14px]">
                     bed
                   </span>
-                  Không gian phòng ngủ &amp; giường tầng
+                  Ảnh chính của phòng
                 </div>
               </div>
-              <!-- Secondary Image 1: Study Corner -->
-              <div class="hidden md:block relative group overflow-hidden rounded-xl h-full">
+              <!-- Secondary Image 1 -->
+              <div id="rd-gallery-col-1" class="hidden md:block relative group overflow-hidden rounded-xl h-full cursor-pointer">
                 <img alt="Góc học tập đôi cho sinh viên với bàn gỗ gọn gàng, ghế công thái học, đèn bàn và kệ sách" class="rd-gallery-sub w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="/assets/images/phong-chi-tiet/room-2.jpg" />
-                <div class="absolute bottom-3 left-3 px-space-sm py-0.5 rounded-md bg-inverse-surface/75 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm">
-                  Bàn học đôi sinh viên
+                <div class="rd-gallery-caption absolute bottom-3 left-3 px-space-sm py-0.5 rounded-md bg-inverse-surface/75 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm">
+                  Không gian sinh hoạt
                 </div>
               </div>
-              <!-- Secondary Image 2: Kitchenette -->
-              <div class="hidden md:flex flex-col gap-2 h-full">
-                <div class="relative group overflow-hidden rounded-xl h-1/2">
+              <!-- Secondary Images 2 & 3 -->
+              <div id="rd-gallery-col-2" class="hidden md:flex flex-col gap-2 h-full">
+                <div class="rd-gallery-tile relative group overflow-hidden rounded-xl h-1/2 cursor-pointer">
                   <img alt="Khu vực bếp riêng gọn gàng với bếp từ, bồn rửa và kệ gia vị ngăn nắp trong phòng trọ sinh viên" class="rd-gallery-sub w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="/assets/images/phong-chi-tiet/room-3.jpg" />
-                  <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm">
-                    Bếp nấu riêng
+                  <div class="rd-gallery-caption absolute bottom-2 left-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm">
+                    Khu bếp &amp; tiện ích
                   </div>
                 </div>
-                <div class="relative group overflow-hidden rounded-xl h-1/2">
+                <div class="rd-gallery-tile relative group overflow-hidden rounded-xl h-1/2 cursor-pointer">
                   <img alt="Ban công riêng nhiều cây xanh thoáng mát nhìn ra khuôn viên cây xanh tại khu đại học TP.HCM" class="rd-gallery-sub w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="/assets/images/phong-chi-tiet/room-4.jpg" />
-                  <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm">
-                    Ban công đón gió
+                  <div class="rd-gallery-caption absolute bottom-2 left-2 px-2 py-0.5 rounded bg-inverse-surface/75 text-inverse-on-surface backdrop-blur-md font-label-sm text-label-sm">
+                    Ban công / Cửa sổ
                   </div>
                 </div>
               </div>
@@ -179,8 +180,8 @@
               <span class="material-symbols-outlined text-[18px] text-primary">
                 photo_library
               </span>
-              <span>
-                Xem tất cả 12 ảnh &amp; VR 360°
+              <span id="rd-gallery-count">
+                Xem tất cả ảnh phòng
               </span>
             </button>
           </section>
@@ -252,7 +253,7 @@
                 </div>
               </div>
               <!-- SECTION: Roommate Compatibility Highlight (The Core Differentiator) -->
-              <div class="rounded-2xl p-space-lg bg-gradient-to-br from-secondary-container/25 via-surface-container-lowest to-primary-fixed/20 shadow-[0_2px_12px_rgba(32,36,43,0.04)] relative overflow-hidden">
+              <div id="rd-roommate-match-section" class="rounded-2xl p-space-lg bg-gradient-to-br from-secondary-container/25 via-surface-container-lowest to-primary-fixed/20 shadow-[0_2px_12px_rgba(32,36,43,0.04)] relative overflow-hidden">
                 <div class="flex flex-col gap-space-md">
                   <div class="flex items-center justify-between flex-wrap gap-space-sm">
                     <div class="flex items-center gap-2">
@@ -271,11 +272,11 @@
                       <svg class="w-6 h-6 transform -rotate-90" viewbox="0 0 36 36">
                         <path class="text-surface-container-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4">
                         </path>
-                        <path class="text-tertiary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="94, 100" stroke-linecap="round" stroke-width="4">
+                        <path id="rd-match-ring" class="text-tertiary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="94, 100" stroke-linecap="round" stroke-width="4">
                         </path>
                       </svg>
                       <span id="rd-match-score" class="font-title-md text-title-md text-tertiary font-bold">
-                        94% Hợp gu
+                        Khóa theo Gói 4/5
                       </span>
                     </div>
                   </div>
@@ -283,24 +284,24 @@
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-lowest/80 backdrop-blur-sm p-space-md rounded-xl">
                     <div class="flex items-center gap-space-md">
                       <div class="relative">
-                        <img alt="Ảnh đại diện bạn cùng phòng sinh viên ĐH Khoa học Tự nhiên thân thiện trên Roomie" class="w-16 h-16 rounded-full object-cover ring-2 ring-secondary-container" id="rd-rm-avatar" src="/assets/images/phong-chi-tiet/avatar-1.jpg" />
+                        <img alt="Ảnh đại diện bạn cùng phòng trên Roomie" class="w-16 h-16 rounded-full object-cover object-top ring-2 ring-secondary-container" id="rd-rm-avatar" src="/assets/images/common/avatar-profile.jpg" />
                         <span class="absolute bottom-0 right-0 w-4 h-4 bg-tertiary rounded-full border-2 border-white" title="Đang online">
                         </span>
                       </div>
                       <div class="flex flex-col">
                         <div class="flex items-center gap-1.5">
                           <span id="rd-rm-name" class="font-title-md text-title-md text-on-surface font-bold">
-                            Hoàng Nam
+                            Đang tải hồ sơ...
                           </span>
                           <span id="rd-rm-age" class="px-2 py-0.5 rounded-full bg-secondary-container/60 text-on-secondary-container font-label-sm text-label-sm">
-                            20 tuổi
+                            —
                           </span>
                         </div>
                         <span id="rd-rm-bio" class="font-body-sm text-body-sm text-on-surface-variant">
-                          Sinh viên Năm 2 • Khoa CNTT, ĐH Khoa học Tự nhiên TP.HCM (HCMUS)
+                          Đang tải thông tin sinh viên từ máy chủ...
                         </span>
                         <span id="rd-rm-note" class="font-label-sm text-label-sm text-tertiary mt-0.5 font-medium">
-                          Tìm bạn cùng phòng tính tình hòa nhã, tôn trọng giờ giấc
+                          —
                         </span>
                       </div>
                     </div>
@@ -316,7 +317,7 @@
                     <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
                       Thói quen sinh hoạt của bạn cùng phòng:
                     </span>
-                    <div class="flex flex-wrap gap-2">
+                    <div id="rd-rm-habits" class="flex flex-wrap gap-2">
                       <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest text-on-surface font-body-sm text-body-sm shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
                         <span class="material-symbols-outlined text-[16px] text-primary">
                           bedtime
@@ -364,7 +365,7 @@
                       <strong class="text-on-surface font-semibold">
                         Gợi ý từ Roomie:
                       </strong>
-                      Phòng này rất hợp với sinh viên các trường ĐHQG (KHTN, Bách Khoa, CNTT, Kinh tế - Luật) có nhu cầu tìm bạn ở chung tử tế, chăm học và duy trì môi trường sống sạch sẽ.
+                      Phù hợp sinh viên ĐHQG (KHTN, Bách Khoa, CNTT, UEL) thích môi trường học tập yên tĩnh, sạch sẽ.
                     </p>
                   </div>
                 </div>
@@ -376,13 +377,13 @@
                 </h2>
                 <div id="rd-description" class="font-body-md text-body-md text-on-surface-variant flex flex-col gap-space-sm leading-relaxed">
                   <p>
-                    Phòng nằm ở tầng 3 tòa nhà 5 tầng mới xây, cách KTX Khu B ĐHQG chỉ 100m. Có thang máy hiện đại, camera an ninh 24/7 và hệ thống khóa vân tay riêng từng tầng nên cực kỳ an tâm cho sinh viên.
+                    Phòng ở tầng 3 tòa nhà 5 tầng mới xây, cách KTX Khu B ĐHQG 100m. Có thang máy, camera 24/7 và khóa vân tay từng tầng.
                   </p>
                   <p>
-                    Phòng có ban công riêng cực thoáng mát đón gió tự nhiên, view nhìn ra hàng cây xanh của khuôn viên Làng Đại học, không bị khuất nắng. Đã trang bị sẵn giường đôi tầng trên/dưới loại cao cấp chịu lực, 2 bàn học gỗ có giá sách, tủ quần áo riêng 2 buồng, máy lạnh Inverter tiết kiệm điện. Bếp nấu và bồn rửa đặt ngay lối đi ra ban công nên khi nấu ăn không hề bị ám mùi vào phòng ngủ.
+                    Phòng có ban công thoáng mát, sẵn giường tầng, 2 bàn học gỗ, tủ quần áo, máy lạnh Inverter và khu bếp cạnh ban công không ám mùi.
                   </p>
                   <p>
-                    Hiện bạn Nam (SV KHTN) đang ở giường dưới, cần tìm thêm 1 bạn nam gọn gàng vào ở giường trên để san sẻ chi phí tiền phòng. Chủ nhà thân thiện, không ở chung, giờ giấc hoàn toàn tự do.
+                    Hiện có bạn nam SV KHTN ở giường dưới, tìm thêm 1 bạn nam gọn gàng ở ghép. Chủ nhà không ở chung, giờ tự do.
                   </p>
                 </div>
               </div>
@@ -392,11 +393,11 @@
                   <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">
                     Tiện ích phòng &amp; Khu nhà trọ
                   </h2>
-                  <span class="font-label-sm text-label-sm text-on-surface-variant">
+                  <span id="rd-amenities-count" class="font-label-sm text-label-sm text-on-surface-variant">
                     8 tiện nghi nổi bật
                   </span>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-space-sm">
+                <div id="rd-amenities-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-space-sm">
                   <div class="p-space-md rounded-xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(32,36,43,0.03)] flex flex-col gap-2">
                     <span class="material-symbols-outlined text-primary text-[24px]">
                       ac_unit
@@ -495,7 +496,7 @@
                       Bảng chi phí sinh hoạt minh bạch
                     </h2>
                     <p class="font-body-sm text-body-sm text-on-surface-variant">
-                      Chi phí được niêm yết rõ ràng, không phát sinh khoản ẩn
+                      Niêm yết rõ ràng, không phí ẩn
                     </p>
                   </div>
                   <span class="px-space-sm py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
@@ -601,7 +602,7 @@
                       Dự kiến tổng chi phí mỗi tháng:
                     </span>
                     <span class="font-body-sm text-body-sm text-on-surface-variant">
-                      Đã bao gồm tiền phòng + điện nước ước lượng thông thường
+                      Gồm tiền phòng và điện nước ước tính
                     </span>
                   </div>
                   <span id="rd-cost-total" class="font-headline-sm text-headline-sm text-primary font-bold">
@@ -682,7 +683,7 @@
                   </div>
                 </div>
                 <!-- Interactive Styled Static Map Container -->
-                <div class="w-full h-72 rounded-2xl bg-cover bg-center relative overflow-hidden shadow-[0_2px_8px_rgba(32,36,43,0.04)]" data-location="Đường Vành Đai, Phường Linh Trung, Thủ Đức, Hồ Chí Minh" style="background-image: url('/assets/images/phong-chi-tiet/map-1.png')">
+                <div id="rd-map-box" class="w-full h-72 rounded-2xl bg-cover bg-center relative overflow-hidden shadow-[0_2px_8px_rgba(32,36,43,0.04)]" data-location="Đường Vành Đai, Phường Linh Trung, Thủ Đức, Hồ Chí Minh" style="background-image: url('/assets/images/phong-chi-tiet/map-1.png')">
                   <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/20 to-transparent flex items-end p-space-md">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-space-sm text-inverse-on-surface">
                       <div class="flex items-center gap-2">
@@ -695,12 +696,12 @@
                           <span class="font-label-md text-label-md font-semibold block">
                             Vị trí phòng trọ
                           </span>
-                          <span class="font-body-sm text-body-sm opacity-90">
+                          <span id="rd-map-address" class="font-body-sm text-body-sm opacity-90">
                             Hẻm 48 Đường Vành Đai ĐHQG, Phường Linh Trung
                           </span>
                         </div>
                       </div>
-                      <a class="inline-flex items-center gap-1 px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface font-label-sm text-label-sm font-semibold hover:bg-surface-container-high transition-colors self-start sm:self-auto" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
+                      <a id="rd-map-link" class="inline-flex items-center gap-1 px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface font-label-sm text-label-sm font-semibold hover:bg-surface-container-high transition-colors self-start sm:self-auto" href="https://www.google.com/maps/search/?api=1&amp;query=%C4%90%C6%B0%E1%BB%9Dng%20V%C3%A0nh%20%C4%90ai%2C%20Linh%20Trung%2C%20Th%E1%BB%A7%20%C4%90%E1%BB%A9c%2C%20TP.HCM" rel="noopener noreferrer" target="_blank">
                         <span class="material-symbols-outlined text-[14px]">
                           open_in_new
                         </span>
@@ -724,7 +725,7 @@
                       check_circle
                     </span>
                     <span>
-                      Không dẫn bạn khác giới ở lại qua đêm qua 22h00 nhằm tôn trọng quyền riêng tư của bạn cùng phòng.
+                      Không đưa người lạ ở lại qua đêm sau 22h00 để giữ riêng tư chung.
                     </span>
                   </div>
                   <div class="flex items-start gap-space-sm">
@@ -732,7 +733,7 @@
                       check_circle
                     </span>
                     <span>
-                      Giữ gìn không gian chung, rửa chén bát ngay sau khi nấu ăn xong.
+                      Giữ vệ sinh chung, rửa chén ngay sau khi nấu ăn.
                     </span>
                   </div>
                   <div class="flex items-start gap-space-sm">
@@ -740,7 +741,7 @@
                       check_circle
                     </span>
                     <span>
-                      Đeo tai nghe khi xem phim, chơi game hoặc học bài sau 23h để bạn cùng phòng ngủ ngon giấc.
+                      Đeo tai nghe khi học hoặc giải trí sau 23h00.
                     </span>
                   </div>
                   <div class="flex items-start gap-space-sm">
@@ -748,7 +749,7 @@
                       check_circle
                     </span>
                     <span>
-                      Thanh toán tiền phòng và điện nước đúng hạn từ ngày 01 đến ngày 05 hằng tháng.
+                      Đóng tiền phòng và điện nước từ ngày 01 đến 05 hằng tháng.
                     </span>
                   </div>
                 </div>
@@ -799,7 +800,7 @@
                     <label class="font-label-sm text-label-sm text-on-surface-variant" for="visitDate">
                       Ngày dự kiến ghé qua:
                     </label>
-                    <input class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="visitDate" type="date" value="2026-11-25" />
+                    <input class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="visitDate" type="date" />
                   </div>
                   <div class="flex flex-col gap-1">
                     <label class="font-label-sm text-label-sm text-on-surface-variant" for="visitTime">
@@ -826,12 +827,12 @@
                     </span>
                     Gửi lời mời kết nối &amp; Hẹn xem phòng
                   </button>
-                  <button class="w-full py-3 px-space-md rounded-xl bg-primary-fixed text-on-primary-fixed-variant hover:bg-primary-fixed-dim font-label-md text-label-md font-semibold transition-all flex items-center justify-center gap-2" id="test-hop-gu">
+                  <button type="button" class="scroll-mt-28 w-full py-3 px-space-md rounded-xl bg-primary-fixed text-on-primary-fixed-variant hover:bg-primary-fixed-dim font-label-md text-label-md font-semibold transition-all flex items-center justify-center gap-2" id="test-hop-gu">
                     <span class="material-symbols-outlined text-[20px]">
                       psychology
                     </span>
                     <span id="rd-test-btn-label">
-                      Làm bài test hợp gu với Hoàng Nam
+                      Làm bài test hợp gu ngay
                     </span>
                   </button>
                 </div>
@@ -845,10 +846,10 @@
                   </div>
                   <ul class="flex flex-col gap-1 font-body-sm text-body-sm text-on-surface-variant list-disc pl-4">
                     <li>
-                      Phòng đã được nhân sự Roomie đến chụp ảnh &amp; xác minh giấy tờ thực tế.
+                      Phòng đã được xác minh hình ảnh và thông tin thực tế.
                     </li>
                     <li>
-                      Cung cấp hợp đồng ở ghép mẫu bảo vệ quyền lợi và tiền cọc sinh viên.
+                      Có sẵn mẫu thỏa thuận ở ghép bảo vệ tiền cọc sinh viên.
                     </li>
                   </ul>
                 </div>
@@ -856,14 +857,14 @@
                 <div class="pt-space-sm flex items-center justify-between border-t border-surface-container">
                   <div class="flex items-center gap-space-sm">
                     <div class="relative">
-                      <img alt="Ảnh đại diện người đăng tin Hoàng Nam sinh viên HCMUS trên Roomie" class="w-10 h-10 rounded-full object-cover" id="rd-poster-avatar" src="/assets/images/phong-chi-tiet/avatar-2.jpg" />
+                      <img alt="Ảnh đại diện người đăng tin trên Roomie" class="w-10 h-10 rounded-full object-cover" id="rd-poster-avatar" src="/assets/images/common/avatar-profile.jpg" />
                       <span class="material-symbols-outlined text-tertiary text-[14px] absolute -bottom-1 -right-1 bg-white rounded-full">
                         check_circle
                       </span>
                     </div>
                     <div class="flex flex-col">
                       <span id="rd-poster-name" class="font-label-md text-label-md text-on-surface font-semibold">
-                        Hoàng Nam (Người đăng)
+                        Người đăng tin xác thực
                       </span>
                       <span class="font-label-sm text-label-sm text-tertiary flex items-center gap-0.5">
                         <span class="material-symbols-outlined text-[12px]">
@@ -887,34 +888,34 @@
                   Mẹo sinh viên đi xem phòng:
                 </span>
                 <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                  Nên hẹn đến xem phòng vào khung giờ chiều tối để kiểm tra xem phòng có cách âm tốt không, kiểm tra áp lực nước vòi sen và ngồi nói chuyện trực tiếp 10 phút với bạn cùng phòng để cảm nhận sự ăn ý!
+                  Nên xem phòng buổi chiều tối để kiểm tra độ cách âm, áp lực nước và trao đổi trực tiếp 10 phút với bạn cùng phòng.
                 </p>
               </div>
             </aside>
           </div>
-          <!-- SECTION: Similar Listings (Phòng trọ tương tự lân cận Làng Đại học) -->
-          <section class="mt-space-2xl flex flex-col gap-space-lg">
+          <!-- SECTION: Similar Listings (Phòng trọ tương tự lân cận) -->
+          <section id="rd-similar-section" class="mt-space-2xl flex flex-col gap-space-lg">
             <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-space-xs">
               <div>
                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">
                   Khu vực lân cận
                 </span>
                 <h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">
-                  Phòng trọ sinh viên tương tự gần KTX
+                  Phòng trọ sinh viên tương tự gần khu vực này
                 </h2>
               </div>
-              <a class="font-label-md text-label-md text-primary hover:text-primary-container font-semibold flex items-center gap-1" data-path="khu-vuc-lang-dai-hoc" href="/roomie/tim-phong?area=thu-duc">
-                Xem thêm phòng Thủ Đức
+              <a id="rd-similar-more-link" class="font-label-md text-label-md text-primary hover:text-primary-container font-semibold flex items-center gap-1" href="/roomie/tim-phong">
+                <span id="rd-similar-more-text">Xem thêm phòng cùng khu vực</span>
                 <span class="material-symbols-outlined text-[16px]">
                   arrow_forward
                 </span>
               </a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-lg">
+            <div id="rd-similar-grid" class="grid grid-cols-1 md:grid-cols-3 gap-gutter-lg">
               <!-- Card 1 -->
               <a href="/roomie/phong-chi-tiet?id=2" class="group bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(32,36,43,0.04)] hover:shadow-[0_12px_24px_-4px_rgba(99,91,255,0.08)] transition-all flex flex-col">
                 <div class="relative h-48 overflow-hidden">
-                  <img alt="Phòng trọ rộng rãi gần ĐH Khoa học Tự nhiên ĐHQG Thủ Đức với bàn học gỗ và cửa sổ lớn thoáng mát" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/phong-chi-tiet/room-5.jpg" />
+                  <img loading="lazy" decoding="async" alt="Phòng trọ rộng rãi gần ĐH Khoa học Tự nhiên ĐHQG Thủ Đức với bàn học gỗ và cửa sổ lớn thoáng mát" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/phong-chi-tiet/room-5.jpg" />
                   <span class="absolute top-3 left-3 px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
                     Còn 1 chỗ Nữ
                   </span>
@@ -955,7 +956,7 @@
               <!-- Card 2 -->
               <a href="/roomie/phong-chi-tiet?id=6" class="group bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(32,36,43,0.04)] hover:shadow-[0_12px_24px_-4px_rgba(99,91,255,0.08)] transition-all flex flex-col">
                 <div class="relative h-48 overflow-hidden">
-                  <img alt="Căn hộ mini gần KTX Khu A ĐHQG có ban công nắng ấm, nội thất tối giản hiện đại" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/phong-chi-tiet/room-6.jpg" />
+                  <img loading="lazy" decoding="async" alt="Căn hộ mini gần KTX Khu A ĐHQG có ban công nắng ấm, nội thất tối giản hiện đại" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/phong-chi-tiet/room-6.jpg" />
                   <span class="absolute top-3 left-3 px-space-sm py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm font-semibold">
                     Còn 1 chỗ Nam
                   </span>
@@ -996,7 +997,7 @@
               <!-- Card 3 -->
               <a href="/roomie/phong-chi-tiet?id=1" class="group bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(32,36,43,0.04)] hover:shadow-[0_12px_24px_-4px_rgba(99,91,255,0.08)] transition-all flex flex-col">
                 <div class="relative h-48 overflow-hidden">
-                  <img alt="Phòng trọ sinh viên yên tĩnh ngăn nắp tại Làng Đại học TP.HCM với máy lạnh và bàn học gọn gàng" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/phong-chi-tiet/room-7.jpg" />
+                  <img loading="lazy" decoding="async" alt="Phòng trọ sinh viên yên tĩnh ngăn nắp tại Làng Đại học TP.HCM với máy lạnh và bàn học gọn gàng" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/images/phong-chi-tiet/room-7.jpg" />
                   <span class="absolute top-3 left-3 px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
                     Còn 1 chỗ Nam
                   </span>
@@ -1037,33 +1038,29 @@
             </div>
           </section>
           <!-- SECTION: Student Support Banner & Safe Housing FAQ -->
-          <section class="mt-space-2xl rounded-2xl bg-gradient-to-r from-primary via-primary-container to-tertiary text-on-primary p-space-xl shadow-[0_12px_24px_-4px_rgba(73,62,229,0.18)] relative overflow-hidden">
-            <!-- Abstract decorative ring -->
-            <div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none">
-            </div>
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-space-lg">
-              <div class="flex flex-col gap-space-xs max-w-xl text-center md:text-left">
-                <span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-white/20 text-on-primary font-label-sm text-label-sm w-fit mx-auto md:mx-0">
-                  <span class="material-symbols-outlined text-[14px]">
-                    support_agent
-                  </span>
-                  Đồng hành cùng tân sinh viên
+          <section class="mt-space-2xl relative rounded-2xl lg:rounded-3xl overflow-hidden bg-primary bg-gradient-to-br from-primary via-[#3f35cc] to-[#2f2799] text-white px-6 py-6 md:px-10 md:py-8 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div class="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#7b73ff]/20 blur-3xl"></div>
+            <div class="relative z-10 flex flex-col gap-1.5 min-w-0 max-w-xl text-center lg:text-left">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white/95 font-label-sm text-label-sm font-semibold backdrop-blur-sm w-fit mx-auto lg:mx-0 mb-1">
+                <span class="material-symbols-outlined text-[15px] text-primary-fixed">
+                  support_agent
                 </span>
-                <h3 class="font-headline-md text-headline-md font-bold tracking-tight">
-                  Bạn cần người đi cùng kiểm tra hợp đồng thuê trọ?
-                </h3>
-                <p class="font-body-md text-body-md text-on-primary/90 leading-relaxed">
-                  CLB Hỗ trợ sinh viên HCMUS &amp; Ban an toàn Roomie sẵn sàng rà soát hợp đồng cọc, hướng dẫn đăng ký tạm trú và giải quyết tranh chấp hoàn toàn miễn phí.
-                </p>
-              </div>
-              <div class="flex flex-col sm:flex-row items-center gap-space-sm shrink-0">
-                <a id="rd-support-btn" class="px-space-lg py-space-sm rounded-xl bg-surface-container-lowest text-primary font-label-md text-label-md font-bold shadow-md hover:bg-surface-container-high transition-all text-center" href="#">
-                  Yêu cầu hỗ trợ ngay
-                </a>
-                <a class="px-space-md py-space-sm rounded-xl bg-white/10 hover:bg-white/20 text-on-primary font-label-md text-label-md font-medium transition-all text-center backdrop-blur-sm" data-path="nguyen-tac-an-toan" href="/roomie/an-toan#nguyen-tac">
-                  Cẩm nang thuê trọ 2026
-                </a>
-              </div>
+                Đồng hành cùng tân sinh viên
+              </span>
+              <h3 class="font-headline-lg text-[23px] sm:text-[26px] lg:text-[28px] xl:text-[30px] text-white font-bold leading-tight">
+                Bạn cần người đi cùng kiểm tra hợp đồng thuê trọ?
+              </h3>
+              <p class="font-body-md text-[14.5px] sm:text-[15.5px] text-white/95 leading-relaxed">
+                CLB Hỗ trợ SV HCMUS &amp; Ban An toàn Roomie hỗ trợ rà soát hợp đồng cọc và tạm trú miễn phí.
+              </p>
+            </div>
+            <div class="relative z-10 flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto shrink-0">
+              <a id="rd-support-btn" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-surface-container-lowest hover:bg-primary-fixed border border-transparent text-primary font-label-md text-[14.5px] xl:text-[15px] font-bold shadow-md hover:-translate-y-0.5 transition-all text-center whitespace-nowrap" href="#">
+                Yêu cầu hỗ trợ ngay
+              </a>
+              <a class="w-full sm:w-auto px-6 py-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-label-md text-[14.5px] xl:text-[15px] font-semibold backdrop-blur-sm hover:-translate-y-0.5 transition-all text-center whitespace-nowrap" data-path="nguyen-tac-an-toan" href="/roomie/an-toan#nguyen-tac">
+                Cẩm nang thuê trọ 2026
+              </a>
             </div>
           </section>
         </div>
@@ -1072,10 +1069,10 @@
     </div>
   </main>
   <div id="rm-footer-root"></div>
-  <script src="/scripts/data.js"></script>
-  <script src="/scripts/core.js"></script>
-  <script src="/scripts/layout.js"></script>
-  <script src="/scripts/pages/room-detail.js"></script>
+  <script defer src="/scripts/data.js"></script>
+  <script defer src="/scripts/core.js"></script>
+  <script defer src="/scripts/layout.js"></script>
+  <script defer src="/scripts/pages/room-detail.js"></script>
 
 </body>
 </html>

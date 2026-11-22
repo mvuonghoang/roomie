@@ -102,22 +102,28 @@
     const msgInput = document.getElementById("contact-message");
     const charCountEl = document.getElementById("contact-char-count");
 
-    if (topicGroup) {
-      const topicBtns = Array.from(topicGroup.querySelectorAll("[data-contact-topic]"));
-      const activeTopicCls = ["bg-gradient-to-r", "from-[#493ee5]", "to-[#635bff]", "text-white", "shadow-sm"];
-      const inactiveTopicCls = ["bg-surface-container-low", "text-on-surface-variant", "hover:bg-primary-fixed", "hover:text-primary"];
-
-      topicBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          if (topicInput) topicInput.value = btn.dataset.contactTopic || "";
-          if (msgInput && btn.dataset.placeholder) msgInput.placeholder = btn.dataset.placeholder;
-          topicBtns.forEach((b) => {
-            const active = b === btn;
-            activeTopicCls.forEach((c) => b.classList.toggle(c, active));
-            inactiveTopicCls.forEach((c) => b.classList.toggle(c, !active));
-          });
-        });
+    let topicBtns = [];
+    const activeTopicCls = ["bg-gradient-to-r", "from-[#493ee5]", "to-[#635bff]", "text-white", "shadow-sm"];
+    const inactiveTopicCls = ["bg-surface-container-low", "text-on-surface-variant", "hover:bg-primary-fixed", "hover:text-primary"];
+    function selectTopicButton(btn) {
+      if (!btn) return;
+      if (topicInput) topicInput.value = btn.dataset.contactTopic || "";
+      if (msgInput && btn.dataset.placeholder) msgInput.placeholder = btn.dataset.placeholder;
+      topicBtns.forEach((b) => {
+        const active = b === btn;
+        activeTopicCls.forEach((c) => b.classList.toggle(c, active));
+        inactiveTopicCls.forEach((c) => b.classList.toggle(c, !active));
       });
+    }
+
+    if (topicGroup) {
+      topicBtns = Array.from(topicGroup.querySelectorAll("[data-contact-topic]"));
+      topicBtns.forEach((btn) => btn.addEventListener("click", () => selectTopicButton(btn)));
+      const topicParam = new URLSearchParams(window.location.search).get("topic");
+      if (topicParam === "chu-nha") {
+        const landlordBtn = topicBtns.find((b) => (b.dataset.contactTopic || "").includes("Chủ trọ"));
+        if (landlordBtn) selectTopicButton(landlordBtn);
+      }
     }
 
     if (msgInput && charCountEl) {
@@ -216,7 +222,7 @@
     const successPanel = document.getElementById("contact-success-panel");
     const sendAnotherBtn = document.getElementById("contact-send-another");
 
-    form?.addEventListener("submit", (e) => {
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const nameVal = document.getElementById("contact-name")?.value.trim() || "bạn";
       const phoneEmailVal = document.getElementById("contact-phone-email")?.value.trim() || "";
@@ -231,10 +237,10 @@
       const uniSummary = locationState.selectedUniversity ? locationState.selectedUniversity.name : uniInput?.value.trim() || "";
       const locParts = [areaSummary, uniSummary].filter(Boolean);
 
-      Core.submitContactTicket?.({
+      const res = await Core.submitContactTicket?.({
         ticketId,
         name: nameVal,
-        email: phoneEmailVal.includes("@") ? phoneEmailVal : "",
+        email: phoneEmailVal,
         phone: !phoneEmailVal.includes("@") ? phoneEmailVal : "",
         topic: topicVal,
         city: locationState.areaCity,
@@ -242,6 +248,10 @@
         university: uniSummary,
         message: messageVal
       });
+      if (res && !res.ok) {
+        Core.showToast(res.error || "Không thể gửi lời nhắn lúc này.", "error");
+        return;
+      }
 
       const setElText = (id, text) => {
         const el = document.getElementById(id);
@@ -262,6 +272,7 @@
 
     sendAnotherBtn?.addEventListener("click", () => {
       form?.reset();
+      if (topicBtns.length) selectTopicButton(topicBtns[0]);
       locationState.uniCityFilter = "all";
       locationState.selectedUniversity = null;
       setContactAreaCity("TP.HCM", { preferredDistrictKey: "" });

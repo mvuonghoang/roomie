@@ -5,10 +5,13 @@
   "description": "RoomieMatch - Frontend-only demo for finding student rooms and roommates",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "db:seed": "node backend/database/seed.js",
+    "test": "node --test backend/database/plan-entitlements.test.js backend/routes/plans-api.test.js backend/services/vietqr.test.js"
   },
   "dependencies": {
     "dotenv": "^18.0.10",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4"
   }
 }

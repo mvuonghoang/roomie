@@ -1,5 +1,5 @@
 /**
- * CLI Script: Seed & Inspect Roomie SQLite Database
+ * CLI Script: Seed & Inspect Roomie Supabase PostgreSQL Database
  * Usage: node backend/database/seed.js [--reset]
  */
 
@@ -7,37 +7,53 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./db');
 
-const isReset = process.argv.includes('--reset');
+async function main() {
+  const isReset = process.argv.includes('--reset');
+  const pool = db.openDatabaseConnection();
 
-if (isReset) {
-  const conn = db.openDatabaseConnection();
-  const schemaSql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
-  conn.exec(`
-    DROP TABLE IF EXISTS sessions;
-    DROP TABLE IF EXISTS saved_rooms;
-    DROP TABLE IF EXISTS quiz_submissions;
-    DROP TABLE IF EXISTS connections;
-    DROP TABLE IF EXISTS user_plans;
-    DROP TABLE IF EXISTS notifications;
-    DROP TABLE IF EXISTS reports;
-    DROP TABLE IF EXISTS contacts;
-    DROP TABLE IF EXISTS rooms;
-    DROP TABLE IF EXISTS roommates;
-    DROP TABLE IF EXISTS users;
-  `);
-  conn.exec(schemaSql);
+  try {
+    if (isReset) {
+      const schemaSql = fs.readFileSync(path.join(__dirname, 'schema.postgres.sql'), 'utf8');
+      await pool.query(`
+        DROP TABLE IF EXISTS contacts CASCADE;
+        DROP TABLE IF EXISTS reports CASCADE;
+        DROP TABLE IF EXISTS notifications CASCADE;
+        DROP TABLE IF EXISTS plan_purchase_orders CASCADE;
+        DROP TABLE IF EXISTS user_plans CASCADE;
+        DROP TABLE IF EXISTS connections CASCADE;
+        DROP TABLE IF EXISTS quiz_submissions CASCADE;
+        DROP TABLE IF EXISTS saved_rooms CASCADE;
+        DROP TABLE IF EXISTS roommate_match_daily_usage CASCADE;
+        DROP TABLE IF EXISTS roommate_daily_post_usage CASCADE;
+        DROP TABLE IF EXISTS roommates CASCADE;
+        DROP TABLE IF EXISTS rooms CASCADE;
+        DROP TABLE IF EXISTS sessions CASCADE;
+        DROP TABLE IF EXISTS users CASCADE;
+      `);
+      await pool.query(schemaSql);
+    } else {
+      await db.ensureDatabaseReady();
+    }
+
+    await db.seedDatabase(pool);
+    const stats = await db.getDatabaseStats();
+
+    console.log('\n================================================');
+    console.log('  Roomie Match - PostgreSQL Database Ready!');
+    console.log('================================================');
+    console.log(`  Engine : ${stats.engine}`);
+    console.log(`  Target : ${stats.dbTarget}`);
+    console.log('  Tables :');
+    Object.entries(stats.tables).forEach(([tbl, cnt]) => {
+      console.log(`    - ${tbl.padEnd(28, ' ')}: ${cnt} records`);
+    });
+    console.log('================================================\n');
+  } finally {
+    await db.closePool();
+  }
 }
 
-db.seedDatabase();
-const stats = db.getDatabaseStats();
-
-console.log('\n================================================');
-console.log('  Roomie Match - SQLite Database Ready!');
-console.log('================================================');
-console.log(`  Engine : ${stats.engine}`);
-console.log(`  File   : ${stats.dbPath}`);
-console.log('  Tables :');
-Object.entries(stats.tables).forEach(([tbl, cnt]) => {
-  console.log(`    - ${tbl.padEnd(18, ' ')}: ${cnt} records`);
+main().catch((err) => {
+  console.error('[Roomie DB Seed Error]', err);
+  process.exit(1);
 });
-console.log('================================================\n');

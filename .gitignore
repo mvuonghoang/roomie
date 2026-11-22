@@ -17,9 +17,10 @@ desktop.ini
 .env
 .env.local
 
-# Local SQLite files are not used by the frontend demo.
+# Local SQLite files (legacy / local dev)
 *.sqlite
 *.sqlite3
 *.sqlite-shm
 *.sqlite-wal
+data/
 .vercel

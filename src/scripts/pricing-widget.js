@@ -20,7 +20,7 @@
     formatCtaLabel,
     onStateSync
   }) {
-    const packages = Data.PRICING_PACKAGES || [];
+    const getPackages = () => Array.isArray(Data.PRICING_PACKAGES) ? Data.PRICING_PACKAGES : [];
     let billingMode = "standard";
 
     const toggleBtns = toggleContainer
@@ -61,6 +61,7 @@
       const hasPredictionAccess = Core.hasUnlockedPrediction();
       const latestPlan = Core.getLatestPurchasedPlan();
 
+      const packages = getPackages();
       ctaButtons.forEach((btn) => {
         if (!btn.dataset.defaultLabel) btn.dataset.defaultLabel = btn.textContent.trim();
         const pkgId = btn.dataset[pkgAttr];
@@ -71,7 +72,7 @@
           return;
         }
         const pkg = packages.find((p) => p.id === pkgId);
-        const unavailable = !pkg || pkg.available !== true;
+        const unavailable = packages.length > 0 && (!pkg || pkg.available !== true);
         const isActive = Core.hasPurchasedPlan(pkgId);
         btn.disabled = unavailable;
         btn.setAttribute("aria-disabled", unavailable ? "true" : "false");
@@ -88,7 +89,7 @@
     ctaButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const pkgId = btn.dataset[pkgAttr];
-        const pkg = packages.find((p) => p.id === pkgId);
+        const pkg = getPackages().find((p) => p.id === pkgId);
         if (!pkg) return;
         if (pkg.id === "basic") {
           Core.showToast("Bạn đang sử dụng Gói Cơ bản (0đ) miễn phí!");
@@ -102,6 +103,8 @@
 
     syncBillingUI();
     syncPlanButtons();
+    Core.ready?.then(syncPlanButtons);
+    window.addEventListener("roomie:demo-ready", syncPlanButtons);
     Core.onPlanStateChange(syncPlanButtons);
   }
 

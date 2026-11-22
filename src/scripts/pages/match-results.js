@@ -534,7 +534,7 @@
       grid.innerHTML = visible.map((rm) => buildRoommateCardHtml(rm)).join("");
 
       grid.querySelectorAll("[data-connect-rm]").forEach((btn) => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", async () => {
           const rm = Data.ROOMMATES.find((r) => r.id === btn.dataset.connectRm);
           if (!rm || isOwnRoommateListing(rm)) return;
           const existing = Core.getConnectionForPartner(rm.id, rm.name);
@@ -543,7 +543,8 @@
               Core.openSlotFullModal();
               return;
             }
-            const accepted = Core.updateConnectionStatus(existing.id, "accepted");
+            const accepted = await Core.updateConnectionStatus(existing.id, "accepted");
+            if (!accepted) return;
             renderMatches();
             Core.showToast(`Đã đồng ý kết nối với ${rm.name}! Zalo & SĐT đã được mở khóa.`);
             Core.openContactUnlockedModal(accepted, renderMatches);
@@ -555,7 +556,6 @@
             meta: rm.school,
             avatar: rm.avatar,
             roomId: rm.linkedRoomId,
-            contact: rm.contact,
             onUpdate: renderMatches
           });
         });
@@ -569,28 +569,24 @@
       });
     }
 
+    let matchesRenderQueued = false;
+    const scheduleRenderMatches = () => {
+      if (matchesRenderQueued) return;
+      matchesRenderQueued = true;
+      queueMicrotask(() => {
+        matchesRenderQueued = false;
+        renderMatches();
+      });
+    };
+
     filterToggleBtn?.addEventListener("click", openRoommateFilterDrawer);
-    window.addEventListener("roomie:connections-updated", renderMatches);
+    window.addEventListener("roomie:connections-updated", scheduleRenderMatches);
     loadMoreBtn?.addEventListener("click", () => {
       state.showAll = true;
       renderMatches();
       Core.showToast("Đã hiển thị thêm bài đăng tìm roommate!", "info");
     });
 
-    document.getElementById("mr-share-result-btn")?.addEventListener("click", async () => {
-      const arch = document.getElementById("mr-archetype-title")?.textContent || "Kỷ Luật Tự Do";
-      try {
-        await navigator.clipboard.writeText(
-          `Mình vừa làm Test Roomie và thuộc tuýp ${arch}! Xem bạn hợp gu: ${window.location.origin}/roomie/trac-nghiem`
-        );
-        Core.showToast("Đã sao chép Thẻ cá tính ở trọ để chia sẻ!");
-      } catch {
-        Core.showToast(`Bạn thuộc tuýp ${arch}`, "info");
-      }
-    });
-    document.getElementById("mr-retake-quiz-btn")?.addEventListener("click", () => {
-      window.location.href = "/roomie/trac-nghiem";
-    });
     document.getElementById("mr-download-contract-btn")?.addEventListener("click", () => {
       Core.showToast("Đang tải mẫu thỏa thuận nội quy (.PDF)!");
     });
@@ -611,10 +607,8 @@
     }
 
     renderMatches();
-    window.addEventListener("roomie:demo-ready", () => {
-      renderMatches();
-    });
-    window.addEventListener("roomie:roommates-updated", renderMatches);
+    window.addEventListener("roomie:demo-ready", scheduleRenderMatches);
+    window.addEventListener("roomie:roommates-updated", scheduleRenderMatches);
   }
 
   function buildRoommateCardHtml(rm) {
@@ -646,7 +640,7 @@
           <div class="flex items-start justify-between gap-space-sm">
             <div class="flex items-center gap-4 sm:gap-5">
               <div class="relative shrink-0">
-                <img class="w-[74px] h-[74px] sm:w-20 sm:h-20 rounded-full object-cover ring-2 ring-primary-fixed" src="${escapeHTML(
+                <img loading="lazy" decoding="async" class="w-[74px] h-[74px] sm:w-20 sm:h-20 rounded-full object-cover ring-2 ring-primary-fixed" src="${escapeHTML(
                   rm.avatar
                 )}" alt="Ảnh đại diện ${escapeHTML(rm.name)}" />
               </div>
@@ -841,6 +835,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (document.body.dataset.page === "tim-roommate") initMatchResultsPage();
+    if (document.body.dataset.page === "tim-roommate") {
+      (Core.ready || Promise.resolve()).then(initMatchResultsPage);
+    }
   });
 })();

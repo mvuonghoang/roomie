@@ -45,7 +45,7 @@
       city: "TP.HCM",
       district: "Quận 1 · TP. Thủ Đức",
       aliases: ["USSH", "Nhân văn", "KHXH&NV", "KHXHNV", "QSX"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-1"],
       roomMatchTerms: ["khxh&nv", "nhan van", "ussh", "hcmussh"]
     },
     {
@@ -97,7 +97,7 @@
       city: "TP.HCM",
       district: "Quận 3 · Quận 10 · Bình Chánh",
       aliases: ["Kinh tế TP.HCM", "KSA", "Nguyễn Tri Phương"],
-      areaKeys: ["quan-10"],
+      areaKeys: ["quan-10", "quan-3"],
       roomMatchTerms: ["ueh", "kinh te"]
     },
     {
@@ -157,7 +157,7 @@
       city: "TP.HCM",
       district: "Quận Tân Phú",
       aliases: ["Công Thương", "ĐH Công nghiệp Thực phẩm", "HUFI", "DCT", "Lê Trọng Tấn"],
-      areaKeys: [],
+      areaKeys: ["tan-phu"],
       roomMatchTerms: ["huit", "hufi", "cong thuong", "cong nghiep thuc pham"]
     },
     {
@@ -167,7 +167,7 @@
       city: "TP.HCM",
       district: "Quận 1 · TP. Thủ Đức",
       aliases: ["BUH", "Ngân hàng TP.HCM", "NHS", "Hoàng Diệu 2"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-1"],
       roomMatchTerms: ["ngan hang", "hub", "buh"]
     },
     {
@@ -177,7 +177,7 @@
       city: "TP.HCM",
       district: "Quận 4 · TP. Thủ Đức",
       aliases: ["HCMUL", "Luật TP.HCM", "LPS", "Nguyễn Tất Thành"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-4"],
       roomMatchTerms: ["luat tp", "ulaw", "hcmul"]
     },
     {
@@ -197,7 +197,7 @@
       city: "TP.HCM",
       district: "Quận 7 · Phú Nhuận · TP. Thủ Đức",
       aliases: ["Tài chính Marketing", "DMS"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-7", "phu-nhuan"],
       roomMatchTerms: ["tai chinh marketing", "ufm"]
     },
     {
@@ -207,7 +207,7 @@
       city: "TP.HCM",
       district: "Quận 3 · Gò Vấp · Nhà Bè",
       aliases: ["HCMCOU", "ĐH Mở", "MBS"],
-      areaKeys: ["go-vap"],
+      areaKeys: ["go-vap", "quan-3"],
       roomMatchTerms: ["mo tp", "hcmcou"]
     },
     {
@@ -267,7 +267,7 @@
       city: "TP.HCM",
       district: "Quận 3 · TP. Thủ Đức",
       aliases: ["Kiến trúc TP.HCM", "KTS", "Pasteur"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-3"],
       roomMatchTerms: ["kien truc tp", "uah"]
     },
     {
@@ -287,7 +287,7 @@
       city: "TP.HCM",
       district: "Quận Tân Bình",
       aliases: ["Tài nguyên Môi trường", "DTM", "Lê Văn Sỹ"],
-      areaKeys: [],
+      areaKeys: ["tan-binh"],
       roomMatchTerms: ["tai nguyen", "hcmunre"]
     },
     {
@@ -307,7 +307,7 @@
       city: "TP.HCM",
       district: "Quận 1",
       aliases: ["Sân khấu Điện ảnh TP.HCM", "DSD", "Cống Quỳnh"],
-      areaKeys: [],
+      areaKeys: ["quan-1"],
       roomMatchTerms: ["san khau dien anh"]
     },
     {
@@ -317,7 +317,7 @@
       city: "TP.HCM",
       district: "Quận 1",
       aliases: ["Nhạc viện", "NVS", "Nguyễn Du"],
-      areaKeys: [],
+      areaKeys: ["quan-1"],
       roomMatchTerms: ["nhac vien"]
     },
     {
@@ -347,7 +347,7 @@
       city: "TP.HCM",
       district: "Quận 7",
       aliases: ["Tôn Đức Thắng", "DTT", "Nguyễn Hữu Thọ"],
-      areaKeys: [],
+      areaKeys: ["quan-7"],
       roomMatchTerms: ["ton duc thang", "tdtu"]
     },
     {
@@ -357,7 +357,7 @@
       city: "TP.HCM",
       district: "Quận 12",
       aliases: ["Lao động Xã hội TP.HCM", "DLS"],
-      areaKeys: [],
+      areaKeys: ["quan-12"],
       roomMatchTerms: ["lao dong xa hoi", "ulsa2"]
     },
     {
@@ -377,7 +377,7 @@
       city: "TP.HCM",
       district: "Quận 7 · TP. Thủ Đức",
       aliases: ["Trường Đại học Cảnh sát Nhân dân", "CSS"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-7"],
       roomMatchTerms: ["canh sat nhan dan", "csnd"]
     },
     {
@@ -409,7 +409,7 @@
       city: "TP.HCM",
       district: "Quận Tân Bình",
       aliases: ["Hàng không", "HHK", "Nguyễn Văn Trỗi"],
-      areaKeys: [],
+      areaKeys: ["tan-binh"],
       roomMatchTerms: ["hang khong", "vaa"]
     },
     {
@@ -419,7 +419,7 @@
       city: "TP.HCM",
       district: "TP. Thủ Đức · Quận 1",
       aliases: ["Bưu chính Viễn thông TP.HCM", "PTIT", "BVS", "Man Thiện"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-1"],
       roomMatchTerms: ["buu chinh vien thong", "ptit"]
     },
     {
@@ -439,7 +439,7 @@
       city: "TP.HCM",
       district: "Quận Tân Bình",
       aliases: ["Kỹ thuật Mật mã TP.HCM", "ACTVN", "Cộng Hòa"],
-      areaKeys: [],
+      areaKeys: ["tan-binh"],
       roomMatchTerms: ["ky thuat mat ma", "kma"]
     },
     {
@@ -469,7 +469,7 @@
       city: "TP.HCM",
       district: "Quận 3",
       aliases: ["Phụ nữ Việt Nam TP.HCM"],
-      areaKeys: [],
+      areaKeys: ["quan-3"],
       roomMatchTerms: ["hoc vien phu nu"]
     },
     {
@@ -511,7 +511,7 @@
       city: "TP.HCM",
       district: "Quận Bình Thạnh · Quận Gò Vấp · Quận 1",
       aliases: ["Văn Lang", "DVL", "Đặng Thùy Trâm"],
-      areaKeys: ["binh-thanh", "go-vap"],
+      areaKeys: ["binh-thanh", "go-vap", "quan-1"],
       roomMatchTerms: ["van lang", "vlu"]
     },
     {
@@ -531,7 +531,7 @@
       city: "TP.HCM",
       district: "Quận 4 · Quận 12 · TP. Thủ Đức",
       aliases: ["Nguyễn Tất Thành", "NTT"],
-      areaKeys: ["thu-duc"],
+      areaKeys: ["thu-duc", "quan-4", "quan-12"],
       roomMatchTerms: ["nguyen tat thanh", "nttu"]
     },
     {
@@ -541,7 +541,7 @@
       city: "TP.HCM",
       district: "Quận 1 · Quận 10 · Quận Gò Vấp",
       aliases: ["Hoa Sen", "DTH", "Nguyễn Văn Tráng", "Thành Thái"],
-      areaKeys: ["quan-10", "go-vap"],
+      areaKeys: ["quan-10", "go-vap", "quan-1"],
       roomMatchTerms: ["hoa sen", "hsu"]
     },
     {
@@ -551,7 +551,7 @@
       city: "TP.HCM",
       district: "Quận 10 · Tân Phú · Bình Chánh",
       aliases: ["Văn Hiến", "DVH"],
-      areaKeys: ["quan-10"],
+      areaKeys: ["quan-10", "tan-phu"],
       roomMatchTerms: ["van hien", "vhu"]
     },
     {
@@ -571,7 +571,7 @@
       city: "TP.HCM",
       district: "Quận 8",
       aliases: ["Công nghệ Sài Gòn", "DSG", "Cao Lỗ"],
-      areaKeys: [],
+      areaKeys: ["quan-8"],
       roomMatchTerms: ["cong nghe sai gon", "stu"]
     },
     {
@@ -581,7 +581,7 @@
       city: "TP.HCM",
       district: "Quận Bình Thạnh · Quận 6",
       aliases: ["Hồng Bàng", "Điện Biên Phủ"],
-      areaKeys: ["binh-thanh"],
+      areaKeys: ["binh-thanh", "quan-6"],
       roomMatchTerms: ["hong bang", "hiu"]
     },
     {
@@ -641,7 +641,7 @@
       city: "TP.HCM",
       district: "Quận 7",
       aliases: ["RMIT TP.HCM", "Nam Sài Gòn", "Nguyễn Văn Linh"],
-      areaKeys: [],
+      areaKeys: ["quan-7"],
       roomMatchTerms: ["rmit"]
     },
     {
@@ -651,7 +651,7 @@
       city: "TP.HCM",
       district: "Quận 7 · TP. Thủ Đức",
       aliases: ["Fulbright"],
-      areaKeys: [],
+      areaKeys: ["quan-7", "thu-duc"],
       roomMatchTerms: ["fulbright"]
     },
     {
@@ -661,7 +661,7 @@
       city: "TP.HCM",
       district: "Quận Tân Bình",
       aliases: ["Greenwich TP.HCM", "Cộng Hòa"],
-      areaKeys: [],
+      areaKeys: ["tan-binh"],
       roomMatchTerms: ["greenwich"]
     },
     {
@@ -671,7 +671,7 @@
       city: "TP.HCM",
       district: "Quận Tân Bình",
       aliases: ["Swinburne TP.HCM", "Bạch Đằng"],
-      areaKeys: [],
+      areaKeys: ["tan-binh"],
       roomMatchTerms: ["swinburne"]
     },
     {
@@ -681,7 +681,7 @@
       city: "TP.HCM",
       district: "Quận 7",
       aliases: ["Saigon Business School"],
-      areaKeys: [],
+      areaKeys: ["quan-7"],
       roomMatchTerms: ["kinh doanh sai gon", "sbs"]
     },
 
@@ -697,7 +697,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy · Thạch Thất (Hòa Lạc)",
       aliases: ["ĐHQG Hà Nội", "ĐHQGHN", "QGH", "Xuân Thủy", "Hòa Lạc"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["dhqg ha noi", "vnu", "xuan thuy"]
     },
     {
@@ -707,7 +707,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["ĐH Công nghệ Hà Nội", "QHI", "Xuân Thủy"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["uet", "cong nghe ha noi"]
     },
     {
@@ -717,7 +717,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân",
       aliases: ["KHTN Hà Nội", "Tự nhiên Hà Nội", "QHT", "Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["hus", "khtn ha noi"]
     },
     {
@@ -727,7 +727,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân",
       aliases: ["Nhân văn Hà Nội", "KHXH&NV Hà Nội", "QHX", "Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["nhan van ha noi", "ussh ha noi"]
     },
     {
@@ -737,7 +737,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Ngoại ngữ ĐHQG", "QHF", "Phạm Văn Đồng"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["ulis", "ngoai ngu ha noi"]
     },
     {
@@ -747,7 +747,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Kinh tế ĐHQG Hà Nội", "QHE", "Xuân Thủy"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["ueb", "kinh te dhqg"]
     },
     {
@@ -757,7 +757,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy · Thạch Thất",
       aliases: ["Giáo dục ĐHQG", "QHS"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["giao duc dhqg"]
     },
     {
@@ -767,7 +767,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Khoa Luật ĐHQG Hà Nội", "QHL"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["luat dhqg"]
     },
     {
@@ -777,7 +777,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Y Dược ĐHQG Hà Nội", "QHY"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["y duoc dhqg"]
     },
     {
@@ -787,7 +787,7 @@
       city: "Hà Nội",
       district: "Quận Nam Từ Liêm · Hòa Lạc",
       aliases: ["Việt Nhật", "QHJ", "Mỹ Đình"],
-      areaKeys: [],
+      areaKeys: ["nam-tu-liem"],
       roomMatchTerms: ["viet nhat", "vju"]
     },
     {
@@ -797,7 +797,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy · Thanh Xuân",
       aliases: ["Trường Quốc tế ĐHQGHN", "QHQ"],
-      areaKeys: [],
+      areaKeys: ["cau-giay", "thanh-xuan"],
       roomMatchTerms: ["quoc te dhqg ha noi", "vnu-is"]
     },
     {
@@ -807,7 +807,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Quản trị Kinh doanh ĐHQG"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["hsb"]
     },
     {
@@ -817,7 +817,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Khoa học Liên ngành và Nghệ thuật"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["lien nganh"]
     },
 
@@ -829,7 +829,7 @@
       city: "Hà Nội",
       district: "Quận Hai Bà Trưng",
       aliases: ["Bách khoa Hà Nội", "BKHN", "BKA", "Giải Phóng", "Đại Cồ Việt"],
-      areaKeys: [],
+      areaKeys: ["hai-ba-trung"],
       roomMatchTerms: ["bach khoa ha noi", "hust"]
     },
     {
@@ -839,7 +839,7 @@
       city: "Hà Nội",
       district: "Quận Hai Bà Trưng",
       aliases: ["Kinh tế Quốc dân", "KTQD", "KHA", "Trần Đại Nghĩa"],
-      areaKeys: [],
+      areaKeys: ["hai-ba-trung"],
       roomMatchTerms: ["kinh te quoc dan", "neu"]
     },
     {
@@ -849,7 +849,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Ngoại thương Hà Nội", "NTH", "Chùa Láng"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["ngoai thuong ha noi", "ftu"]
     },
     {
@@ -859,7 +859,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Thương mại", "Hồ Tùng Mậu"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["thuong mai", "tmu"]
     },
     {
@@ -869,7 +869,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Luật Hà Nội", "LPH", "Nguyễn Chí Thanh"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["luat ha noi", "hlu"]
     },
     {
@@ -879,7 +879,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Kiểm sát Hà Nội", "DKS", "Dương Nội"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["kiem sat"]
     },
     {
@@ -889,7 +889,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Công đoàn", "LDA", "Tây Sơn"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["cong doan", "tuu"]
     },
     {
@@ -899,7 +899,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Lao động Xã hội Hà Nội", "DLX", "Trần Duy Hưng"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["lao dong xa hoi", "ulsa"]
     },
     {
@@ -909,7 +909,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["GTVT Hà Nội", "GHA", "Láng Thượng"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["giao thong van tai ha noi", "utc"]
     },
     {
@@ -919,7 +919,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân",
       aliases: ["Công nghệ GTVT", "GTA", "Triều Khúc"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["cong nghe giao thong", "utt"]
     },
     {
@@ -929,7 +929,7 @@
       city: "Hà Nội",
       district: "Quận Hai Bà Trưng",
       aliases: ["Xây dựng", "NUCE", "XDH", "Giải Phóng"],
-      areaKeys: [],
+      areaKeys: ["hai-ba-trung"],
       roomMatchTerms: ["xay dung ha noi", "huce", "nuce"]
     },
     {
@@ -939,7 +939,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Kiến trúc Hà Nội", "KTA", "Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["kien truc ha noi", "hau"]
     },
     {
@@ -949,7 +949,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Mỏ Địa chất", "MDA", "Đức Thắng"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["mo dia chat", "humg"]
     },
     {
@@ -959,7 +959,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Công nghiệp Hà Nội", "DCN", "Nhổn"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["cong nghiep ha noi", "haui"]
     },
     {
@@ -989,7 +989,7 @@
       city: "Hà Nội",
       district: "Quận Hai Bà Trưng · Quận Hoàng Mai",
       aliases: ["Kinh tế Kỹ thuật Công nghiệp", "DKK", "Minh Khai", "Lĩnh Nam"],
-      areaKeys: [],
+      areaKeys: ["hai-ba-trung", "hoang-mai"],
       roomMatchTerms: ["uneti", "kinh te ky thuat cong nghiep"]
     },
     {
@@ -999,7 +999,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy · Bắc Từ Liêm",
       aliases: ["Điện lực", "DDL", "Hoàng Quốc Việt"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem", "cau-giay"],
       roomMatchTerms: ["dien luc", "epu"]
     },
     {
@@ -1009,7 +1009,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Thủy lợi Hà Nội", "TLA", "Tây Sơn"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["thuy loi ha noi", "tlu"]
     },
     {
@@ -1019,7 +1019,7 @@
       city: "Hà Nội",
       district: "Quận Nam Từ Liêm · Thanh Xuân",
       aliases: ["ĐH Hà Nội", "NHF", "Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["nam-tu-liem", "thanh-xuan"],
       roomMatchTerms: ["hanu", "dai hoc ha noi"]
     },
     {
@@ -1029,7 +1029,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Việt Pháp", "KCN", "Hoàng Quốc Việt"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["usth", "viet phap"]
     },
     {
@@ -1039,7 +1039,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Sư phạm Hà Nội", "SPH", "Xuân Thủy"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["su pham ha noi", "hnue"]
     },
     {
@@ -1049,7 +1049,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Thủ đô Hà Nội", "Dương Quảng Hàm"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["thu do ha noi", "hnmu"]
     },
     {
@@ -1059,7 +1059,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân",
       aliases: ["Sư phạm Nghệ thuật Trung ương", "GNT", "Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["su pham nghe thuat", "nuae"]
     },
     {
@@ -1079,7 +1079,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Y Hà Nội", "YHB", "Tôn Thất Tùng"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["y ha noi", "hmu"]
     },
     {
@@ -1089,7 +1089,7 @@
       city: "Hà Nội",
       district: "Quận Hoàn Kiếm",
       aliases: ["Dược Hà Nội", "DKH", "Lê Thánh Tông"],
-      areaKeys: [],
+      areaKeys: ["hoan-kiem"],
       roomMatchTerms: ["duoc ha noi", "hup"]
     },
     {
@@ -1099,7 +1099,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Y tế Công cộng", "YTC", "Đức Thắng"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["y te cong cong", "huph"]
     },
     {
@@ -1109,7 +1109,7 @@
       city: "Hà Nội",
       district: "Quận Hai Bà Trưng · Hoàng Mai",
       aliases: ["Mở Hà Nội", "MHN", "Nguyễn Hiền"],
-      areaKeys: [],
+      areaKeys: ["hai-ba-trung", "hoang-mai"],
       roomMatchTerms: ["mo ha noi", "hou"]
     },
     {
@@ -1119,7 +1119,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Văn hóa Hà Nội", "VHH", "Đê La Thành"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["van hoa ha noi", "huc"]
     },
     {
@@ -1129,7 +1129,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Mỹ thuật Công nghiệp", "Đê La Thành"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["my thuat cong nghiep", "mtc"]
     },
     {
@@ -1139,7 +1139,7 @@
       city: "Hà Nội",
       district: "Quận Hai Bà Trưng",
       aliases: ["Mỹ thuật Việt Nam", "Yết Kiêu", "MTH"],
-      areaKeys: [],
+      areaKeys: ["hai-ba-trung"],
       roomMatchTerms: ["my thuat viet nam", "vnufa"]
     },
     {
@@ -1149,7 +1149,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Sân khấu Điện ảnh Hà Nội", "SKD", "Mai Dịch"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["san khau dien anh ha noi", "skda"]
     },
     {
@@ -1159,7 +1159,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Tài nguyên Môi trường Hà Nội", "DMT", "Phú Diễn"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["tai nguyen va moi truong ha noi", "hunre"]
     },
     {
@@ -1181,7 +1181,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Tài chính", "HVTC", "HTC", "Đức Thắng"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["hoc vien tai chinh", "aof", "hvtc"]
     },
     {
@@ -1191,7 +1191,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["HVNH", "Ngân hàng", "BA", "NHH", "Chùa Bộc"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["hoc vien ngan hang", "hvnh", "bav"]
     },
     {
@@ -1201,7 +1201,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Ngoại giao", "HQT", "Chùa Láng"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["ngoai giao", "dav"]
     },
     {
@@ -1211,7 +1211,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Báo chí Tuyên truyền", "TGC", "Xuân Thủy"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["bao chi", "ajc"]
     },
     {
@@ -1221,7 +1221,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Bưu chính Viễn thông", "BVH", "Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["ptit", "buu chinh vien thong"]
     },
     {
@@ -1231,7 +1231,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân · Thanh Trì",
       aliases: ["Mật mã", "ACTVN", "Chiến Thắng"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["ky thuat mat ma", "kma"]
     },
     {
@@ -1261,7 +1261,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa · Bắc Từ Liêm",
       aliases: ["Học viện Hành chính Quốc gia", "NAPA", "ĐH Nội vụ Hà Nội", "HCH", "Nguyễn Chí Thanh"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem", "dong-da"],
       roomMatchTerms: ["hanh chinh", "apag", "napa", "noi vu ha noi"]
     },
     {
@@ -1271,7 +1271,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân",
       aliases: ["Quản lý Giáo dục", "HVQ", "Phan Đình Giót"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["quan ly giao duc", "naem"]
     },
     {
@@ -1281,7 +1281,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Phụ nữ Việt Nam", "HPN", "Nguyễn Chí Thanh"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["phu nu viet nam", "vwa"]
     },
     {
@@ -1291,7 +1291,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Thanh thiếu niên", "HTN", "Chùa Láng"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["thanh thieu nien", "vya"]
     },
     {
@@ -1311,7 +1311,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Y Dược học cổ truyền", "HYD", "Trần Phú"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["y duoc hoc co truyen", "vutm"]
     },
     {
@@ -1321,7 +1321,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Âm nhạc Quốc gia", "Nhạc viện Hà Nội", "NVH", "Hào Nam"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["am nhac quoc gia", "vnam"]
     },
     {
@@ -1331,7 +1331,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Múa Việt Nam", "HVM", "Mai Dịch"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["mua viet nam", "vnad"]
     },
     {
@@ -1341,7 +1341,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Chính trị Quốc gia Hồ Chí Minh", "Nguyễn Phong Sắc"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["chinh tri quoc gia", "hcma"]
     },
     {
@@ -1351,7 +1351,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân",
       aliases: ["Khoa học Xã hội", "Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["hoc vien khoa hoc xa hoi"]
     },
     {
@@ -1361,7 +1361,7 @@
       city: "Hà Nội",
       district: "Quận Nam Từ Liêm",
       aliases: ["Dân tộc"],
-      areaKeys: [],
+      areaKeys: ["nam-tu-liem"],
       roomMatchTerms: ["hoc vien dan toc"]
     },
     {
@@ -1371,7 +1371,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Tư pháp Hà Nội", "Trần Vỹ"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["hoc vien tu phap"]
     },
     {
@@ -1393,7 +1393,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Kỹ thuật Quân sự", "Đại học Lê Quý Đôn", "KQH", "Hoàng Quốc Việt"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["ky thuat quan su", "mta"]
     },
     {
@@ -1403,7 +1403,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Quân y", "YQH", "Phùng Hưng"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["quan y", "vmmu"]
     },
     {
@@ -1413,7 +1413,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Khoa học Quân sự", "NQH"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["khoa hoc quan su", "msa"]
     },
     {
@@ -1423,7 +1423,7 @@
       city: "Hà Nội",
       district: "Quận Long Biên",
       aliases: ["Hậu cần", "HEH", "Ngọc Thụy"],
-      areaKeys: [],
+      areaKeys: ["long-bien"],
       roomMatchTerms: ["hau can", "als"]
     },
     {
@@ -1433,7 +1433,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Chính trị Quân sự", "Quang Trung Hà Đông"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["hoc vien chinh tri"]
     },
     {
@@ -1443,7 +1443,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Quốc phòng", "Hoàng Quốc Việt"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["hoc vien quoc phong"]
     },
     {
@@ -1483,7 +1483,7 @@
       city: "Hà Nội",
       district: "Quận Đống Đa",
       aliases: ["Văn hóa Nghệ thuật Quân đội", "ZNH", "Nguyễn Chí Thanh"],
-      areaKeys: [],
+      areaKeys: ["dong-da"],
       roomMatchTerms: ["nghe thuat quan doi", "muca"]
     },
     {
@@ -1493,7 +1493,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["An ninh Nhân dân", "C500", "ANH", "Trần Phú"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["an ninh nhan dan", "psa"]
     },
     {
@@ -1503,7 +1503,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm",
       aliases: ["Cảnh sát Nhân dân", "T02", "CSH", "Cổ Nhuế"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["canh sat nhan dan", "ppa"]
     },
     {
@@ -1533,7 +1533,7 @@
       city: "Hà Nội",
       district: "Quận Thanh Xuân",
       aliases: ["Phòng cháy Chữa cháy", "PCCC", "PCH", "Khuất Duy Tiến"],
-      areaKeys: [],
+      areaKeys: ["thanh-xuan"],
       roomMatchTerms: ["phong chay chua chay", "pccc"]
     },
     {
@@ -1543,7 +1543,7 @@
       city: "Hà Nội",
       district: "Quận Nam Từ Liêm",
       aliases: ["Học viện Quốc tế Bộ Công an"],
-      areaKeys: [],
+      areaKeys: ["nam-tu-liem"],
       roomMatchTerms: ["hoc vien quoc te"]
     },
 
@@ -1565,7 +1565,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Phenikaa", "Yên Nghĩa"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["phenikaa"]
     },
     {
@@ -1585,7 +1585,7 @@
       city: "Hà Nội",
       district: "Quận Hoàng Mai",
       aliases: ["Thăng Long", "DTL", "Nghiêm Xuân Yêm"],
-      areaKeys: [],
+      areaKeys: ["hoang-mai"],
       roomMatchTerms: ["thang long"]
     },
     {
@@ -1595,7 +1595,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông · Quận Cầu Giấy",
       aliases: ["Đại học CMC", "Vạn Phúc"],
-      areaKeys: [],
+      areaKeys: ["cau-giay", "ha-dong"],
       roomMatchTerms: ["cmc"]
     },
     {
@@ -1605,7 +1605,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Đại Nam", "DDN", "Phú Lãm"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["dai nam", "dnu"]
     },
     {
@@ -1615,7 +1615,7 @@
       city: "Hà Nội",
       district: "Quận Hai Bà Trưng",
       aliases: ["Kinh doanh và Công nghệ", "DQK", "Vĩnh Tuy"],
-      areaKeys: [],
+      areaKeys: ["hai-ba-trung"],
       roomMatchTerms: ["kinh doanh va cong nghe", "hubt"]
     },
     {
@@ -1625,7 +1625,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy · Hoàng Mai",
       aliases: ["Phương Đông", "DPD", "Trung Kính"],
-      areaKeys: [],
+      areaKeys: ["cau-giay", "hoang-mai"],
       roomMatchTerms: ["phuong dong", "pdu"]
     },
     {
@@ -1635,7 +1635,7 @@
       city: "Hà Nội",
       district: "Quận Hoàng Mai · Thanh Xuân",
       aliases: ["Đông Đô", "DDD"],
-      areaKeys: [],
+      areaKeys: ["hoang-mai", "thanh-xuan"],
       roomMatchTerms: ["dong do", "ddu"]
     },
     {
@@ -1655,7 +1655,7 @@
       city: "Hà Nội",
       district: "Quận Nam Từ Liêm",
       aliases: ["Hòa Bình", "ETU", "Mỹ Đình"],
-      areaKeys: [],
+      areaKeys: ["nam-tu-liem"],
       roomMatchTerms: ["dai hoc hoa binh", "hbu"]
     },
     {
@@ -1665,7 +1665,7 @@
       city: "Hà Nội",
       district: "Quận Hà Đông",
       aliases: ["Nguyễn Trãi"],
-      areaKeys: [],
+      areaKeys: ["ha-dong"],
       roomMatchTerms: ["dai hoc nguyen trai"]
     },
     {
@@ -1675,7 +1675,7 @@
       city: "Hà Nội",
       district: "Quận Nam Từ Liêm",
       aliases: ["Công nghệ Đông Á", "DDA", "Trịnh Văn Bô"],
-      areaKeys: [],
+      areaKeys: ["nam-tu-liem"],
       roomMatchTerms: ["cong nghe dong a", "eaut"]
     },
     {
@@ -1685,7 +1685,7 @@
       city: "Hà Nội",
       district: "Quận Hoàng Mai",
       aliases: ["Quản lý Hữu nghị", "DCQ", "Minh Khai"],
-      areaKeys: [],
+      areaKeys: ["hoang-mai"],
       roomMatchTerms: ["huu nghi", "utm"]
     },
     {
@@ -1695,7 +1695,7 @@
       city: "Hà Nội",
       district: "Quận Bắc Từ Liêm · Mê Linh",
       aliases: ["Tài chính Ngân hàng Hà Nội", "Dịch Vọng Hậu"],
-      areaKeys: [],
+      areaKeys: ["bac-tu-liem"],
       roomMatchTerms: ["tai chinh ngan hang ha noi", "fbu"]
     },
     {
@@ -1705,7 +1705,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy · Bắc Ninh",
       aliases: ["Quốc tế Bắc Hà"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["bac ha", "bhiu"]
     },
     {
@@ -1715,7 +1715,7 @@
       city: "Hà Nội",
       district: "Quận Ba Đình",
       aliases: ["RMIT Hà Nội", "Kim Mã"],
-      areaKeys: [],
+      areaKeys: ["ba-dinh"],
       roomMatchTerms: ["rmit ha noi"]
     },
     {
@@ -1735,7 +1735,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Greenwich Hà Nội", "Phạm Văn Bạch"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["greenwich ha noi"]
     },
     {
@@ -1745,7 +1745,7 @@
       city: "Hà Nội",
       district: "Quận Cầu Giấy",
       aliases: ["Swinburne Hà Nội", "Dương Khuê"],
-      areaKeys: [],
+      areaKeys: ["cau-giay"],
       roomMatchTerms: ["swinburne ha noi"]
     }
   ];

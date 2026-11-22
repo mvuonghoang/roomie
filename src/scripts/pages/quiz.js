@@ -1,6 +1,6 @@
 /**
  * Page: Personality Quiz (/roomie/trac-nghiem)
- * Trắc nghiệm tính cách & gợi ý roommate; chọn/kết nối trực tiếp thuộc gói dịch vụ.
+ * Trắc nghiệm tính cách & gợi ý roommate; kết quả bị làm mờ khóa toàn bộ cho tới khi mua Gói 4/5.
  */
 (function () {
   const Data = window.RoomieData || {};
@@ -9,8 +9,8 @@
 
   function hasPersonalizedQuizResults() {
     const questions = Data.QUIZ_QUESTIONS || [];
-    const result = Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null);
-    const answers = Core.readJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, {});
+    const result = Core.getQuizResult ? Core.getQuizResult() : Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null);
+    const answers = Core.getQuizAnswers ? Core.getQuizAnswers() : Core.readJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, {});
     const genderOption = answers?.[1] || answers?.["1"];
     return (
       questions.length > 0 &&
@@ -25,7 +25,7 @@
     const questions = Data.QUIZ_QUESTIONS || [];
     if (!questions.length) return;
 
-    const savedAnswers = Core.readJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, {});
+    const savedAnswers = { ...(Core.getQuizAnswers ? Core.getQuizAnswers() : Core.readJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, {})) };
     let currentIdx = 0;
 
     const qNumBadge = document.getElementById("quiz-q-num-badge");
@@ -44,53 +44,25 @@
     const saveBtn = document.getElementById("save-continue-btn");
     const finishBannerBtn = document.getElementById("quiz-finish-now-btn");
 
-    const previewScores = [
-      {
-        id: "hoang-nam",
-        el: document.getElementById("preview-score-0"),
-        labelEl: document.getElementById("preview-match-label-0")
-      },
-      {
-        id: "minh-anh",
-        el: document.getElementById("preview-score-1"),
-        labelEl: document.getElementById("preview-match-label-1")
-      },
-      {
-        id: "quoc-bao",
-        el: document.getElementById("preview-score-2"),
-        labelEl: document.getElementById("preview-match-label-2")
-      }
-    ];
-
-    function updatePreviewPredictions() {
-      const hasCompletedQuiz = hasPersonalizedQuizResults();
-      const canViewScores = Core.hasUnlockedPrediction() || Core.hasCompletedQuiz?.();
-
-      previewScores.forEach((p) => {
-        if (!p.el) return;
-        const roommate = (Data.ROOMMATES || []).find((rm) => rm.id === p.id);
-        const hasCompleteProfile = [2, 3, 4, 5, 6, 7, 8, 9].every(
-          (question) => roommate?.quizProfile?.[question] || roommate?.quizProfile?.[String(question)]
-        );
-        const hasMatchScore =
-          canViewScores && hasCompletedQuiz && hasCompleteProfile && roommate?.hasPersonalizedMatchScore;
-        p.el.textContent = hasMatchScore ? `${roommate.matchScore}%` : "—";
-        if (p.labelEl) {
-          p.labelEl.textContent = hasMatchScore
-            ? String(roommate.matchLabel || "").replace(/^\d+%\s*/, "")
-            : hasCompletedQuiz
-            ? canViewScores
-              ? "Chưa đủ dữ liệu đối chiếu"
-              : "Mở gói dịch vụ để xem"
-            : "Hoàn thành trắc nghiệm để xem";
-        }
-      });
-    }
+    const canViewPredictions = () => Boolean(Core.hasUnlockedPrediction?.());
 
     async function finishQuiz() {
       const genderOption = savedAnswers[1] || savedAnswers["1"];
       if (!["A", "B", "C", "D"].includes(genderOption)) {
-        Core.showToast("Câu giới tính là điều kiện bắt buộc. Vui lòng chọn một phương án.", "info");
+        currentIdx = 0;
+        renderQuestion();
+        Core.showToast("Câu 1 (Giới tính) là điều kiện bắt buộc. Vui lòng chọn một phương án.", "info");
+        return;
+      }
+
+      const missingIdx = questions.findIndex((q) => !savedAnswers[q.number]);
+      if (missingIdx >= 0) {
+        currentIdx = missingIdx;
+        renderQuestion();
+        Core.showToast(
+          `Vui lòng trả lời Câu ${questions[missingIdx].number} để hoàn thành đủ 9 câu trắc nghiệm.`,
+          "info"
+        );
         return;
       }
 
@@ -109,7 +81,7 @@
           : isNeat
           ? '"Ngăn Nắp Văn Minh - Học Tập Tập Trung"'
           : '"Linh Hoạt Hòa Nhã - Sống Chung Bình Yên"',
-        matchCount: 42,
+        matchCount: (Data.ROOMMATES || []).length,
         pillars: {
           sleep: savedAnswers[2] ? 95 : 90,
           clean: savedAnswers[5] === "A" ? 96 : 92,
@@ -119,30 +91,37 @@
         answeredCount: answeredVals.length,
         completedAt: new Date().toISOString()
       };
-      let submissionSucceeded = true;
+
       let submission = null;
       if (Core.submitQuizResult) {
         submission = await Core.submitQuizResult(savedAnswers, result);
-        submissionSucceeded = Boolean(submission?.ok);
-      } else {
-        Core.writeJSON(Core.STORAGE_KEYS.QUIZ_RESULT, result);
       }
-      const hasAnsweredEveryQuestion = answeredVals.length === questions.length;
-      const toastMessage = submission?.code === "daily_match_limit"
-        ? submission.error
-        : !submissionSucceeded
-        ? "Chưa đồng bộ được kết quả. Phần trăm hợp gu sẽ hiện sau khi kết nối lại."
-        : hasAnsweredEveryQuestion
-        ? "Đã hoàn thành trắc nghiệm! Kết quả ghép đã được cập nhật."
-        : "Bạn chưa trả lời đủ câu nên chưa có phần trăm hợp gu.";
-      Core.showToast(toastMessage, submissionSucceeded && hasAnsweredEveryQuestion ? undefined : "info");
-      window.dispatchEvent(new CustomEvent("roomie:quiz-results-updated"));
-      if (submissionSucceeded && hasAnsweredEveryQuestion) {
-        const predictionSection = document.getElementById("quiz-prediction-section");
-        if (predictionSection) {
-          window.history.replaceState(null, "", "#quiz-prediction-section");
-          predictionSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+      if (submission?.code === "AUTH_REQUIRED") {
+        Core.openAuthModal?.("login", {
+          subtitle: "Đăng nhập để lưu hồ sơ 9 câu trắc nghiệm của bạn",
+          onSuccess: () => finishQuiz()
+        });
+        return;
+      }
+
+      const submissionSucceeded = Boolean(submission?.ok);
+      const unlocked = canViewPredictions();
+      Core.showToast(
+        !submissionSucceeded
+          ? submission?.error || "Chưa lưu được kết quả. Vui lòng thử lại."
+          : unlocked
+          ? "Đã hoàn thành 9 câu trắc nghiệm! Xem kết quả gợi ý bên dưới."
+          : "Đã lưu hồ sơ 9 câu trắc nghiệm lên hệ thống! Kích hoạt Gói 4 hoặc Gói 5 bên dưới để mở khóa kết quả hợp gu.",
+        submissionSucceeded ? undefined : "error"
+      );
+      if (!submissionSucceeded) {
+        window.dispatchEvent(new CustomEvent("roomie:quiz-results-updated"));
+      }
+
+      const predictionSection = document.getElementById("quiz-prediction-section");
+      if (submissionSucceeded && predictionSection) {
+        window.history.replaceState(null, "", "#quiz-prediction-section");
+        predictionSection.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
 
@@ -196,7 +175,7 @@
         }
       });
 
-      const selectedKey = savedAnswers[q.number] || (q.number === 1 ? null : "A");
+      const selectedKey = savedAnswers[q.number] || null;
       if (optionsGrid) {
         optionsGrid.innerHTML = q.options
           .map((opt) => {
@@ -238,7 +217,6 @@
           card.addEventListener("click", () => {
             savedAnswers[q.number] = card.dataset.option;
             Core.writeJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, savedAnswers);
-            updatePreviewPredictions();
             renderQuestion();
           });
         });
@@ -252,11 +230,10 @@
       if (saveBtn) {
         const label = saveBtn.querySelector("span:first-child");
         if (label) {
-          label.textContent = currentIdx === questions.length - 1 ? "Hoàn tất & Xem kết quả Match" : "Lưu & Tiếp tục";
+          label.textContent = currentIdx === questions.length - 1 ? "Hoàn tất trắc nghiệm" : "Lưu & Tiếp tục";
         }
       }
       if (skipBtn) skipBtn.classList.toggle("hidden", q.number === 1);
-      updatePreviewPredictions();
     }
 
     pillarCards.forEach((card, pIdx) => {
@@ -288,12 +265,13 @@
     saveBtn?.addEventListener("click", () => {
       const q = questions[currentIdx];
       if (!savedAnswers[q.number]) {
-        if (q.number === 1) {
-          Core.showToast("Vui lòng chọn giới tính và mong muốn ghép phòng trước.", "info");
-          return;
-        }
-        savedAnswers[q.number] = "A";
-        Core.writeJSON(Core.STORAGE_KEYS.QUIZ_ANSWERS, savedAnswers);
+        Core.showToast(
+          q.number === 1
+            ? "Vui lòng chọn giới tính và mong muốn ghép phòng trước."
+            : "Vui lòng chọn 1 phương án hoặc bấm 'Bỏ qua câu này' để quay lại sau.",
+          "info"
+        );
+        return;
       }
       if (currentIdx < questions.length - 1) {
         currentIdx += 1;
@@ -305,25 +283,17 @@
     finishBannerBtn?.addEventListener("click", finishQuiz);
 
     initQuizPredictionSection();
-    window.addEventListener("roomie:demo-ready", updatePreviewPredictions);
-    window.addEventListener("roomie:plan-updated", updatePreviewPredictions);
-    window.addEventListener("roomie:quiz-results-updated", updatePreviewPredictions);
     renderQuestion();
   }
 
   function initQuizPredictionSection() {
     const predictionContent = document.getElementById("quiz-prediction-content");
     const predictionOverlay = document.getElementById("quiz-prediction-lock-overlay");
+    const cardsGrid = document.getElementById("quiz-prediction-cards-grid");
+    const poolCountEl = document.getElementById("quiz-preview-pool-count");
     const statusPill = document.getElementById("quiz-preview-status-pill");
     const statusDot = document.getElementById("quiz-preview-status-dot");
     const statusLabel = document.getElementById("quiz-preview-status-label");
-    const previewCards = Array.from(document.querySelectorAll(".quiz-preview-card[data-preview-card]"));
-    const previewSelectBtns = Array.from(document.querySelectorAll(".quiz-preview-select-btn[data-preview-select]"));
-    const previewProfileBtns = Array.from(document.querySelectorAll(".quiz-preview-profile-btn[data-preview-profile]"));
-
-    const findRoommateById = (rmId) => (Data.ROOMMATES || []).find((r) => r.id === rmId);
-    const hasPersonalizedScore = (rm) => hasPersonalizedQuizResults() && Boolean(rm?.hasPersonalizedMatchScore);
-    const canViewPredictions = () => Core.hasUnlockedPrediction();
 
     const statusStyleMap = {
       matched: { cls: "bg-tertiary text-on-tertiary", icon: "done_all", text: "Đã chốt Roommate" },
@@ -340,55 +310,191 @@
         text: "Chọn bạn cùng phòng này"
       }
     };
-    const allStateClasses = Array.from(new Set(Object.values(statusStyleMap).flatMap((v) => v.cls.split(" "))));
 
-    function syncPreviewCardStates() {
+    const canViewPredictions = () => Boolean(Core.hasUnlockedPrediction?.());
+    const hasPersonalizedScore = (rm) => hasPersonalizedQuizResults() && Boolean(rm?.hasPersonalizedMatchScore);
+
+    function getPreviewCandidates() {
+      const currentUser = Core.getCurrentUser?.();
+      const all = (Data.ROOMMATES || []).filter(
+        (rm) => !currentUser?.id || String(rm.userId || "") !== String(currentUser.id)
+      );
+      if (poolCountEl) poolCountEl.textContent = String(all.length);
+
+      const completedQuiz = hasPersonalizedQuizResults();
+      const quizResultObj = Core.getQuizResult ? Core.getQuizResult() : Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null);
+      const preferredGender = quizResultObj?.preferredGender || "all";
+
+      const filtered =
+        completedQuiz && preferredGender !== "all"
+          ? all.filter((rm) => rm.gender === preferredGender)
+          : all;
+
+      return [...filtered]
+        .sort((a, b) => {
+          if (completedQuiz) {
+            return (Number(b.matchScore) || 0) - (Number(a.matchScore) || 0);
+          }
+          return 0;
+        })
+        .slice(0, 3);
+    }
+
+    function renderPredictionCards() {
+      if (!cardsGrid) return;
       const unlocked = canViewPredictions();
       const completedQuiz = hasPersonalizedQuizResults();
-      const preferredGender = Core.readJSON(Core.STORAGE_KEYS.QUIZ_RESULT, null)?.preferredGender || "all";
-      const rankedCards = previewCards
-        .map((card) => ({ card, roommate: findRoommateById(card.dataset.previewCard) }))
-        .filter(({ roommate }) => !completedQuiz || preferredGender === "all" || roommate?.gender === preferredGender)
-        .sort((a, b) => (completedQuiz ? (b.roommate?.matchScore || 0) - (a.roommate?.matchScore || 0) : 0));
+      const candidates = getPreviewCandidates();
 
-      previewCards.forEach((card) => {
-        card.classList.toggle("cursor-pointer", unlocked);
-        card.classList.toggle("hover:-translate-y-1", unlocked);
-        card.classList.toggle("hover:ring-2", unlocked);
-        card.classList.toggle("hover:ring-primary/30", unlocked);
-        const roommate = findRoommateById(card.dataset.previewCard);
-        card.classList.toggle(
-          "hidden",
-          completedQuiz && preferredGender !== "all" && roommate?.gender !== preferredGender
-        );
-      });
-      if (completedQuiz && previewCards[0]?.parentElement) {
-        rankedCards.forEach(({ card }) => previewCards[0].parentElement.appendChild(card));
+      if (!candidates.length) {
+        cardsGrid.innerHTML = `
+          <div class="col-span-full rounded-2xl bg-surface-container-lowest p-8 text-center text-sm text-on-surface-variant">
+            Chưa có hồ sơ phù hợp tiêu chí giới tính bạn chọn. Hãy thử mở rộng tùy chọn ở Câu 1 hoặc xem danh sách tại <a href="/roomie/tim-roommate" class="font-semibold text-primary underline">Tìm roommate</a>.
+          </div>
+        `;
+        return;
       }
 
-      previewSelectBtns.forEach((btn) => {
-        const rm = findRoommateById(btn.dataset.previewSelect);
-        const conn = rm ? Core.getConnectionForPartner(rm.id, rm.name) : null;
-        const statusKey = conn && statusStyleMap[conn.status] ? conn.status : "default";
-        const cfg = statusStyleMap[statusKey];
-
-        allStateClasses.forEach((c) => btn.classList.remove(c));
-        cfg.cls.split(" ").forEach((c) => btn.classList.add(c));
-        btn.innerHTML = `<span class="material-symbols-outlined text-[17px]">${cfg.icon}</span><span>${cfg.text}</span>`;
-
-        const card = btn.closest("[data-preview-card]");
-        if (card) {
+      cardsGrid.innerHTML = candidates
+        .map((rm) => {
+          const showScore = unlocked && hasPersonalizedScore(rm);
+          const scoreText = showScore ? `${rm.matchScore}%` : "—";
+          const labelText = showScore
+            ? String(rm.matchLabel || "").replace(/^\d+%\s*/, "") || "Hợp gu"
+            : unlocked
+            ? "Hoàn thành đủ 9 câu để chấm điểm"
+            : "Mở khóa với Gói 4 / Gói 5";
+          const conn = Core.getConnectionForPartner?.(rm.id, rm.name);
+          const statusKey = conn && statusStyleMap[conn.status] ? conn.status : "default";
+          const cfg = statusStyleMap[statusKey];
           const isChosen = ["pending", "accepted", "matched"].includes(statusKey);
-          card.classList.toggle("ring-2", unlocked && isChosen);
-          card.classList.toggle("ring-primary/40", unlocked && isChosen);
-        }
+          const criteriaTags = (rm.criteria || rm.tags || []).slice(0, 3);
+
+          return `
+            <article data-preview-card="${escapeHTML(rm.id)}" class="quiz-preview-card bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between ${
+              unlocked ? "cursor-pointer hover:-translate-y-1 hover:ring-2 hover:ring-primary/30" : ""
+            } ${unlocked && isChosen ? "ring-2 ring-primary/40" : ""}">
+              <div>
+                <div class="flex items-start justify-between gap-space-sm mb-space-md">
+                  <div class="relative">
+                    <img loading="lazy" decoding="async" alt="Ảnh đại diện ${escapeHTML(rm.name)}" class="w-16 h-16 rounded-2xl object-cover object-top ring-2 ring-tertiary-fixed shadow-sm" src="${escapeHTML(rm.avatar || "/assets/images/common/avatar-profile.jpg")}" />
+                    <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-[12px]">
+                      <span class="material-symbols-outlined text-[13px]">school</span>
+                    </span>
+                  </div>
+                  <div class="text-right">
+                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ecfdf5] text-tertiary font-title-md text-title-md font-bold">
+                      <span class="material-symbols-outlined text-[18px]">favorite</span>
+                      <span>${escapeHTML(scoreText)}</span>
+                    </div>
+                    <span class="block font-label-sm text-label-sm text-tertiary font-semibold mt-0.5">${escapeHTML(labelText)}</span>
+                  </div>
+                </div>
+                <div class="mb-space-sm">
+                  <div class="flex items-center gap-space-xs">
+                    <h3 class="font-title-md text-title-md text-on-surface font-bold">${escapeHTML(rm.name)}</h3>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">${escapeHTML(rm.age || 20)} tuổi</span>
+                  </div>
+                  <span class="font-body-sm text-body-sm text-primary font-semibold">${escapeHTML(rm.school)}</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 mb-space-md">
+                  ${criteriaTags
+                    .map(
+                      (tag) => `<span class="px-2.5 py-1 rounded-full bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant">${escapeHTML(tag)}</span>`
+                    )
+                    .join("")}
+                </div>
+                ${
+                  rm.quote
+                    ? `<p class="font-body-sm text-body-sm text-on-surface-variant italic mb-space-md line-clamp-2">${escapeHTML(rm.quote)}</p>`
+                    : ""
+                }
+              </div>
+              <div class="pt-space-sm border-t border-surface-container flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">
+                    Ngân sách: ${escapeHTML(rm.budget)}
+                  </span>
+                  <button type="button" data-preview-profile="${escapeHTML(rm.id)}" class="quiz-preview-profile-btn font-label-md text-label-md text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5">
+                    Hồ sơ sơ bộ
+                    <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
+                <button type="button" data-preview-select="${escapeHTML(rm.id)}" class="quiz-preview-select-btn w-full py-2.5 px-4 rounded-xl ${cfg.cls} font-label-md text-label-md font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                  <span class="material-symbols-outlined text-[17px]">${cfg.icon}</span>
+                  <span>${escapeHTML(cfg.text)}</span>
+                </button>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      const findRm = (id) => (Data.ROOMMATES || []).find((r) => r.id === id);
+
+      cardsGrid.querySelectorAll(".quiz-preview-profile-btn[data-preview-profile]").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (!canViewPredictions()) return;
+          const rm = findRm(btn.dataset.previewProfile);
+          if (rm) {
+            Core.openProfileModal(rm, syncPredictionLockState, {
+              showMatchScore: hasPersonalizedScore(rm)
+            });
+          }
+        });
+      });
+
+      cardsGrid.querySelectorAll(".quiz-preview-select-btn[data-preview-select]").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const rm = findRm(btn.dataset.previewSelect);
+          if (!rm) return;
+          if (!canViewPredictions()) {
+            const pkg = (Data.PRICING_PACKAGES || []).find((p) => p.id === "unlimited-matches-day");
+            if (pkg) Core.openPaymentModal(pkg);
+            return;
+          }
+          const existing = Core.getConnectionForPartner(rm.id, rm.name);
+          if (existing?.status === "incoming") {
+            if (Core.getActiveSlotConnections().length >= Core.MAX_CONTACT_SLOTS) {
+              Core.openSlotFullModal();
+              return;
+            }
+            const accepted = await Core.updateConnectionStatus(existing.id, "accepted");
+            if (!accepted) return;
+            syncPredictionLockState();
+            Core.showToast(`Đã đồng ý kết nối với ${rm.name}! Zalo & SĐT đã được mở khóa.`);
+            Core.openContactUnlockedModal(accepted, syncPredictionLockState);
+            return;
+          }
+          Core.openConnectInviteModal({
+            partnerId: rm.id,
+            name: rm.name,
+            meta: hasPersonalizedScore(rm) ? `${rm.school} • ${rm.matchScore}% Hợp gu` : rm.school,
+            avatar: rm.avatar,
+            roomId: rm.linkedRoomId,
+            onUpdate: syncPredictionLockState
+          });
+        });
+      });
+
+      cardsGrid.querySelectorAll(".quiz-preview-card[data-preview-card]").forEach((card) => {
+        card.addEventListener("click", () => {
+          if (!canViewPredictions()) return;
+          const rm = findRm(card.dataset.previewCard);
+          if (rm) {
+            Core.openProfileModal(rm, syncPredictionLockState, {
+              showMatchScore: hasPersonalizedScore(rm)
+            });
+          }
+        });
       });
     }
 
     function syncPredictionLockState() {
-      const planUnlocked = Core.hasUnlockedPrediction();
+      const unlocked = canViewPredictions();
       const quizComplete = hasPersonalizedQuizResults();
-      const unlocked = planUnlocked || Core.hasCompletedQuiz?.();
       const activePlan = Core.getLatestPurchasedPlan();
       const blurClasses = ["blur-[8px]", "opacity-65", "select-none", "pointer-events-none"];
 
@@ -405,24 +511,29 @@
       predictionOverlay?.classList.toggle("hidden", unlocked);
 
       if (statusPill && statusDot && statusLabel) {
-        if (planUnlocked) {
+        if (unlocked && quizComplete) {
           statusPill.className =
             "inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-bold mb-space-xs";
           statusDot.className = "w-2 h-2 rounded-full bg-tertiary animate-pulse";
-          statusLabel.textContent = `Đã mở khóa kết quả (${activePlan?.name || "Gói dịch vụ"})`;
+          statusLabel.textContent = `Đã mở khóa kết quả (${activePlan?.name || "Gói 4 / Gói 5"})`;
+        } else if (unlocked) {
+          statusPill.className =
+            "inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-bold mb-space-xs";
+          statusDot.className = "w-2 h-2 rounded-full bg-tertiary";
+          statusLabel.textContent = "Đã mở khóa gói • Hãy hoàn thành 9 câu để xem % hợp gu";
         } else if (quizComplete) {
           statusPill.className =
             "inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-bold mb-space-xs";
           statusDot.className = "w-2 h-2 rounded-full bg-primary";
-          statusLabel.textContent = "Đã hoàn thành • Mở gói để xem kết quả";
+          statusLabel.textContent = "Đã hoàn thành 9 câu • Mua Gói 4 hoặc Gói 5 để mở khóa kết quả";
         } else {
           statusPill.className =
             "inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-bold mb-space-xs";
           statusDot.className = "w-2 h-2 rounded-full bg-primary";
-          statusLabel.textContent = "Hoàn thành trắc nghiệm và mở gói để xem kết quả";
+          statusLabel.textContent = "Hoàn thành trắc nghiệm & mở Gói 4/5 để xem kết quả";
         }
       }
-      syncPreviewCardStates();
+      renderPredictionCards();
     }
 
     const bindUnlockPlanButton = (btnId, pkgId) => {
@@ -434,73 +545,26 @@
     bindUnlockPlanButton("quiz-unlock-unlimited-matches-btn", "unlimited-matches-day");
     bindUnlockPlanButton("quiz-unlock-all-in-one-btn", "all-in-one");
 
-    previewProfileBtns.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (!canViewPredictions()) return;
-        const rm = findRoommateById(btn.dataset.previewProfile);
-        if (rm) {
-          Core.openProfileModal(rm, syncPreviewCardStates, {
-            showMatchScore: hasPersonalizedScore(rm)
-          });
-        }
+    let predictionSyncQueued = false;
+    const scheduleSyncPredictionLockState = () => {
+      if (predictionSyncQueued) return;
+      predictionSyncQueued = true;
+      queueMicrotask(() => {
+        predictionSyncQueued = false;
+        syncPredictionLockState();
       });
-    });
-
-    previewSelectBtns.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const rm = findRoommateById(btn.dataset.previewSelect);
-        if (!rm) return;
-        if (!Core.hasUnlockedPrediction()) {
-          const pkg = (Data.PRICING_PACKAGES || []).find((p) => p.id === "unlimited-matches-day");
-          if (pkg) Core.openPaymentModal(pkg);
-          return;
-        }
-        const existing = Core.getConnectionForPartner(rm.id, rm.name);
-        if (existing?.status === "incoming") {
-          if (Core.getActiveSlotConnections().length >= Core.MAX_CONTACT_SLOTS) {
-            Core.openSlotFullModal();
-            return;
-          }
-          const accepted = Core.updateConnectionStatus(existing.id, "accepted");
-          syncPreviewCardStates();
-          Core.showToast(`Đã đồng ý kết nối với ${rm.name}! Zalo & SĐT đã được mở khóa.`);
-          Core.openContactUnlockedModal(accepted, syncPreviewCardStates);
-          return;
-        }
-        Core.openConnectInviteModal({
-          partnerId: rm.id,
-          name: rm.name,
-          meta: hasPersonalizedScore(rm) ? `${rm.school} • ${rm.matchScore}% Hợp gu` : rm.school,
-          avatar: rm.avatar,
-          roomId: rm.linkedRoomId,
-          contact: rm.contact,
-          onUpdate: syncPreviewCardStates
-        });
-      });
-    });
-
-    previewCards.forEach((card) => {
-      card.addEventListener("click", () => {
-        if (!canViewPredictions()) return;
-        const rm = findRoommateById(card.dataset.previewCard);
-        if (rm) {
-          Core.openProfileModal(rm, syncPreviewCardStates, {
-            showMatchScore: hasPersonalizedScore(rm)
-          });
-        }
-      });
-    });
+    };
 
     syncPredictionLockState();
-    Core.onPlanStateChange(syncPredictionLockState);
-    window.addEventListener("roomie:demo-ready", syncPredictionLockState);
-    window.addEventListener("roomie:quiz-results-updated", syncPredictionLockState);
-    window.addEventListener("roomie:connections-updated", syncPreviewCardStates);
+    Core.onPlanStateChange(scheduleSyncPredictionLockState);
+    window.addEventListener("roomie:demo-ready", scheduleSyncPredictionLockState);
+    window.addEventListener("roomie:quiz-results-updated", scheduleSyncPredictionLockState);
+    window.addEventListener("roomie:connections-updated", scheduleSyncPredictionLockState);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (document.body.dataset.page === "trac-nghiem") initQuizPage();
+    if (document.body.dataset.page === "trac-nghiem") {
+      (Core.ready || Promise.resolve()).then(initQuizPage);
+    }
   });
 })();
