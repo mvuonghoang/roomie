@@ -22,3 +22,4 @@ desktop.ini
 *.sqlite3
 *.sqlite-shm
 *.sqlite-wal
+.vercel

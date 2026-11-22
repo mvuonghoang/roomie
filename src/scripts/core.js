@@ -4,6 +4,7 @@
  */
 (function () {
   const Data = window.RoomieData || {};
+  const SEED_ROOMMATES = Array.isArray(Data.ROOMMATES) ? [...Data.ROOMMATES] : [];
   const CONTACT = Data.CONTACT_INFO || {
     phone: "+84 777 639 593",
     tel: "+84777639593",
@@ -2157,7 +2158,7 @@ Chữ ký Bên A                                                    Chữ ký B�
   function getAllLocalRoommates() {
     const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
     const byId = new Map();
-    [...(Data.ROOMMATES || []), ...(Array.isArray(listings) ? listings : [])].forEach((roommate) => {
+    [...SEED_ROOMMATES, ...(Array.isArray(listings) ? listings : [])].forEach((roommate) => {
       if (roommate?.id) byId.set(String(roommate.id), roommate);
     });
     const now = Date.now();
@@ -2167,6 +2168,15 @@ Chữ ký Bên A                                                    Chữ ký B�
       if (aBoosted !== bBoosted) return aBoosted ? -1 : 1;
       return Number(b.createdAt || 0) - Number(a.createdAt || 0);
     });
+  }
+
+  function getMyRoommateListings() {
+    const userId = getCurrentDemoUserId();
+    if (userId === "guest") return [];
+    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
+    return (Array.isArray(listings) ? listings : [])
+      .filter((listing) => String(listing?.userId) === userId)
+      .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
   }
 
   function hasDemoPlanFeature(packageId) {
@@ -2737,6 +2747,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     openAuthModal,
     onAuthStateChange,
     getAllRooms,
+    getMyRoommateListings,
     isPrivateRoom,
     getSavedRoomIds,
     toggleSavedRoom,

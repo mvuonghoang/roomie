@@ -97,25 +97,8 @@
     }
 
     status.innerHTML = "";
-    container.innerHTML = `<div class="rounded-2xl bg-surface-container-lowest p-space-xl text-center text-on-surface-variant">Đang tải tin đăng...</div>`;
-    const result = await Core.apiFetch("/api/roommates?mine=1");
-    if (!result || !result.ok || !Array.isArray(result.roommates)) {
-      status.innerHTML = `<p class="rounded-xl bg-error-container/50 px-4 py-3 text-sm text-on-error-container">${Core.escapeHTML(
-        result?.error || "Không thể tải tin đăng. Vui lòng thử lại."
-      )}</p>`;
-      container.innerHTML = `
-        <button id="my-roommate-listings-retry" type="button" class="rounded-xl bg-surface-container-lowest px-4 py-3 text-primary font-semibold hover:bg-surface-container-low">
-          Thử tải lại
-        </button>
-      `;
-      container.querySelector("#my-roommate-listings-retry")?.addEventListener("click", loadMyListings);
-      return;
-    }
-
     const currentUser = Core.getCurrentUser?.();
-    const myListings = result.roommates.filter(
-      (listing) => currentUser?.id && String(listing.userId) === String(currentUser.id)
-    );
+    const myListings = Core.getMyRoommateListings?.() || [];
     renderListings(container, myListings);
     bindListingActions(container, currentUser);
   }
