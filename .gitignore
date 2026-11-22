@@ -17,6 +17,8 @@ desktop.ini
 .env
 .env.local
 
-# SQLite temporary WAL/SHM files
+# Local SQLite files are not used by the frontend demo.
+*.sqlite
+*.sqlite3
 *.sqlite-shm
 *.sqlite-wal

@@ -19,12 +19,18 @@
     QUIZ_RESULT: "rm_quiz_result",
     QUIZ_USER_ID: "rm_quiz_user_id",
     CUSTOM_LISTINGS: "rm_custom_listings",
+    CUSTOM_ROOMMATE_LISTINGS: "rm_custom_roommate_listings",
     LISTING_DRAFT: "rm_listing_draft",
     NOTIFICATIONS_READ: "rm_notifications_read",
     CONNECTIONS: "rm_connections",
     ACTIVE_PLANS: "rm_active_plans",
     AUTH_SESSION: "rm_auth_session",
-    AUTH_USERS: "rm_auth_users"
+    AUTH_USERS: "rm_auth_users",
+    DEMO_POST_USAGE: "rm_demo_post_usage",
+    DEMO_MATCH_USAGE: "rm_demo_match_usage",
+    DEMO_PLAN_ORDERS: "rm_demo_plan_orders",
+    DEMO_REPORTS: "rm_demo_reports",
+    DEMO_CONTACT_TICKETS: "rm_demo_contact_tickets"
   };
 
   const MAX_CONTACT_SLOTS = 3;
@@ -104,6 +110,13 @@
     return Number(String(str || "").replace(/[^\d]/g, "")) || 0;
   }
 
+  function getCurrentDemoUserId() {
+    const session = readJSON(STORAGE_KEYS.AUTH_SESSION, null);
+    return session?.loggedIn && session.user?.id
+      ? String(session.user.id)
+      : "guest";
+  }
+
   /** Normalize Vietnamese text for accent-insensitive search matching. */
   function normalizeSearchText(value) {
     return String(value || "")
@@ -121,8 +134,17 @@
 
   function getPurchasedPlans() {
     const raw = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []);
+    const userId = getCurrentDemoUserId();
+    const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
     return Array.isArray(raw)
-      ? raw.filter((p) => p && p.id && p.id !== "basic" && Number(p.expiresAt) > Date.now())
+      ? raw.filter(
+          (p) =>
+            p &&
+            p.id &&
+            p.id !== "basic" &&
+            String(p.userId || defaultUserId) === userId &&
+            Number(p.expiresAt) > Date.now()
+        )
       : [];
   }
 
@@ -144,9 +166,24 @@
   }
 
   function resetPurchasedPlans() {
-    writeJSON(STORAGE_KEYS.ACTIVE_PLANS, []);
+    const userId = getCurrentDemoUserId();
+    const plans = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []).filter(
+      (plan) => String(plan.userId || (DEFAULT_DEMO_USERS[0]?.id || "user-minhthu")) !== userId
+    );
+    writeJSON(STORAGE_KEYS.ACTIVE_PLANS, plans);
+    const orders = readJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, []).map((order) =>
+      order.userId === userId && order.status === "pending" ? { ...order, status: "cancelled" } : order
+    );
+    writeJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, orders);
+    const customListings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
+    writeJSON(
+      STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS,
+      customListings.map((listing) =>
+        listing.userId === userId ? { ...listing, isBoosted: false, boostExpiresAt: null } : listing
+      )
+    );
     window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: null } }));
-    apiFetch("/api/plans/reset", { method: "POST" });
+    syncWithLocalDemo();
   }
 
   function onPlanStateChange(callback) {
@@ -184,7 +221,6 @@
     const exists = saved.includes(strId);
     const next = exists ? saved.filter((x) => x !== strId) : [...saved, strId];
     writeJSON(STORAGE_KEYS.SAVED_ROOMS, next);
-    apiFetch(`/api/rooms/${encodeURIComponent(strId)}/save`, { method: "POST" });
     return !exists;
   }
 
@@ -314,22 +350,6 @@
     };
     const filtered = all.filter((c) => c.id !== nextRecord.id);
     saveConnections([nextRecord, ...filtered]);
-    apiFetch("/api/connections/invite", {
-      method: "POST",
-      body: {
-        connId: nextRecord.id,
-        partnerId: nextRecord.partnerId,
-        name: nextRecord.name,
-        meta: nextRecord.meta,
-        avatar: nextRecord.avatar,
-        roomId: nextRecord.roomId,
-        status: nextRecord.status,
-        note: nextRecord.note,
-        releaseReason: nextRecord.releaseReason,
-        revertedOnce: nextRecord.revertedOnce,
-        contact
-      }
-    });
     return nextRecord;
   }
 
@@ -342,14 +362,6 @@
       return updated;
     });
     saveConnections(nextList);
-    apiFetch(`/api/connections/${encodeURIComponent(connId)}`, {
-      method: "PATCH",
-      body: {
-        status: nextStatus,
-        releaseReason: extra.releaseReason,
-        revertedOnce: extra.revertedOnce
-      }
-    });
     return updated;
   }
 
@@ -1302,7 +1314,7 @@
               Tạo mã QR
             </button>
             <p class="text-xs leading-relaxed text-on-surface-variant">
-              Nếu chưa cấu hình ngân hàng, hệ thống sẽ tạo QR demo không thể thanh toán. Xác nhận trong cửa sổ tiếp theo sẽ kích hoạt gói.
+              Đây là chế độ demo: mã QR không thể thanh toán. Xác nhận ở cửa sổ tiếp theo chỉ mô phỏng việc kích hoạt gói.
             </p>
           </div>
         `
@@ -1387,7 +1399,12 @@
           return;
         }
 
-        writeJSON(STORAGE_KEYS.ACTIVE_PLANS, result.plans);
+        const userId = getCurrentDemoUserId();
+        const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
+        const otherUsersPlans = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []).filter(
+          (plan) => String(plan.userId || defaultUserId) !== userId
+        );
+        writeJSON(STORAGE_KEYS.ACTIVE_PLANS, [...result.plans, ...otherUsersPlans]);
         window.dispatchEvent(
           new CustomEvent("roomie:plan-updated", { detail: { pkg: result.plans[0] || null } })
         );
@@ -1716,7 +1733,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     });
     ensureQuizDataBelongsToCurrentUser();
     emitAuthChange(null);
-    apiFetch("/api/auth/logout", { method: "POST" });
+    syncWithLocalDemo();
   }
 
   function loginUser(identifier, password) {
@@ -1743,15 +1760,7 @@ Chữ ký Bên A                                                    Chữ ký B�
       return { ok: false, error: "Mật khẩu chưa chính xác. Vui lòng kiểm tra lại." };
     }
     const activeUser = setLoggedInUser(matched);
-    apiFetch("/api/auth/login", {
-      method: "POST",
-      body: { identifier: cleanId, password: cleanPass || "123" }
-    }).then((res) => {
-      if (res && res.ok && res.user) {
-        setLoggedInUser(res.user, res.token);
-        syncWithBackend();
-      }
-    });
+    syncWithLocalDemo();
     return { ok: true, user: activeUser };
   }
 
@@ -1814,25 +1823,7 @@ Chữ ký Bên A                                                    Chữ ký B�
 
     writeJSON(STORAGE_KEYS.AUTH_USERS, [newUser, ...users]);
     const activeUser = setLoggedInUser(newUser);
-    apiFetch("/api/auth/register", {
-      method: "POST",
-      body: {
-        id: newUser.id,
-        name,
-        email,
-        password,
-        confirmPassword,
-        schoolCode,
-        major,
-        gender,
-        avatar
-      }
-    }).then((res) => {
-      if (res && res.ok && res.user) {
-        setLoggedInUser(res.user, res.token);
-        syncWithBackend();
-      }
-    });
+    syncWithLocalDemo();
     return { ok: true, user: activeUser };
   }
 
@@ -2158,191 +2149,558 @@ Chữ ký Bên A                                                    Chữ ký B�
   // BACKEND API & SQLITE DATABASE SYNC LAYER
   // =========================================================================
 
-  async function apiFetch(endpoint, options = {}) {
-    try {
-      const session = readJSON(STORAGE_KEYS.AUTH_SESSION, null);
-      const headers = {
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-      };
-      if (session?.token) {
-        headers.Authorization = `Bearer ${session.token}`;
-      }
-      if (session?.loggedIn && session?.user?.id) {
-        headers["X-User-Id"] = session.user.id;
-      } else if (session && session.loggedIn === false) {
-        headers["X-User-Id"] = "guest";
-      }
-
-      const fetchOpts = {
-        method: options.method || "GET",
-        headers
-      };
-      if (options.body !== undefined) {
-        fetchOpts.body = typeof options.body === "string" ? options.body : JSON.stringify(options.body);
-      }
-
-      const response = await fetch(endpoint, fetchOpts);
-      const data = await response.json().catch(() => null);
-      return data;
-    } catch {
-      return null;
-    }
+  function getVietnamDayStart(timestamp = Date.now()) {
+    const vietnamOffset = 7 * 60 * 60 * 1000;
+    return Math.floor((timestamp + vietnamOffset) / 86400000) * 86400000 - vietnamOffset;
   }
 
-  async function syncWithBackend() {
-    const data = await apiFetch("/api/bootstrap");
-    if (!data || !data.ok) return null;
+  function getAllLocalRoommates() {
+    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
+    const byId = new Map();
+    [...(Data.ROOMMATES || []), ...(Array.isArray(listings) ? listings : [])].forEach((roommate) => {
+      if (roommate?.id) byId.set(String(roommate.id), roommate);
+    });
+    const now = Date.now();
+    return [...byId.values()].sort((a, b) => {
+      const aBoosted = Number(a.boostExpiresAt) > now;
+      const bBoosted = Number(b.boostExpiresAt) > now;
+      if (aBoosted !== bBoosted) return aBoosted ? -1 : 1;
+      return Number(b.createdAt || 0) - Number(a.createdAt || 0);
+    });
+  }
 
-    if (Array.isArray(data.users) && data.users.length) {
-      const localUsers = getRegisteredUsers();
-      const byEmail = new Map(localUsers.map((u) => [u.email?.toLowerCase(), u]));
-      data.users.forEach((dbUser) => {
-        const key = dbUser.email?.toLowerCase();
-        if (key) {
-          const existing = byEmail.get(key) || {};
-          byEmail.set(key, { ...existing, ...dbUser, password: existing.password || "123" });
+  function hasDemoPlanFeature(packageId) {
+    return (
+      hasPurchasedPlan(packageId) ||
+      (packageId !== "all-in-one" && hasPurchasedPlan("all-in-one"))
+    );
+  }
+
+  function getDemoQrDataUrl(seed) {
+    const size = 29;
+    const matrix = Array.from({ length: size }, () => Array(size).fill(false));
+    const reserved = Array.from({ length: size }, () => Array(size).fill(false));
+    let randomState = String(seed).split("").reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 7);
+    const nextBit = () => {
+      randomState ^= randomState << 13;
+      randomState ^= randomState >>> 17;
+      randomState ^= randomState << 5;
+      return randomState & 1;
+    };
+
+    [[0, 0], [size - 7, 0], [0, size - 7]].forEach(([left, top]) => {
+      for (let y = -1; y <= 7; y += 1) {
+        for (let x = -1; x <= 7; x += 1) {
+          const px = left + x;
+          const py = top + y;
+          if (px < 0 || py < 0 || px >= size || py >= size) continue;
+          reserved[py][px] = true;
+          matrix[py][px] =
+            x >= 0 &&
+            x < 7 &&
+            y >= 0 &&
+            y < 7 &&
+            (x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4));
         }
-      });
-      writeJSON(STORAGE_KEYS.AUTH_USERS, Array.from(byEmail.values()));
-    }
+      }
+    });
 
-    if (Array.isArray(data.rooms) && data.rooms.length) {
-      Data.ROOMS = data.rooms;
-    }
-    if (Array.isArray(data.roommates) && data.roommates.length) {
-      Data.ROOMMATES = markPersonalizedRoommateScores(data.roommates, data.quizAnswers);
-    }
-    if (Array.isArray(data.notifications) && data.notifications.length) {
-      Data.NOTIFICATIONS = data.notifications;
-    }
-    if (Array.isArray(data.savedRoomIds)) {
-      const localSaved = getSavedRoomIds();
-      const mergedSaved = Array.from(new Set([...data.savedRoomIds, ...localSaved]));
-      writeJSON(STORAGE_KEYS.SAVED_ROOMS, mergedSaved);
-    }
-    if (Array.isArray(data.connections) && data.connections.length) {
-      saveConnections(data.connections);
-    }
-    if (Array.isArray(data.activePlans)) {
-      writeJSON(STORAGE_KEYS.ACTIVE_PLANS, data.activePlans);
-      window.dispatchEvent(
-        new CustomEvent("roomie:plan-updated", { detail: { pkg: data.activePlans[0] || null } })
-      );
-    }
-    if (data.quizResult && data.quizResult.archetype) {
-      writeJSON(STORAGE_KEYS.QUIZ_RESULT, data.quizResult);
-      if (data.quizAnswers && Object.keys(data.quizAnswers).length) {
-        writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, data.quizAnswers);
+    for (let y = 0; y < size; y += 1) {
+      for (let x = 0; x < size; x += 1) {
+        if (!reserved[y][x]) matrix[y][x] = nextBit() === 1;
       }
     }
 
-    window.dispatchEvent(new CustomEvent("roomie:backend-synced", { detail: data }));
+    const cell = 8;
+    const margin = 4;
+    const cells = [];
+    matrix.forEach((row, y) => {
+      row.forEach((isDark, x) => {
+        if (isDark) cells.push(`<rect x="${margin + x * cell}" y="${margin + y * cell}" width="${cell}" height="${cell}"/>`);
+      });
+    });
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240"><rect width="240" height="240" fill="#fff"/><g fill="#111">${cells.join("")}</g></svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  function getLocalPlanOrders() {
+    const orders = readJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, []);
+    return Array.isArray(orders) ? orders : [];
+  }
+
+  function getLocalPlansForCurrentUser() {
+    const userId = getCurrentDemoUserId();
+    const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
+    return readJSON(STORAGE_KEYS.ACTIVE_PLANS, []).filter(
+      (plan) =>
+        String(plan.userId || defaultUserId) === userId &&
+        Number(plan.expiresAt) > Date.now()
+    );
+  }
+
+  function createLocalPlanOrder(body) {
+    const packageId = String(body.packageId || "");
+    const plan = (Data.PRICING_PACKAGES || []).find((item) => item.id === packageId);
+    if (!plan || plan.id === "basic" || plan.available !== true) {
+      return { ok: false, error: "Gói dịch vụ không hợp lệ hoặc hiện chưa mở bán." };
+    }
+
+    const userId = getCurrentDemoUserId();
+    const targetId = String(body.targetId || "");
+    const isBoostPlan = packageId === "boost-24h" || packageId === "boost-7d";
+    if (isBoostPlan) {
+      const target = getAllLocalRoommates().find(
+        (roommate) => String(roommate.id) === targetId && String(roommate.userId) === userId
+      );
+      if (!targetId || !target) {
+        return { ok: false, error: "Không tìm thấy bài đăng của bạn để đẩy." };
+      }
+    }
+
+    const now = Date.now();
+    const order = {
+      id: `demo-order-${now}-${Math.random().toString(36).slice(2, 10)}`,
+      userId,
+      packageId,
+      packageName: plan.name,
+      amountVnd: Number(plan.priceVnd) || 0,
+      transferCode: `RMDEMO${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+      targetId: targetId || null,
+      status: "pending",
+      createdAt: now,
+      expiresAt: now + 30 * 60 * 1000
+    };
+    writeJSON(STORAGE_KEYS.DEMO_PLAN_ORDERS, [order, ...getLocalPlanOrders()]);
+    return {
+      ok: true,
+      order,
+      payment: {
+        qrDataUrl: getDemoQrDataUrl(order.transferCode),
+        bank: "QR demo",
+        accountNumber: "Không áp dụng",
+        accountName: "Không thể nhận tiền",
+        isDemo: true
+      }
+    };
+  }
+
+  function confirmLocalPlanOrder(orderId) {
+    const userId = getCurrentDemoUserId();
+    const orders = getLocalPlanOrders();
+    const order = orders.find(
+      (item) => item.id === String(orderId) && item.userId === userId
+    );
+    if (!order) return { ok: false, error: "Không tìm thấy đơn demo." };
+    if (order.status === "confirmed") {
+      return { ok: true, alreadyConfirmed: true, plans: getLocalPlansForCurrentUser() };
+    }
+    if (order.status !== "pending" || Number(order.expiresAt) <= Date.now()) {
+      return { ok: false, error: "Đơn demo đã hết hạn. Vui lòng tạo đơn mới." };
+    }
+
+    const plan = (Data.PRICING_PACKAGES || []).find((item) => item.id === order.packageId);
+    if (!plan) return { ok: false, error: "Không tìm thấy gói demo." };
+    const now = Date.now();
+    const dailyPackage = ["extra-posts-day", "unlimited-matches-day"].includes(plan.id);
+    const durationMs = dailyPackage
+      ? getVietnamDayStart(now) + 86400000 - now
+      : Number(plan.durationMs);
+    if (!Number.isFinite(durationMs) || durationMs <= 0) {
+      return { ok: false, error: "Thời hạn gói demo không hợp lệ." };
+    }
+
+    const isBoostPlan = plan.id === "boost-24h" || plan.id === "boost-7d";
+    let expiresAt = now + durationMs;
+    const allPlans = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []);
+    const defaultUserId = DEFAULT_DEMO_USERS[0]?.id || "user-minhthu";
+    const currentPlans = allPlans.filter(
+      (item) => String(item.userId || defaultUserId) === userId
+    );
+
+    if (isBoostPlan) {
+      const boostDuration = durationMs;
+      let foundTarget = false;
+      const customListings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
+      const updatedListings = customListings.map((listing) => {
+        if (String(listing.id) !== String(order.targetId) || String(listing.userId) !== userId) return listing;
+        foundTarget = true;
+        const currentExpiry = Number(listing.boostExpiresAt) > now ? Number(listing.boostExpiresAt) : now;
+        expiresAt = currentExpiry + boostDuration;
+        return { ...listing, isBoosted: true, boostExpiresAt: expiresAt };
+      });
+      if (!foundTarget) return { ok: false, error: "Bài đăng không còn tồn tại để đẩy." };
+      writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, updatedListings);
+    } else {
+      const previousPlan = currentPlans.find(
+        (item) => item.id === plan.id && Number(item.expiresAt) > now
+      );
+      if (previousPlan) expiresAt = Number(previousPlan.expiresAt) + durationMs;
+    }
+
+    const activePlan = {
+      id: plan.id,
+      recordId: `demo-plan-${order.id}`,
+      userId,
+      name: plan.name,
+      price: plan.price,
+      period: plan.period,
+      paymentCode: order.transferCode,
+      purchasedAt: now,
+      expiresAt,
+      targetId: order.targetId
+    };
+    const otherPlans = allPlans.filter(
+      (item) =>
+        String(item.userId || defaultUserId) !== userId ||
+        item.id !== plan.id
+    );
+    writeJSON(STORAGE_KEYS.ACTIVE_PLANS, [activePlan, ...otherPlans]);
+    writeJSON(
+      STORAGE_KEYS.DEMO_PLAN_ORDERS,
+      orders.map((item) => item.id === order.id ? { ...item, status: "confirmed", confirmedAt: now } : item)
+    );
+    Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), readJSON(STORAGE_KEYS.QUIZ_ANSWERS, {}));
+    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    window.dispatchEvent(
+      new CustomEvent("roomie:plan-updated", { detail: { pkg: activePlan } })
+    );
+    return {
+      ok: true,
+      plans: getLocalPlansForCurrentUser(),
+      roommates: Data.ROOMMATES
+    };
+  }
+
+  async function apiFetch(endpoint, options = {}) {
+    const requestUrl = new URL(endpoint, window.location.origin);
+    const pathname = requestUrl.pathname.startsWith("/roomie/api/")
+      ? requestUrl.pathname.slice("/roomie".length)
+      : requestUrl.pathname;
+    const method = String(options.method || "GET").toUpperCase();
+    let body = options.body || {};
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        return { ok: false, error: "Dữ liệu demo không đúng định dạng." };
+      }
+    }
+
+    if (pathname === "/api/plans" && method === "GET") {
+      return {
+        ok: true,
+        packages: Data.PRICING_PACKAGES || [],
+        activePlans: getLocalPlansForCurrentUser(),
+        paymentConfigured: false
+      };
+    }
+    if (pathname === "/api/plans/checkout" && method === "POST") {
+      return createLocalPlanOrder(body);
+    }
+    if (pathname === "/api/plans/confirm" && method === "POST") {
+      return confirmLocalPlanOrder(body.orderId);
+    }
+    if (pathname === "/api/plans/reset" && method === "POST") {
+      resetPurchasedPlans();
+      return { ok: true, plans: getLocalPlansForCurrentUser() };
+    }
+    if (pathname === "/api/roommates" && method === "GET") {
+      const roommates = getAllLocalRoommates();
+      return {
+        ok: true,
+        roommates: requestUrl.searchParams.get("mine") === "1"
+          ? roommates.filter((roommate) => String(roommate.userId) === getCurrentDemoUserId())
+          : roommates
+      };
+    }
+
+    const boostMatch = pathname.match(/^\/api\/roommates\/([^/]+)\/boost$/);
+    if (boostMatch && method === "POST") {
+      const userId = getCurrentDemoUserId();
+      if (!hasPurchasedPlan("all-in-one")) {
+        return { ok: false, error: "Tính năng đẩy tin trong Gói trọn bộ chưa được kích hoạt." };
+      }
+      const durationMs = body.period === "24h" ? 86400000 : body.period === "7d" ? 7 * 86400000 : 0;
+      if (!durationMs) return { ok: false, error: "Thời hạn đẩy tin không hợp lệ." };
+      const targetId = decodeURIComponent(boostMatch[1]);
+      let foundTarget = false;
+      const now = Date.now();
+      const customListings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
+      const updatedListings = customListings.map((listing) => {
+        if (String(listing.id) !== targetId || String(listing.userId) !== userId) return listing;
+        foundTarget = true;
+        const currentExpiry = Number(listing.boostExpiresAt) > now ? Number(listing.boostExpiresAt) : now;
+        return { ...listing, isBoosted: true, boostExpiresAt: currentExpiry + durationMs };
+      });
+      if (!foundTarget) return { ok: false, error: "Không tìm thấy bài đăng của bạn để đẩy." };
+      writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, updatedListings);
+      Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), readJSON(STORAGE_KEYS.QUIZ_ANSWERS, {}));
+      window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+      return { ok: true, roommates: Data.ROOMMATES };
+    }
+
+    return {
+      ok: false,
+      error: `Chức năng ${method} ${pathname} chưa được triển khai trong chế độ demo.`
+    };
+  }
+
+  function syncWithLocalDemo() {
+    const user = getCurrentUser();
+    const quizAnswers = readJSON(STORAGE_KEYS.QUIZ_ANSWERS, {});
+    Data.ROOMS = getAllRooms();
+    Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), quizAnswers);
+    const readNotifications = new Set(readJSON(STORAGE_KEYS.NOTIFICATIONS_READ, []));
+    Data.NOTIFICATIONS = (Data.NOTIFICATIONS || []).map((notification) => ({
+      ...notification,
+      unread: notification.unread && !readNotifications.has(notification.id)
+    }));
+    window.dispatchEvent(new CustomEvent("roomie:demo-ready", { detail: { user } }));
     window.dispatchEvent(new CustomEvent("roomie:connections-updated"));
-    return data;
+    return { ok: true, user, rooms: Data.ROOMS, roommates: Data.ROOMMATES };
   }
 
   async function createRoomListing(newRoom) {
     const existing = readJSON(STORAGE_KEYS.CUSTOM_LISTINGS, []);
-    writeJSON(STORAGE_KEYS.CUSTOM_LISTINGS, [newRoom, ...existing.filter((r) => r.id !== newRoom.id)]);
-    const res = await apiFetch("/api/rooms", {
-      method: "POST",
-      body: newRoom
-    });
-    if (res && res.ok && Array.isArray(res.rooms)) {
-      Data.ROOMS = res.rooms;
-    }
-    return res?.room || newRoom;
+    const listing = { ...newRoom, createdAt: newRoom.createdAt || Date.now() };
+    writeJSON(STORAGE_KEYS.CUSTOM_LISTINGS, [listing, ...existing.filter((room) => room.id !== listing.id)]);
+    Data.ROOMS = getAllRooms();
+    window.dispatchEvent(new CustomEvent("roomie:demo-ready", { detail: { rooms: Data.ROOMS } }));
+    return listing;
   }
 
-  async function createRoommateListing(listing) {
-    const res = await apiFetch("/api/roommates", {
-      method: "POST",
-      body: listing
-    });
-    if (res && res.ok && Array.isArray(res.roommates)) {
-      Data.ROOMMATES = res.roommates;
+  async function createRoommateListing(payload = {}) {
+    const user = getCurrentUser();
+    if (!user || String(user.role || "student").toLowerCase() !== "student") {
+      return { ok: false, error: "Chỉ tài khoản sinh viên mới được đăng tin tìm roommate." };
     }
-    return res;
+
+    const postType = String(payload.postType || "");
+    const hasRoom = postType === "has-room";
+    const area = String(payload.area || "").trim().slice(0, 180);
+    const areaKey = String(payload.areaKey || "");
+    const budgetAmount = Number(payload.budget);
+    const allowedAreaKeys = ["thu-duc", "binh-thanh", "quan-5", "go-vap", "quan-10"];
+    if (
+      (!hasRoom && postType !== "find-room") ||
+      !area ||
+      !allowedAreaKeys.includes(areaKey) ||
+      !Number.isFinite(budgetAmount) ||
+      budgetAmount <= 0 ||
+      !user.gender
+    ) {
+      return { ok: false, error: "Thông tin tin đăng chưa hợp lệ." };
+    }
+
+    const now = Date.now();
+    const usage = readJSON(STORAGE_KEYS.DEMO_POST_USAGE, {});
+    const usageKey = `${user.id}:${getVietnamDayStart(now)}`;
+    const used = Number(usage[usageKey]) || 0;
+    const dailyLimit = hasDemoPlanFeature("extra-posts-day") ? 4 : 1;
+    if (used >= dailyLimit) {
+      return {
+        ok: false,
+        code: "daily_limit",
+        error: dailyLimit > 1
+          ? "Bạn đã dùng hết 4 lượt đăng roommate hôm nay."
+          : "Gói miễn phí cho phép đăng 1 tin roommate mỗi ngày. Mua Gói 1 để đăng thêm tối đa 3 tin."
+      };
+    }
+    usage[usageKey] = used + 1;
+    writeJSON(STORAGE_KEYS.DEMO_POST_USAGE, usage);
+
+    const budget = `${(budgetAmount / 1000000).toFixed(1)} tr/tháng/người`;
+    const roomType = String(payload.roomType || "").trim();
+    const schoolPreference = String(payload.schoolPreference || "").trim();
+    const school = String(user.school || user.shortSchool || "Sinh viên").trim();
+    const shortSchool = String(user.shortSchool || school).trim();
+    const roommate = {
+      id: `roommate-${now}-${Math.random().toString(36).slice(2, 10)}`,
+      userId: String(user.id),
+      name: String(user.name || "Sinh viên Roomie").trim(),
+      shortName: String(user.name || "Sinh viên Roomie").trim(),
+      age: Number(user.age) || 20,
+      gender: String(user.gender),
+      school,
+      shortSchool,
+      major: String(user.major || "").trim(),
+      matchScore: 90,
+      matchLabel: "Chưa có điểm hợp gu",
+      hasPersonalizedMatchScore: false,
+      createdAt: now,
+      vnuMember: /HCMUS|HCMUT|UIT|UEL|HCMUSSH|HCMIU|ĐHQG/i.test(`${school} ${shortSchool}`),
+      hasRoom,
+      roomStatusTitle: hasRoom ? "Đang tìm bạn ở ghép:" : "Đang tìm bạn cùng đi tìm phòng:",
+      roomStatusDetail: hasRoom
+        ? `${area}${roomType ? ` • ${roomType}` : ""}${schoolPreference ? ` • Gần ${schoolPreference}` : ""} • ${budget}`
+        : `Mong muốn tìm phòng tại ${area}${roomType ? ` • ${roomType}` : ""}${schoolPreference ? ` • Ưu tiên ${schoolPreference}` : ""} • Ngân sách ${budget}`,
+      linkedRoomId: null,
+      areaKey,
+      city: String(payload.city || "TP.HCM"),
+      budget,
+      avatar: String(user.avatar || "/assets/images/common/avatar-profile.jpg"),
+      quote: String(payload.note || "").trim().slice(0, 500),
+      criteria: Array.isArray(payload.criteria) ? payload.criteria.slice(0, 12) : [],
+      tags: Array.isArray(payload.criteria) ? payload.criteria.slice(0, 12) : [],
+      contact: { phone: CONTACT.phone, zalo: CONTACT.zalo, facebook: "fb.com/roomie.student" },
+      quizProfile: {},
+      isBoosted: false,
+      boostExpiresAt: null
+    };
+    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
+    writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, [roommate, ...listings]);
+    Data.ROOMMATES = getAllLocalRoommates();
+    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    return { ok: true, roommate, roommates: Data.ROOMMATES };
   }
 
   async function deleteRoommateListing(roommateId) {
-    const res = await apiFetch(`/api/roommates/${encodeURIComponent(roommateId)}`, {
-      method: "DELETE"
-    });
-    if (res && res.ok && Array.isArray(res.roommates)) {
-      Data.ROOMMATES = res.roommates;
-      window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    const userId = getCurrentDemoUserId();
+    const listings = readJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, []);
+    const nextListings = listings.filter(
+      (listing) => !(String(listing.id) === String(roommateId) && String(listing.userId) === userId)
+    );
+    if (nextListings.length === listings.length) {
+      return { ok: false, error: "Không tìm thấy bài đăng của bạn để xóa." };
     }
-    return res;
+    writeJSON(STORAGE_KEYS.CUSTOM_ROOMMATE_LISTINGS, nextListings);
+    Data.ROOMMATES = getAllLocalRoommates();
+    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    return { ok: true, roommates: Data.ROOMMATES };
   }
 
   async function submitQuizResult(answers, result) {
-    const res = await apiFetch("/api/quiz/submit", {
-      method: "POST",
-      body: { answers, result }
-    });
-    if (!res?.ok) return res;
-
-    writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers);
-    if (res.quizResult) writeJSON(STORAGE_KEYS.QUIZ_RESULT, res.quizResult);
-    if (Array.isArray(res.roommates)) {
-      Data.ROOMMATES = markPersonalizedRoommateScores(res.roommates, answers);
+    const userId = getCurrentDemoUserId();
+    const completed = Number(result?.answeredCount) >= (Data.QUIZ_QUESTIONS || []).length;
+    if (completed && !hasDemoPlanFeature("unlimited-matches-day")) {
+      const usage = readJSON(STORAGE_KEYS.DEMO_MATCH_USAGE, {});
+      const usageKey = `${userId}:${getVietnamDayStart()}`;
+      if ((Number(usage[usageKey]) || 0) >= 1) {
+        return {
+          ok: false,
+          code: "daily_match_limit",
+          error: "Bạn đã dùng lượt xem kết quả hôm nay. Mua Gói 4 để xem kết quả ghép không giới hạn trong ngày."
+        };
+      }
+      usage[usageKey] = (Number(usage[usageKey]) || 0) + 1;
+      writeJSON(STORAGE_KEYS.DEMO_MATCH_USAGE, usage);
     }
-    return res;
+
+    writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers || {});
+    const quizResult = { ...result, answers: answers || {} };
+    writeJSON(STORAGE_KEYS.QUIZ_RESULT, quizResult);
+    Data.ROOMMATES = markPersonalizedRoommateScores(getAllLocalRoommates(), answers || {});
+    window.dispatchEvent(new CustomEvent("roomie:quiz-results-updated"));
+    window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+    return { ok: true, quizResult, roommates: Data.ROOMMATES };
   }
 
   function markPersonalizedRoommateScores(roommates, answers) {
     const questionCount = (Data.QUIZ_QUESTIONS || []).length;
     const hasCompleteAnswers = questionCount > 0 && Object.keys(answers || {}).length === questionCount;
     const genderOption = answers?.[1] || answers?.["1"];
+    const weights = { 2: 20, 3: 15, 4: 10, 5: 25, 6: 15, 7: 10, 8: 10, 9: 15 };
+
+    const compareOptions = (question, userOption, targetOption) => {
+      if (!userOption || !targetOption) return 0.9;
+      if (userOption === targetOption) return 1;
+      const pair = [userOption, targetOption].sort().join("");
+      if (question === 2) {
+        if (pair.includes("D")) return 0.92;
+        if (pair === "AB" || pair === "BC") return 0.88;
+        if (pair === "AC") return 0.72;
+      }
+      if (question === 5) {
+        if (pair === "AB" || pair === "AC" || pair === "BC") return 0.92;
+        return 0.78;
+      }
+      if (question === 6) {
+        if (pair === "AB" || pair === "AD") return 0.86;
+        return 0.74;
+      }
+      return ["AB", "BC", "CD", "AD"].includes(pair) ? 0.88 : 0.8;
+    };
 
     return roommates.map((roommate) => {
-      const hasCompleteProfile = [2, 3, 4, 5, 6, 7, 8, 9].every(
-        (question) => roommate.quizProfile?.[question] || roommate.quizProfile?.[String(question)]
-      );
       const genderCompatible =
         (genderOption === "A" && roommate.gender === "Nam") ||
         (genderOption === "B" && roommate.gender === "Nữ") ||
         genderOption === "C" ||
         genderOption === "D";
+      let weightedSum = 0;
+      let totalWeight = 0;
+      Object.entries(weights).forEach(([questionText, weight]) => {
+        const question = Number(questionText);
+        const userOption = answers?.[question] || answers?.[questionText];
+        const targetOption =
+          roommate.quizProfile?.[question] || roommate.quizProfile?.[questionText];
+        if (userOption && targetOption) {
+          weightedSum += compareOptions(question, userOption, targetOption) * weight;
+          totalWeight += weight;
+        }
+      });
+      const score =
+        genderCompatible && totalWeight > 0
+          ? Math.round(Math.min(99, Math.max(84, (weightedSum / totalWeight) * 98)))
+          : null;
+      const matchLabel =
+        !genderCompatible
+          ? "Không phù hợp giới tính"
+          : score === null
+          ? "Chưa đủ dữ liệu lối sống"
+          : score >= 96
+          ? `${score}% Cực hợp gu`
+          : score >= 91
+          ? `${score}% Rất hợp gu`
+          : `${score}% Hòa hợp`;
       return {
         ...roommate,
-        ...(genderOption && !genderCompatible ? { matchScore: null } : {}),
-        hasPersonalizedMatchScore: Boolean(
-          genderCompatible && (roommate.hasPersonalizedMatchScore || (hasCompleteAnswers && hasCompleteProfile))
-        )
+        matchScore: hasCompleteAnswers ? score : null,
+        matchLabel,
+        hasPersonalizedMatchScore: Boolean(hasCompleteAnswers && genderCompatible && totalWeight > 0)
       };
     });
   }
 
   async function submitSafetyReport(payload) {
-    return apiFetch("/api/reports", {
-      method: "POST",
-      body: payload
-    });
+    const report = {
+      ...payload,
+      id: `demo-report-${Date.now()}`,
+      userId: getCurrentDemoUserId(),
+      createdAt: Date.now(),
+      status: "pending"
+    };
+    writeJSON(STORAGE_KEYS.DEMO_REPORTS, [report, ...readJSON(STORAGE_KEYS.DEMO_REPORTS, [])]);
+    return { ok: true, report };
   }
 
   async function submitContactTicket(payload) {
-    return apiFetch("/api/contacts", {
-      method: "POST",
-      body: payload
-    });
+    const ticket = {
+      ...payload,
+      id: `demo-contact-${Date.now()}`,
+      userId: getCurrentDemoUserId(),
+      createdAt: Date.now()
+    };
+    writeJSON(
+      STORAGE_KEYS.DEMO_CONTACT_TICKETS,
+      [ticket, ...readJSON(STORAGE_KEYS.DEMO_CONTACT_TICKETS, [])]
+    );
+    return { ok: true, ticket };
   }
 
   async function markAllNotificationsRead() {
-    writeJSON(
-      STORAGE_KEYS.NOTIFICATIONS_READ,
-      (Data.NOTIFICATIONS || []).map((n) => n.id)
-    );
-    return apiFetch("/api/notifications/read-all", {
-      method: "POST"
-    });
+    const readIds = (Data.NOTIFICATIONS || []).map((notification) => notification.id);
+    writeJSON(STORAGE_KEYS.NOTIFICATIONS_READ, readIds);
+    Data.NOTIFICATIONS = (Data.NOTIFICATIONS || []).map((notification) => ({
+      ...notification,
+      unread: false
+    }));
+    return { ok: true, notifications: Data.NOTIFICATIONS };
   }
 
-  // Initialize USER_PROFILE sync & Backend Database sync on script load
+  // Initialize the local demo state without making an API or database connection.
   getCurrentUser();
-  syncWithBackend();
+  syncWithLocalDemo();
 
   window.RoomieCore = {
     CONTACT,
@@ -2350,7 +2708,7 @@ Chữ ký Bên A                                                    Chữ ký B�
     MAX_CONTACT_SLOTS,
     FALLBACK_SVG,
     apiFetch,
-    syncWithBackend,
+    syncWithLocalDemo,
     createRoomListing,
     createRoommateListing,
     deleteRoommateListing,

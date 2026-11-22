@@ -611,7 +611,7 @@
     }
 
     renderMatches();
-    window.addEventListener("roomie:backend-synced", () => {
+    window.addEventListener("roomie:demo-ready", () => {
       renderMatches();
     });
     window.addEventListener("roomie:roommates-updated", renderMatches);

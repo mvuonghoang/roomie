@@ -472,7 +472,7 @@
     applyQueryParams();
     renderAreaOptions();
     render();
-    window.addEventListener("roomie:backend-synced", () => {
+    window.addEventListener("roomie:demo-ready", () => {
       renderAreaOptions();
       render();
     });

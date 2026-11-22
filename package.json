@@ -1,13 +1,11 @@
 {
-  "name": "roomiematch-fullstack",
+  "name": "roomiematch-demo",
   "version": "1.0.0",
   "private": true,
-  "description": "RoomieMatch - Nen tang tim phong tro va ghep doi roommate cho sinh vien (Fullstack Node.js + SQLite)",
+  "description": "RoomieMatch - Frontend-only demo for finding student rooms and roommates",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "db:seed": "node backend/database/seed.js",
-    "db:reset": "node backend/database/seed.js --reset"
+    "dev": "node server.js"
   },
   "dependencies": {
     "dotenv": "^18.0.10",

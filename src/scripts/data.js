@@ -492,6 +492,7 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
   ROOMMATES: [
     {
       id: "hoang-nam",
+      quizProfile: { 1: "A", 2: "B", 3: "A", 4: "A", 5: "A", 6: "A", 7: "A", 8: "B", 9: "A" },
       name: "Nguyễn Hoàng Nam",
       shortName: "Hoàng Nam",
       age: 20,
@@ -526,6 +527,7 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
     },
     {
       id: "minh-anh",
+      quizProfile: { 1: "B", 2: "B", 3: "A", 4: "B", 5: "A", 6: "A", 7: "A", 8: "B", 9: "A" },
       name: "Lê Minh Anh",
       shortName: "Minh Anh",
       age: 20,
@@ -560,6 +562,7 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
     },
     {
       id: "quoc-bao",
+      quizProfile: { 1: "A", 2: "C", 3: "A", 4: "B", 5: "B", 6: "A", 7: "B", 8: "A", 9: "B" },
       name: "Trần Quốc Bảo",
       shortName: "Quốc Bảo",
       age: 21,
@@ -594,6 +597,7 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
     },
     {
       id: "thao-vy",
+      quizProfile: { 1: "B", 2: "A", 3: "A", 4: "C", 5: "A", 6: "A", 7: "D", 8: "A", 9: "A" },
       name: "Vũ Thảo Vy",
       shortName: "Thảo Vy",
       age: 19,
@@ -628,6 +632,7 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
     },
     {
       id: "gia-huy",
+      quizProfile: { 1: "A", 2: "C", 3: "B", 4: "B", 5: "B", 6: "A", 7: "C", 8: "B", 9: "A" },
       name: "Phạm Gia Huy",
       shortName: "Gia Huy",
       age: 21,
@@ -662,6 +667,7 @@ window.RoomieData = Object.assign(window.RoomieData || {}, {
     },
     {
       id: "ngoc-han",
+      quizProfile: { 1: "B", 2: "A", 3: "A", 4: "A", 5: "A", 6: "A", 7: "A", 8: "B", 9: "D" },
       name: "Trịnh Ngọc Hân",
       shortName: "Ngọc Hân",
       age: 20,

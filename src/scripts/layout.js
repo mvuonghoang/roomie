@@ -624,9 +624,32 @@
     });
   }
 
+  function showDemoStorageNotice() {
+    if (document.getElementById("roomie-demo-storage-notice")) return;
+    const notice = document.createElement("aside");
+    notice.id = "roomie-demo-storage-notice";
+    notice.className =
+      "fixed bottom-3 left-3 z-40 flex max-w-[calc(100vw-1.5rem)] items-center gap-2 rounded-xl border border-primary/20 bg-surface-container-lowest px-3 py-2 text-xs text-on-surface shadow-lg";
+    notice.setAttribute("role", "status");
+
+    const message = document.createElement("span");
+    message.textContent = "Chế độ demo: dữ liệu chỉ lưu trên trình duyệt này.";
+    notice.appendChild(message);
+
+    const dismiss = document.createElement("button");
+    dismiss.type = "button";
+    dismiss.className = "rounded-md px-1 text-on-surface-variant hover:bg-surface-container";
+    dismiss.setAttribute("aria-label", "Ẩn thông báo demo");
+    dismiss.textContent = "×";
+    dismiss.addEventListener("click", () => notice.remove());
+    notice.appendChild(dismiss);
+    document.body.appendChild(notice);
+  }
+
   /** Initialize global shell: Header/Footer mount, routes, fallback images, popovers, drawers. */
   function initGlobalShell() {
     mountLayout();
+    showDemoStorageNotice();
 
     document.querySelectorAll("img").forEach((img) => {
       img.addEventListener("error", () => {

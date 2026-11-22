@@ -29,8 +29,6 @@
     { "source": "/quy-chuan-cong-dong", "destination": "/roomie/an-toan", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index.js" },
-    { "source": "/roomie/api/:path*", "destination": "/api/index.js" },
     { "source": "/roomie", "destination": "/index.html" },
     { "source": "/roomie/index.html", "destination": "/index.html" },
     { "source": "/roomie/trang-chu", "destination": "/index.html" },

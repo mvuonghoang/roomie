@@ -305,7 +305,7 @@
     finishBannerBtn?.addEventListener("click", finishQuiz);
 
     initQuizPredictionSection();
-    window.addEventListener("roomie:backend-synced", updatePreviewPredictions);
+    window.addEventListener("roomie:demo-ready", updatePreviewPredictions);
     window.addEventListener("roomie:plan-updated", updatePreviewPredictions);
     window.addEventListener("roomie:quiz-results-updated", updatePreviewPredictions);
     renderQuestion();
@@ -495,7 +495,7 @@
 
     syncPredictionLockState();
     Core.onPlanStateChange(syncPredictionLockState);
-    window.addEventListener("roomie:backend-synced", syncPredictionLockState);
+    window.addEventListener("roomie:demo-ready", syncPredictionLockState);
     window.addEventListener("roomie:quiz-results-updated", syncPredictionLockState);
     window.addEventListener("roomie:connections-updated", syncPreviewCardStates);
   }

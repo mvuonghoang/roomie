@@ -1,18 +1,20 @@
-# Roomie — Fullstack Website (Frontend + Backend + SQLite Database)
+# Roomie — Frontend Demo
 
 > *"Tìm đúng phòng, ghép đúng người — Sống chung bình yên."*
 
-Nền tảng tìm phòng trọ minh bạch chi phí và ghép đôi bạn cùng phòng tương hợp lối sống dành cho sinh viên (Đồ án học phần CNTT — Trường ĐH Khoa học Tự nhiên, ĐHQG-HCM).
+Nền tảng demo tìm phòng trọ và ghép bạn cùng phòng dành cho sinh viên (Đồ án học phần CNTT — Trường ĐH Khoa học Tự nhiên, ĐHQG-HCM).
 
 ---
 
-## 1. Yêu cầu môi trường
+## 1. Chế độ demo frontend-only
 
-- **Node.js** (bản v22.5+ / v24 LTS trở lên — dự án dùng HTTP thuần, SQLite `node:sqlite`, `dotenv` để nạp cấu hình local và `qrcode` để tạo mã thanh toán VietQR ngay trên server).
+- Website không gọi backend hoặc database. Dữ liệu mẫu nằm trong `src/scripts/data.js`; tài khoản, bài đăng, trắc nghiệm và gói demo được lưu bằng `localStorage` của trình duyệt.
+- Mỗi trình duyệt có dữ liệu riêng; dữ liệu không đồng bộ giữa bạn và thầy và có thể mất khi xóa dữ liệu trình duyệt. Đăng nhập, xác nhận gói và QR đều chỉ để trình diễn, không dùng cho tài khoản hay thanh toán thật.
+- **Node.js 22.5+** để chạy máy chủ tĩnh local.
 
-## 2. Cách chạy website & database ở local
+## 2. Cách chạy local hoặc deploy
 
-Clone repository và khởi chạy server bằng một trong các lệnh sau:
+Chạy website tĩnh local:
 
 ```bash
 git clone https://github.com/mvuonghoang/roomie.git
@@ -20,22 +22,9 @@ cd roomie
 npm start
 ```
 
-Chạy website bằng `npm start` tại `http://localhost:3000/roomie` để dùng được các API; không mở bằng Live Server hoặc preview tĩnh vì các cách đó không có endpoint `/api/*`. Nếu chưa cấu hình ngân hàng, checkout tự tạo **QR demo không thể thanh toán** để thử giao diện và luồng kích hoạt. Muốn tạo VietQR nhận tiền thật, sao chép `.env.example` thành `.env` rồi điền mã BIN, tên ngân hàng, số tài khoản và tên chủ tài khoản. `.env` đã được gitignore; không commit thông tin tài khoản thật.
+Mở `http://localhost:3000/roomie`. Vì đây là frontend-only, có thể deploy thư mục `src` lên dịch vụ host static; không cần cấu hình `.env` hay database. Mọi mã QR và thao tác kích hoạt gói đều là giả lập.
 
-Các gói hiện có giá 49.000đ (thêm 3 tin/ngày), 19.000đ (đẩy 24 giờ), 69.000đ (đẩy 7 ngày), 35.000đ (match không giới hạn trong ngày Việt Nam) và 149.000đ (trọn bộ 30 ngày). Gói theo ngày hết hạn lúc 00:00 giờ Việt Nam; gói đẩy và trọn bộ dùng thời hạn ghi trên gói. Nút xác nhận thanh toán kích hoạt gói ngay nhưng **không tự đối soát với ngân hàng**; người dùng có thể xác nhận dù chưa chuyển tiền.
-
-Các lệnh quản trị cơ sở dữ liệu SQLite (`backend/database/roomie.sqlite`):
-
-```bash
-npm run db:seed    # Khởi tạo schema & nạp dữ liệu mẫu (nếu chưa có)
-npm run db:reset   # Xóa trắng & nạp lại toàn bộ dữ liệu mẫu chuẩn ban đầu
-```
-
-Sau đó mở trình duyệt tại:
-- **Website:** **`http://localhost:3000/roomie`** (truy cập `http://localhost:3000/` sẽ tự chuyển hướng sang `/roomie`).
-- **Health & Database Stats API:** **`http://localhost:3000/api/health`**
-- **Bootstrap Data API:** **`http://localhost:3000/api/bootstrap`**
-- Khi chỉnh sửa file HTML/CSS/JS trong `src/`, chỉ cần **tải lại trang (`F5`)** là thấy thay đổi ngay (server đã tắt cache ở local).
+Gói demo giữ mức giá và quyền lợi trình bày: 49.000đ (thêm tin), 19.000đ (đẩy 24 giờ), 69.000đ (đẩy 7 ngày), 35.000đ (match trong ngày) và 149.000đ (trọn bộ 30 ngày). Xác nhận trong demo sẽ mở gói cục bộ ngay, không có giao dịch tiền thật.
 
 ---
 
@@ -43,22 +32,19 @@ Sau đó mở trình duyệt tại:
 
 ```text
 .
-├── server.js                  # Node.js Fullstack Server (Static routes + REST API /api/*)
-├── api/
-│   └── index.js               # Serverless entry point cho Vercel (/api/*)
-├── backend/                   # Toàn bộ mã nguồn Backend & Cơ sở dữ liệu
+├── server.js                  # Máy chủ file tĩnh để chạy demo local
+├── backend/                   # Mã backend/SQLite cũ, không được demo frontend sử dụng
 │   ├── database/
 │   │   ├── schema.sql         # Định nghĩa 14 bảng quan hệ SQLite (users, rooms, roommates, connections...)
 │   │   ├── seed-data.js       # Bộ dữ liệu mẫu chuẩn (phòng trọ, ứng viên, gói dịch vụ, thông báo)
 │   │   ├── db.js              # SQLite Database Engine (node:sqlite) & Repository Layer
 │   │   ├── seed.js            # CLI script khởi tạo, reset và thống kê bản ghi CSDL
-│   │   └── roomie.sqlite      # File cơ sở dữ liệu SQLite lưu trữ bền vững
 │   ├── routes/
 │   │   └── api.js             # RESTful API Router xử lý toàn bộ endpoints /api/*
 │   └── services/
 │       └── matching.js        # Thuật toán Compatibility Engine 2 lớp (>85% hợp gu lối sống)
-├── vercel.json                # Cấu hình deploy & rewrite cho cả Frontend lẫn Backend API
-├── package.json               # Scripts khởi chạy server & quản lý database
+├── vercel.json                # Cấu hình deploy static frontend
+├── package.json               # Script khởi chạy máy chủ file tĩnh
 ├── info/                      # Tài liệu định hướng sản phẩm & hệ thống thiết kế
 │   ├── DESIGN.md              # Bảng màu, typography (Be Vietnam Pro), spacing, components
 │   ├── overview.md            # Tổng quan sản phẩm & mô hình hoạt động
@@ -93,7 +79,9 @@ Sau đó mở trình duyệt tại:
 
 ---
 
-## 4. Kiến trúc Cơ sở dữ liệu (SQLite) & RESTful API
+## 4. Backend/SQLite cũ (không dùng trong chế độ demo)
+
+Mã backend bên dưới được giữ lại làm tài liệu/tham khảo, nhưng website demo hiện không khởi tạo database và không gửi request tới các API này. Không cần chạy lệnh `db:seed`/`db:reset`; các thao tác demo chỉ lưu ở trình duyệt đang mở bằng `localStorage`. File SQLite cũ không được dùng để chạy hoặc deploy demo.
 
 ### 4.1. Các bảng trong CSDL (`backend/database/schema.sql`)
 1. **`users`**: Tài khoản sinh viên & chủ trọ (mật khẩu băm SHA-256 + salt, tự động cấp tích xanh `verified_student` cho email `.edu.vn`).

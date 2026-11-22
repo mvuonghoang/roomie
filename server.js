@@ -1,11 +1,6 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const db = require('./backend/database/db');
-const { handleApiRequest } = require('./backend/routes/api');
-
-// Initialize SQLite database & seed canonical data if empty
-db.openDatabaseConnection();
 
 const ROOT_DIR = __dirname;
 const SRC_DIR = path.join(ROOT_DIR, 'src');
@@ -120,15 +115,9 @@ function resolveSafePath(baseDir, relPath) {
   return fullPath;
 }
 
-const server = http.createServer(async (req, res) => {
+const server = http.createServer((req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(reqUrl.pathname);
-
-  // 0. Handle Backend REST API routes (/api/* and /roomie/api/*)
-  if (pathname.startsWith('/api') || pathname.startsWith('/roomie/api')) {
-    const handled = await handleApiRequest(req, res);
-    if (handled) return;
-  }
 
   if (pathname.length > 1 && pathname.endsWith('/')) {
     pathname = pathname.slice(0, -1);
@@ -200,12 +189,10 @@ function startServer(port, attemptsLeft = 5) {
   });
 
   server.listen(port, '127.0.0.1', () => {
-    const stats = db.getDatabaseStats();
     console.log(`\n========================================`);
-    console.log(`  Roomie Website & Backend API dang chay!`);
+    console.log(`  Roomie frontend demo dang chay!`);
     console.log(`  Web URL : http://localhost:${port}/roomie`);
-    console.log(`  API URL : http://localhost:${port}/api/health`);
-    console.log(`  Database: ${stats.dbPath}`);
+    console.log(`  Storage : localStorage trong trinh duyet`);
     console.log(`========================================\n`);
   });
 }

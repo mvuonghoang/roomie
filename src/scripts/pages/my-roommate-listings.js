@@ -175,7 +175,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     if (document.body.dataset.page === "tin-da-dang") {
       loadMyListings();
-      window.addEventListener("roomie:backend-synced", loadMyListings);
+      window.addEventListener("roomie:demo-ready", loadMyListings);
       window.addEventListener("roomie:plan-updated", loadMyListings);
     }
   });
