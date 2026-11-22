@@ -681,47 +681,63 @@ const PRICING_PACKAGES = [
     price: '0đ',
     studentPrice: '0đ',
     period: '/ vĩnh viễn',
-    desc: 'Đăng 01 tin tìm phòng hoặc ở ghép, xem tối đa 5 hồ sơ/ngày và gửi lời mời kết nối 2 chiều miễn phí.'
+    available: true,
+    desc: 'Đăng tối đa 01 tin tìm roommate mỗi ngày miễn phí.'
   },
   {
-    id: 'boost',
-    name: 'Boost Listing',
-    price: '5.000đ',
-    studentPrice: '4.000đ',
-    period: '/ ngày',
-    desc: "Ưu tiên hiển thị đầu trang tìm kiếm, gắn nhãn 'Cần gấp' nổi bật và tiếp cận gấp 5 lần lượt xem."
-  },
-  {
-    id: 'match-plus',
-    name: 'Match Plus',
-    price: '9.000đ',
-    studentPrice: '7.000đ',
-    period: '/ lượt match',
-    desc: 'Mở khóa dự đoán gợi ý bạn cùng phòng real-time, đối chiếu thói quen ngủ, học & lọc cùng trường đại học.'
-  },
-  {
-    id: 'verified-pro',
-    name: 'Sinh viên Pro',
-    price: '15.000đ',
-    studentPrice: '12.000đ',
-    period: '/ 6 tháng',
-    desc: 'Cấp huy hiệu tích xanh Đã xác thực SV, tăng đến 90% tỉ lệ đồng ý kết nối 2 chiều.'
-  },
-  {
-    id: 'combo',
-    name: 'Combo Thần Tốc',
-    price: '29.000đ',
-    studentPrice: '23.000đ',
-    period: '/ tuần',
-    desc: 'Tặng 3 lượt Boost Listing đầu trang, mở khóa không giới hạn Match Plus & dự đoán gợi ý roommate.'
-  },
-  {
-    id: 'host',
-    name: 'Chủ trọ & Nhượng',
+    id: 'extra-posts-day',
+    name: 'Thêm 3 tin trong ngày',
     price: '49.000đ',
-    studentPrice: '39.000đ',
-    period: '/ tháng',
-    desc: 'Đăng không giới hạn ảnh & video thực tế, hiển thị SĐT & Zalo trực tiếp, ghim top 30 ngày.'
+    studentPrice: '49.000đ',
+    priceVnd: 49000,
+    period: '/ ngày',
+    durationMs: 24 * 60 * 60 * 1000,
+    available: true,
+    desc: 'Thêm tối đa 03 lượt đăng trong ngày, tổng cộng tối đa 04 tin/ngày.'
+  },
+  {
+    id: 'boost-24h',
+    name: 'Đẩy tin 24 giờ',
+    price: '19.000đ',
+    studentPrice: '19.000đ',
+    priceVnd: 19000,
+    period: '/ 24 giờ',
+    durationMs: 24 * 60 * 60 * 1000,
+    available: true,
+    desc: 'Đưa một bài đăng bạn chọn lên đầu danh sách trong 24 giờ.'
+  },
+  {
+    id: 'boost-7d',
+    name: 'Đẩy tin 7 ngày',
+    price: '69.000đ',
+    studentPrice: '69.000đ',
+    priceVnd: 69000,
+    period: '/ 7 ngày',
+    durationMs: 7 * 24 * 60 * 60 * 1000,
+    available: true,
+    desc: 'Đưa một bài đăng bạn chọn lên đầu danh sách trong 07 ngày.'
+  },
+  {
+    id: 'unlimited-matches-day',
+    name: 'Match không giới hạn',
+    price: '35.000đ',
+    studentPrice: '35.000đ',
+    priceVnd: 35000,
+    period: '/ ngày',
+    durationMs: 24 * 60 * 60 * 1000,
+    available: true,
+    desc: 'Không giới hạn lượt xem kết quả ghép roommate trong ngày.'
+  },
+  {
+    id: 'all-in-one',
+    name: 'Gói trọn bộ',
+    price: '149.000đ',
+    studentPrice: '149.000đ',
+    priceVnd: 149000,
+    period: '/ 30 ngày',
+    durationMs: 30 * 24 * 60 * 60 * 1000,
+    available: true,
+    desc: 'Gồm toàn bộ quyền lợi của gói 1–4 trong thời hạn 30 ngày.'
   }
 ];
 

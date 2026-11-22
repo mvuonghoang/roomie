@@ -8,6 +8,7 @@ const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
 const { DatabaseSync } = require('node:sqlite');
+require('../config');
 
 const {
   SEED_USERS,
@@ -46,6 +47,11 @@ function formatVND(num) {
   return n.toLocaleString('vi-VN') + 'đ';
 }
 
+function getVietnamDayStart(timestamp = Date.now()) {
+  const vietnamOffset = 7 * 60 * 60 * 1000;
+  return Math.floor((timestamp + vietnamOffset) / 86400000) * 86400000 - vietnamOffset;
+}
+
 function openDatabaseConnection() {
   if (dbInstance) return dbInstance;
 
@@ -65,9 +71,45 @@ function openDatabaseConnection() {
 
   const schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf8');
   dbInstance.exec(schemaSql);
+  migrateDatabase(dbInstance);
 
   ensureSeeded(dbInstance);
   return dbInstance;
+}
+
+function ensureColumn(db, table, column, definition) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!columns.some((entry) => entry.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
+function migrateDatabase(db) {
+  ensureColumn(db, 'roommates', 'boost_expires_at', 'INTEGER');
+  ensureColumn(db, 'user_plans', 'expires_at', 'INTEGER');
+  ensureColumn(db, 'user_plans', 'target_id', 'TEXT');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_roommates_boost_expires_at ON roommates(boost_expires_at)');
+  db.prepare(`
+    UPDATE user_plans SET status = 'expired'
+    WHERE status = 'active' AND expires_at IS NULL AND package_id <> 'basic'
+  `).run();
+}
+
+function hasActivePackage(db, userId, packageId, now = Date.now()) {
+  return Boolean(
+    db.prepare(`
+      SELECT 1 FROM user_plans
+      WHERE user_id = ? AND package_id = ? AND status = 'active' AND expires_at > ?
+      LIMIT 1
+    `).get(userId, packageId, now)
+  );
+}
+
+function hasPlanFeature(db, userId, packageId, now = Date.now()) {
+  return (
+    hasActivePackage(db, userId, packageId, now) ||
+    (packageId !== 'all-in-one' && hasActivePackage(db, userId, 'all-in-one', now))
+  );
 }
 
 function ensureSeeded(db) {
@@ -356,6 +398,10 @@ function mapRoommateRow(row, userQuizAnswers = null) {
     criteria: parseJSONSafe(row.criteria_json, []),
     tags: parseJSONSafe(row.tags_json, []),
     contact: parseJSONSafe(row.contact_json, {}),
+    isBoosted: row.boost_expires_at == null
+      ? Boolean(row.is_boosted)
+      : Number(row.boost_expires_at) > Date.now(),
+    boostExpiresAt: Number(row.boost_expires_at) || null,
     quizProfile
   };
 
@@ -808,45 +854,85 @@ function saveQuizSubmission(userId = DEFAULT_USER_ID, answers = {}, explicitResu
     : evaluated;
 
   const now = Date.now();
-  db.prepare(`
-    INSERT INTO quiz_submissions (
-      id, user_id, answers_json, gender, preferred_gender, gender_option,
-      archetype, match_count, pillars_json, answered_count, completed_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(user_id) DO UPDATE SET
-      answers_json = excluded.answers_json,
-      gender = excluded.gender,
-      preferred_gender = excluded.preferred_gender,
-      gender_option = excluded.gender_option,
-      archetype = excluded.archetype,
-      match_count = excluded.match_count,
-      pillars_json = excluded.pillars_json,
-      answered_count = excluded.answered_count,
-      completed_at = excluded.completed_at,
-      updated_at = excluded.updated_at
-  `).run(
-    `quiz-${uid}`,
-    uid,
-    JSON.stringify(evaluated.answers),
-    finalResult.gender,
-    finalResult.preferredGender,
-    finalResult.genderOption,
-    finalResult.archetype,
-    Number(finalResult.matchCount) || 42,
-    JSON.stringify(finalResult.pillars || {}),
-    Number(finalResult.answeredCount) || Object.keys(evaluated.answers).length,
-    finalResult.completedAt || new Date().toISOString(),
-    now
-  );
+  const isComplete = evaluated.answeredCount === 9;
+  const dayStart = getVietnamDayStart(now);
 
-  return getQuizSubmission(uid);
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    const hasUnlimitedMatches = hasPlanFeature(db, uid, 'unlimited-matches-day', now);
+    if (isComplete && !hasUnlimitedMatches) {
+      const currentUsage = Number(
+        db.prepare(`
+          SELECT match_count FROM roommate_match_daily_usage
+          WHERE user_id = ? AND day_start = ?
+        `).get(uid, dayStart)?.match_count
+      ) || 0;
+      if (currentUsage >= 1) {
+        db.exec('ROLLBACK');
+        return {
+          ok: false,
+          code: 'daily_match_limit',
+          error: 'Bạn đã dùng lượt xem kết quả hôm nay. Mua Gói 4 để xem kết quả ghép không giới hạn trong ngày.'
+        };
+      }
+      db.prepare(`
+        INSERT INTO roommate_match_daily_usage (user_id, day_start, match_count)
+        VALUES (?, ?, 1)
+        ON CONFLICT(user_id, day_start) DO UPDATE SET
+          match_count = roommate_match_daily_usage.match_count + 1
+      `).run(uid, dayStart);
+    }
+
+    db.prepare(`
+      INSERT INTO quiz_submissions (
+        id, user_id, answers_json, gender, preferred_gender, gender_option,
+        archetype, match_count, pillars_json, answered_count, completed_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id) DO UPDATE SET
+        answers_json = excluded.answers_json,
+        gender = excluded.gender,
+        preferred_gender = excluded.preferred_gender,
+        gender_option = excluded.gender_option,
+        archetype = excluded.archetype,
+        match_count = excluded.match_count,
+        pillars_json = excluded.pillars_json,
+        answered_count = excluded.answered_count,
+        completed_at = excluded.completed_at,
+        updated_at = excluded.updated_at
+    `).run(
+      `quiz-${uid}`,
+      uid,
+      JSON.stringify(evaluated.answers),
+      finalResult.gender,
+      finalResult.preferredGender,
+      finalResult.genderOption,
+      finalResult.archetype,
+      Number(finalResult.matchCount) || 42,
+      JSON.stringify(finalResult.pillars || {}),
+      evaluated.answeredCount,
+      finalResult.completedAt || new Date().toISOString(),
+      now
+    );
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
+
+  return { ok: true, ...getQuizSubmission(uid) };
 }
 
 function getAllRoommates(userId = DEFAULT_USER_ID) {
   const db = openDatabaseConnection();
   const quiz = getQuizSubmission(userId);
   const userAnswers = quiz?.answers || null;
-  const rows = db.prepare('SELECT * FROM roommates ORDER BY created_at DESC').all();
+  const rows = db.prepare(`
+    SELECT * FROM roommates
+    ORDER BY
+      CASE WHEN boost_expires_at > ? THEN 0 ELSE 1 END,
+      boost_expires_at DESC,
+      created_at DESC
+  `).all(Date.now());
   return rows.map((r) => mapRoommateRow(r, userAnswers));
 }
 
@@ -883,45 +969,79 @@ function createRoommateListing(user, payload = {}) {
   const school = String(user.school || 'Sinh viên').trim();
   const shortSchool = String(user.shortSchool || school).trim();
   const isVnuMember = /HCMUS|HCMUT|UIT|UEL|HCMUSSH|HCMIU|ĐHQG/i.test(`${school} ${shortSchool}`);
-
   const db = openDatabaseConnection();
-  db.prepare(`
-    INSERT INTO roommates (
-      id, user_id, name, short_name, age, gender, school, short_school, major,
-      match_score, match_label, vnu_member, has_room, room_status_title,
-      room_status_detail, linked_room_id, area_key, city, budget, avatar, quote,
-      criteria_json, tags_json, contact_json, quiz_profile_json, is_boosted,
-      created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, '{}', '{}', 0, ?, ?)
-  `).run(
-    id,
-    user.id,
-    name,
-    name,
-    Number(user.age) || 20,
-    gender,
-    school,
-    shortSchool,
-    String(user.major || '').trim(),
-    90,
-    'Chưa có điểm hợp gu',
-    isVnuMember ? 1 : 0,
-    hasRoom ? 1 : 0,
-    statusTitle,
-    statusDetail,
-    areaKey,
-    String(payload.city || 'TP.HCM').trim().slice(0, 80),
-    budget,
-    String(user.avatar || ''),
-    note,
-    JSON.stringify(criteria),
-    JSON.stringify(criteria),
-    now,
-    now
-  );
+  const dayStart = getVietnamDayStart(now);
+
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    const storedUsage = db
+      .prepare('SELECT post_count FROM roommate_daily_post_usage WHERE user_id = ? AND day_start = ?')
+      .get(user.id, dayStart);
+    const existingPosts = db
+      .prepare('SELECT COUNT(*) AS count FROM roommates WHERE user_id = ? AND created_at >= ? AND created_at < ?')
+      .get(user.id, dayStart, dayStart + 86400000);
+    const used = Math.max(Number(storedUsage?.post_count) || 0, Number(existingPosts.count) || 0);
+    const dailyLimit = hasPlanFeature(db, user.id, 'extra-posts-day', now) ? 4 : 1;
+    if (used >= dailyLimit) {
+      db.exec('ROLLBACK');
+      return {
+        ok: false,
+        code: 'daily_limit',
+        error: dailyLimit > 1
+          ? 'Bạn đã dùng hết 4 lượt đăng roommate hôm nay.'
+          : 'Gói miễn phí cho phép đăng 1 tin roommate mỗi ngày. Mua Gói 1 để đăng thêm tối đa 3 tin.'
+      };
+    }
+
+    db.prepare(`
+      INSERT INTO roommate_daily_post_usage (user_id, day_start, post_count)
+      VALUES (?, ?, ?)
+      ON CONFLICT(user_id, day_start) DO UPDATE SET
+        post_count = MAX(roommate_daily_post_usage.post_count, excluded.post_count)
+    `).run(user.id, dayStart, used + 1);
+
+    db.prepare(`
+      INSERT INTO roommates (
+        id, user_id, name, short_name, age, gender, school, short_school, major,
+        match_score, match_label, vnu_member, has_room, room_status_title,
+        room_status_detail, linked_room_id, area_key, city, budget, avatar, quote,
+        criteria_json, tags_json, contact_json, quiz_profile_json, is_boosted,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, '{}', '{}', 0, ?, ?)
+    `).run(
+      id,
+      user.id,
+      name,
+      name,
+      Number(user.age) || 20,
+      gender,
+      school,
+      shortSchool,
+      String(user.major || '').trim(),
+      90,
+      'Chưa có điểm hợp gu',
+      isVnuMember ? 1 : 0,
+      hasRoom ? 1 : 0,
+      statusTitle,
+      statusDetail,
+      areaKey,
+      String(payload.city || 'TP.HCM').trim().slice(0, 80),
+      budget,
+      String(user.avatar || ''),
+      note,
+      JSON.stringify(criteria),
+      JSON.stringify(criteria),
+      now,
+      now
+    );
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
 
   const row = db.prepare('SELECT * FROM roommates WHERE id = ?').get(id);
-  return mapRoommateRow(row);
+  return { ok: true, roommate: mapRoommateRow(row) };
 }
 
 function deleteRoommateListing(user, roommateId) {
@@ -1108,8 +1228,12 @@ function getUserPlans(userId = DEFAULT_USER_ID) {
   const db = openDatabaseConnection();
   const uid = userId || DEFAULT_USER_ID;
   const rows = db
-    .prepare('SELECT * FROM user_plans WHERE user_id = ? AND status = ? ORDER BY purchased_at DESC')
-    .all(uid, 'active');
+    .prepare(`
+      SELECT * FROM user_plans
+      WHERE user_id = ? AND status = 'active' AND expires_at > ?
+      ORDER BY purchased_at DESC
+    `)
+    .all(uid, Date.now());
   return rows.map((r) => ({
     id: r.package_id,
     recordId: r.id,
@@ -1117,48 +1241,227 @@ function getUserPlans(userId = DEFAULT_USER_ID) {
     price: r.price,
     period: r.period,
     paymentCode: r.payment_code,
-    purchasedAt: Number(r.purchased_at)
+    purchasedAt: Number(r.purchased_at),
+    expiresAt: Number(r.expires_at),
+    targetId: r.target_id || null
   }));
 }
 
-function purchasePlan(userId = DEFAULT_USER_ID, pkg = {}) {
+function createPlanOrder(userId = DEFAULT_USER_ID, request = {}) {
   const db = openDatabaseConnection();
   const uid = userId || DEFAULT_USER_ID;
-  const pkgId = String(pkg.id || pkg.packageId || '').trim();
-  if (!pkgId || pkgId === 'basic') {
+  const pkgId = String(request.packageId || '').trim();
+  const canonical = PRICING_PACKAGES.find((p) => p.id === pkgId);
+  if (!canonical || pkgId === 'basic') {
     return { ok: false, error: 'Gói dịch vụ không hợp lệ.' };
   }
+  if (canonical.available !== true) {
+    return { ok: false, error: 'Gói này hiện chưa mở bán.' };
+  }
+  if (!Number.isSafeInteger(canonical.priceVnd) || canonical.priceVnd <= 0) {
+    return { ok: false, error: 'Gói này chưa được cấu hình giá hợp lệ.' };
+  }
 
-  const canonical = PRICING_PACKAGES.find((p) => p.id === pkgId) || pkg;
+  const targetId = String(request.targetId || '').trim();
+  const isBoostPlan = pkgId === 'boost-24h' || pkgId === 'boost-7d';
+  if (isBoostPlan && !targetId) {
+    return { ok: false, error: 'Vui lòng chọn bài đăng roommate cần đẩy.' };
+  }
+  if (isBoostPlan) {
+    const listing = db
+      .prepare('SELECT id FROM roommates WHERE id = ? AND user_id = ?')
+      .get(targetId, uid);
+    if (!listing) {
+      return { ok: false, error: 'Không tìm thấy bài đăng của bạn để đẩy.' };
+    }
+  }
+
   const now = Date.now();
-  db.prepare('DELETE FROM user_plans WHERE user_id = ? AND package_id = ?').run(uid, pkgId);
+  const id = `order-${now}-${crypto.randomBytes(5).toString('hex')}`;
+  const transferCode = `RM${crypto.randomBytes(5).toString('hex').toUpperCase()}`;
+  const expiresAt = now + 30 * 60 * 1000;
 
   db.prepare(`
-    INSERT INTO user_plans (
-      id, user_id, package_id, name, price, period, payment_code, status, purchased_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO plan_purchase_orders (
+      id, user_id, package_id, amount_vnd, transfer_code, target_id,
+      status, created_at, expires_at, confirmed_at
+    ) VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?, NULL)
   `).run(
-    `plan-${uid}-${pkgId}-${now}`,
+    id,
     uid,
     pkgId,
-    pkg.name || canonical.name || pkgId,
-    pkg.price || canonical.price || '0đ',
-    pkg.period || canonical.period || '',
-    `RM-${pkgId.toUpperCase()}`,
-    'active',
-    now
+    canonical.priceVnd,
+    transferCode,
+    targetId || null,
+    now,
+    expiresAt
   );
 
   return {
     ok: true,
-    plans: getUserPlans(uid)
+    order: {
+      id,
+      packageId: pkgId,
+      packageName: canonical.name,
+      amountVnd: canonical.priceVnd,
+      transferCode,
+      expiresAt,
+      targetId: targetId || null
+    }
   };
+}
+
+function applyRoommateBoost(db, userId, targetId, durationMs, now) {
+  const listing = db
+    .prepare('SELECT * FROM roommates WHERE id = ? AND user_id = ?')
+    .get(targetId, userId);
+  if (!listing) return { ok: false, error: 'Không tìm thấy bài đăng của bạn để đẩy.' };
+
+  const currentExpiry = Number(listing.boost_expires_at) > now
+    ? Number(listing.boost_expires_at)
+    : now;
+  const expiresAt = currentExpiry + durationMs;
+  db.prepare(`
+    UPDATE roommates
+    SET is_boosted = 1, boost_expires_at = ?, updated_at = ?
+    WHERE id = ? AND user_id = ?
+  `).run(expiresAt, now, targetId, userId);
+  return { ok: true, expiresAt };
+}
+
+function confirmPlanOrder(userId = DEFAULT_USER_ID, orderId = '') {
+  const db = openDatabaseConnection();
+  const uid = userId || DEFAULT_USER_ID;
+  const id = String(orderId || '').trim();
+  const order = db
+    .prepare('SELECT * FROM plan_purchase_orders WHERE id = ? AND user_id = ?')
+    .get(id, uid);
+  if (!order) return { ok: false, error: 'Không tìm thấy đơn thanh toán.' };
+  if (order.status === 'confirmed') {
+    return { ok: true, alreadyConfirmed: true, plans: getUserPlans(uid) };
+  }
+
+  if (order.status !== 'pending' || Number(order.expires_at) <= Date.now()) {
+    if (order.status === 'pending') {
+      db.prepare(`UPDATE plan_purchase_orders SET status = 'expired' WHERE id = ?`).run(id);
+    }
+    return { ok: false, error: 'Mã thanh toán đã hết hạn. Vui lòng tạo đơn mới.' };
+  }
+
+  const canonical = PRICING_PACKAGES.find((p) => p.id === order.package_id);
+  if (!canonical || !Number.isSafeInteger(canonical.durationMs) || canonical.durationMs <= 0) {
+    return { ok: false, error: 'Không thể kích hoạt thời hạn của gói này.' };
+  }
+
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    const lockedOrder = db
+      .prepare('SELECT * FROM plan_purchase_orders WHERE id = ? AND user_id = ?')
+      .get(id, uid);
+    if (!lockedOrder) {
+      db.exec('ROLLBACK');
+      return { ok: false, error: 'Không tìm thấy đơn thanh toán.' };
+    }
+    if (lockedOrder.status === 'confirmed') {
+      db.exec('ROLLBACK');
+      return { ok: true, alreadyConfirmed: true, plans: getUserPlans(uid) };
+    }
+    const now = Date.now();
+    if (lockedOrder.status !== 'pending' || Number(lockedOrder.expires_at) <= now) {
+      if (lockedOrder.status === 'pending') {
+        db.prepare(`UPDATE plan_purchase_orders SET status = 'expired' WHERE id = ?`).run(id);
+      }
+      db.exec('COMMIT');
+      return { ok: false, error: 'Mã thanh toán đã hết hạn. Vui lòng tạo đơn mới.' };
+    }
+
+    const durationMs = ['extra-posts-day', 'unlimited-matches-day'].includes(canonical.id)
+      ? getVietnamDayStart(now) + 86400000 - now
+      : canonical.durationMs;
+    let expiresAt = now + durationMs;
+    if (canonical.id === 'boost-24h' || canonical.id === 'boost-7d') {
+      const boost = applyRoommateBoost(
+        db,
+        uid,
+        lockedOrder.target_id,
+        durationMs,
+        now
+      );
+      if (!boost.ok) {
+        db.exec('ROLLBACK');
+        return boost;
+      }
+      expiresAt = boost.expiresAt;
+    } else {
+      const currentPlan = db.prepare(`
+        SELECT MAX(expires_at) AS expires_at FROM user_plans
+        WHERE user_id = ? AND package_id = ? AND status = 'active' AND expires_at > ?
+      `).get(uid, canonical.id, now);
+      if (Number(currentPlan?.expires_at) > now) {
+        expiresAt = Number(currentPlan.expires_at) + durationMs;
+      }
+    }
+
+    db.prepare(`
+      INSERT INTO user_plans (
+        id, user_id, package_id, name, price, period, payment_code,
+        status, purchased_at, expires_at, target_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
+    `).run(
+      `plan-${order.id}`,
+      uid,
+      canonical.id,
+      canonical.name,
+      canonical.price,
+      canonical.period,
+      lockedOrder.transfer_code,
+      now,
+      expiresAt,
+      lockedOrder.target_id
+    );
+    db.prepare(`
+      UPDATE plan_purchase_orders SET status = 'confirmed', confirmed_at = ? WHERE id = ?
+    `).run(now, id);
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
+
+  return {
+    ok: true,
+    plans: getUserPlans(uid),
+    roommates: getAllRoommates(uid)
+  };
+}
+
+function boostRoommateListing(userId = DEFAULT_USER_ID, targetId = '', period = '') {
+  const db = openDatabaseConnection();
+  const uid = userId || DEFAULT_USER_ID;
+  const durationMs = period === '24h' ? 24 * 60 * 60 * 1000 : period === '7d' ? 7 * 24 * 60 * 60 * 1000 : 0;
+  if (!durationMs) return { ok: false, error: 'Thời hạn đẩy tin không hợp lệ.' };
+  if (!hasActivePackage(db, uid, 'all-in-one')) {
+    return { ok: false, error: 'Tính năng đẩy tin trong Gói trọn bộ chưa được kích hoạt.' };
+  }
+
+  const result = applyRoommateBoost(db, uid, String(targetId || '').trim(), durationMs, Date.now());
+  if (!result.ok) return result;
+  return { ...result, roommates: getAllRoommates(uid) };
 }
 
 function resetUserPlans(userId = DEFAULT_USER_ID) {
   const db = openDatabaseConnection();
   const uid = userId || DEFAULT_USER_ID;
-  db.prepare('DELETE FROM user_plans WHERE user_id = ?').run(uid);
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    db.prepare('DELETE FROM user_plans WHERE user_id = ?').run(uid);
+    db.prepare(`UPDATE roommates SET is_boosted = 0, boost_expires_at = NULL WHERE user_id = ?`).run(uid);
+    db.prepare(`UPDATE plan_purchase_orders SET status = 'cancelled' WHERE user_id = ? AND status = 'pending'`).run(uid);
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
   return { ok: true, plans: [] };
 }
 
@@ -1302,10 +1605,13 @@ function getDatabaseStats() {
       users: countTable('users'),
       rooms: countTable('rooms'),
       roommates: countTable('roommates'),
+      roommate_daily_post_usage: countTable('roommate_daily_post_usage'),
+      roommate_match_daily_usage: countTable('roommate_match_daily_usage'),
       saved_rooms: countTable('saved_rooms'),
       quiz_submissions: countTable('quiz_submissions'),
       connections: countTable('connections'),
       user_plans: countTable('user_plans'),
+      plan_purchase_orders: countTable('plan_purchase_orders'),
       notifications: countTable('notifications'),
       reports: countTable('reports'),
       contacts: countTable('contacts')
@@ -1342,7 +1648,9 @@ module.exports = {
   upsertConnection,
   updateConnectionStatusById,
   getUserPlans,
-  purchasePlan,
+  createPlanOrder,
+  confirmPlanOrder,
+  boostRoommateListing,
   resetUserPlans,
   getNotifications,
   markAllNotificationsRead,

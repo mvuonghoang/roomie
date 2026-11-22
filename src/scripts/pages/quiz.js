@@ -64,7 +64,7 @@
 
     function updatePreviewPredictions() {
       const hasCompletedQuiz = hasPersonalizedQuizResults();
-      const canViewScores = Core.hasUnlockedPrediction();
+      const canViewScores = Core.hasUnlockedPrediction() || Core.hasCompletedQuiz?.();
 
       previewScores.forEach((p) => {
         if (!p.el) return;
@@ -120,17 +120,20 @@
         completedAt: new Date().toISOString()
       };
       let submissionSucceeded = true;
+      let submission = null;
       if (Core.submitQuizResult) {
-        const submission = await Core.submitQuizResult(savedAnswers, result);
+        submission = await Core.submitQuizResult(savedAnswers, result);
         submissionSucceeded = Boolean(submission?.ok);
       } else {
         Core.writeJSON(Core.STORAGE_KEYS.QUIZ_RESULT, result);
       }
       const hasAnsweredEveryQuestion = answeredVals.length === questions.length;
-      const toastMessage = !submissionSucceeded
+      const toastMessage = submission?.code === "daily_match_limit"
+        ? submission.error
+        : !submissionSucceeded
         ? "Chưa đồng bộ được kết quả. Phần trăm hợp gu sẽ hiện sau khi kết nối lại."
         : hasAnsweredEveryQuestion
-        ? "Đã hoàn thành trắc nghiệm! Mở gói dịch vụ để xem phần trăm hợp gu."
+        ? "Đã hoàn thành trắc nghiệm! Kết quả ghép đã được cập nhật."
         : "Bạn chưa trả lời đủ câu nên chưa có phần trăm hợp gu.";
       Core.showToast(toastMessage, submissionSucceeded && hasAnsweredEveryQuestion ? undefined : "info");
       window.dispatchEvent(new CustomEvent("roomie:quiz-results-updated"));
@@ -385,7 +388,7 @@
     function syncPredictionLockState() {
       const planUnlocked = Core.hasUnlockedPrediction();
       const quizComplete = hasPersonalizedQuizResults();
-      const unlocked = planUnlocked;
+      const unlocked = planUnlocked || Core.hasCompletedQuiz?.();
       const activePlan = Core.getLatestPurchasedPlan();
       const blurClasses = ["blur-[8px]", "opacity-65", "select-none", "pointer-events-none"];
 
@@ -428,8 +431,8 @@
         if (pkg) Core.openPaymentModal(pkg);
       });
     };
-    bindUnlockPlanButton("quiz-unlock-match-plus-btn", "match-plus");
-    bindUnlockPlanButton("quiz-unlock-combo-btn", "combo");
+    bindUnlockPlanButton("quiz-unlock-unlimited-matches-btn", "unlimited-matches-day");
+    bindUnlockPlanButton("quiz-unlock-all-in-one-btn", "all-in-one");
 
     previewProfileBtns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -450,7 +453,7 @@
         const rm = findRoommateById(btn.dataset.previewSelect);
         if (!rm) return;
         if (!Core.hasUnlockedPrediction()) {
-          const pkg = (Data.PRICING_PACKAGES || []).find((p) => p.id === "match-plus");
+          const pkg = (Data.PRICING_PACKAGES || []).find((p) => p.id === "unlimited-matches-day");
           if (pkg) Core.openPaymentModal(pkg);
           return;
         }

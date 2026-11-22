@@ -40,6 +40,9 @@
 
   function getRoommateListings() {
     return [...(Data.ROOMMATES || [])].sort((a, b) => {
+      const aBoosted = Number(a.boostExpiresAt) > Date.now();
+      const bBoosted = Number(b.boostExpiresAt) > Date.now();
+      if (aBoosted !== bBoosted) return aBoosted ? -1 : 1;
       const aCreatedAt = Number(a.createdAt) || 0;
       const bCreatedAt = Number(b.createdAt) || 0;
       if (aCreatedAt !== bCreatedAt) return bCreatedAt - aCreatedAt;
@@ -592,20 +595,19 @@
       Core.showToast("Đang tải mẫu thỏa thuận nội quy (.PDF)!");
     });
 
-    const matchPlusBtn = document.getElementById("mr-match-plus-btn");
-    if (matchPlusBtn) {
-      const defaultMatchPlusLabel = matchPlusBtn.textContent.trim();
-      const syncMatchPlusBtn = () => {
-        const unlocked = Core.hasPurchasedPlan("match-plus") || Core.hasPurchasedPlan("combo");
-        matchPlusBtn.textContent = unlocked ? "✓ Đã kích hoạt Match Plus" : defaultMatchPlusLabel;
+    const unlimitedMatchesBtn = document.getElementById("mr-unlimited-matches-btn");
+    if (unlimitedMatchesBtn) {
+      const syncUnlimitedMatchesBtn = () => {
+        const unlocked = Core.hasUnlockedPrediction();
+        unlimitedMatchesBtn.textContent = unlocked
+          ? "✓ Đã mở kết quả ghép hôm nay"
+          : "Mua Gói 4 • Match không giới hạn";
+        unlimitedMatchesBtn.href = unlocked
+          ? "/roomie/trac-nghiem#quiz-prediction-section"
+          : "/roomie/bang-gia";
       };
-      matchPlusBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        const pkg = (Data.PRICING_PACKAGES || []).find((p) => p.id === "match-plus");
-        if (pkg) Core.openPaymentModal(pkg);
-      });
-      syncMatchPlusBtn();
-      Core.onPlanStateChange(syncMatchPlusBtn);
+      syncUnlimitedMatchesBtn();
+      Core.onPlanStateChange(syncUnlimitedMatchesBtn);
     }
 
     renderMatches();
@@ -653,6 +655,11 @@
                   <h3 class="font-headline-sm text-[20px] leading-[28px] font-bold text-on-surface group-hover:text-primary transition-colors">${escapeHTML(
                     rm.name
                   )}</h3>
+                  ${
+                    Number(rm.boostExpiresAt) > Date.now()
+                      ? `<span class="rounded-full bg-primary-fixed px-2.5 py-1 text-[10px] font-bold text-primary">Tin đang được đẩy</span>`
+                      : ""
+                  }
                   <span class="font-body-md text-[14px] text-on-surface-variant">· ${escapeHTML(rm.age)}t</span>
                 </div>
                 <span class="font-label-md text-[13px] text-tertiary flex items-center gap-1.5 font-semibold">

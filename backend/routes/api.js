@@ -5,6 +5,8 @@
 
 const db = require('../database/db');
 const { PRICING_PACKAGES } = require('../database/seed-data');
+const { getVietQrConfig } = require('../config');
+const { createVietQr } = require('../services/vietqr');
 
 const MAX_BODY_BYTES = 12 * 1024 * 1024; // 12MB to support Base64 room cover images
 
@@ -404,18 +406,18 @@ async function handleApiRequest(req, res) {
         return true;
       }
 
-      const roommate = db.createRoommateListing(auth.user, body);
-      if (!roommate) {
-        sendJSON(res, 400, {
+      const result = db.createRoommateListing(auth.user, body);
+      if (!result || !result.ok) {
+        sendJSON(res, result?.code === 'daily_limit' ? 429 : 400, {
           ok: false,
-          error: 'Vui lòng kiểm tra loại tin, khu vực và ngân sách trước khi đăng.'
+          error: result?.error || 'Vui lòng kiểm tra loại tin, khu vực và ngân sách trước khi đăng.'
         });
         return true;
       }
 
       sendJSON(res, 201, {
         ok: true,
-        roommate,
+        roommate: result.roommate,
         roommates: db.getAllRoommates(auth.userId)
       });
       return true;
@@ -466,6 +468,21 @@ async function handleApiRequest(req, res) {
       return true;
     }
 
+    const roommateBoostMatch = pathname.match(/^\/api\/roommates\/([^/]+)\/boost$/);
+    if (roommateBoostMatch && method === 'POST') {
+      if (!auth.user || auth.user.role !== 'student') {
+        sendJSON(res, 403, { ok: false, error: 'Chỉ sinh viên mới được đẩy tin roommate.' });
+        return true;
+      }
+      const result = db.boostRoommateListing(auth.userId, roommateBoostMatch[1], body.period);
+      if (!result.ok) {
+        sendJSON(res, result.error && result.error.includes('Không tìm thấy') ? 404 : 403, result);
+        return true;
+      }
+      sendJSON(res, 200, result);
+      return true;
+    }
+
     const roommateDetailMatch = pathname.match(/^\/api\/roommates\/([^/]+)$/);
     if (roommateDetailMatch && method === 'GET') {
       const rm = db.getRoommateById(roommateDetailMatch[1], auth.userId);
@@ -508,6 +525,10 @@ async function handleApiRequest(req, res) {
       const answers = body.answers || body.quizAnswers || {};
       const explicitResult = body.result || body.quizResult || null;
       const savedQuiz = db.saveQuizSubmission(auth.userId, answers, explicitResult);
+      if (!savedQuiz.ok) {
+        sendJSON(res, savedQuiz.code === 'daily_match_limit' ? 429 : 400, savedQuiz);
+        return true;
+      }
       sendJSON(res, 200, {
         ok: true,
         quizAnswers: savedQuiz.answers,
@@ -568,13 +589,45 @@ async function handleApiRequest(req, res) {
       sendJSON(res, 200, {
         ok: true,
         packages: PRICING_PACKAGES,
-        activePlans: db.getUserPlans(auth.userId)
+        activePlans: db.getUserPlans(auth.userId),
+        paymentConfigured: getVietQrConfig().configured
       });
       return true;
     }
 
-    if ((pathname === '/api/plans' || pathname === '/api/plans/purchase') && method === 'POST') {
-      const result = db.purchasePlan(auth.userId, body);
+    if (
+      (pathname === '/api/plans/checkout' ||
+        pathname === '/api/plans' ||
+        pathname === '/api/plans/purchase') &&
+      method === 'POST'
+    ) {
+      const result = db.createPlanOrder(auth.userId, body);
+      if (!result.ok) {
+        sendJSON(res, 400, result);
+        return true;
+      }
+
+      const qr = await createVietQr(result.order.amountVnd, result.order.transferCode);
+      if (!qr.ok) {
+        sendJSON(res, 503, qr);
+        return true;
+      }
+      sendJSON(res, 201, {
+        ok: true,
+        order: result.order,
+        payment: {
+          qrDataUrl: qr.qrDataUrl,
+          bank: qr.bank,
+          accountNumber: qr.accountNumber,
+          accountName: qr.accountName,
+          isDemo: qr.isDemo
+        }
+      });
+      return true;
+    }
+
+    if (pathname === '/api/plans/confirm' && method === 'POST') {
+      const result = db.confirmPlanOrder(auth.userId, body.orderId);
       if (!result.ok) {
         sendJSON(res, 400, result);
         return true;

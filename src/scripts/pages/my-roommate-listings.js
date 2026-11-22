@@ -43,6 +43,17 @@
         const note = listing.quote
           ? `<p class="text-sm text-on-surface-variant mt-3">${Core.escapeHTML(listing.quote)}</p>`
           : "";
+        const boostStatus = listing.isBoosted && listing.boostExpiresAt
+          ? `<p class="mt-3 rounded-lg bg-primary-fixed/60 px-3 py-2 text-xs font-semibold text-primary">Tin đang được đẩy đến ${new Date(
+              Number(listing.boostExpiresAt)
+            ).toLocaleString("vi-VN")}</p>`
+          : "";
+        const bundleBoostActions = Core.hasPurchasedPlan?.("all-in-one")
+          ? `<div class="mt-3 flex flex-wrap gap-2">
+              <button type="button" data-boost-roommate="${Core.escapeHTML(listing.id)}" data-boost-period="24h" class="rounded-lg bg-primary-fixed px-3 py-2 text-xs font-semibold text-primary hover:bg-primary-fixed-dim">Đẩy 24 giờ</button>
+              <button type="button" data-boost-roommate="${Core.escapeHTML(listing.id)}" data-boost-period="7d" class="rounded-lg bg-secondary-container px-3 py-2 text-xs font-semibold text-on-secondary-container hover:bg-secondary-container/80">Đẩy 7 ngày</button>
+            </div>`
+          : "";
 
         return `
           <article class="rounded-2xl bg-surface-container-lowest p-space-lg sm:p-space-xl shadow-sm border border-outline-variant/20">
@@ -65,6 +76,8 @@
               </button>
             </div>
             ${note}
+            ${boostStatus}
+            ${bundleBoostActions}
             ${criteria ? `<div class="flex flex-wrap gap-1.5 mt-3">${criteria}</div>` : ""}
           </article>
         `;
@@ -104,6 +117,10 @@
       (listing) => currentUser?.id && String(listing.userId) === String(currentUser.id)
     );
     renderListings(container, myListings);
+    bindListingActions(container, currentUser);
+  }
+
+  function bindListingActions(container, currentUser) {
     container.querySelectorAll("[data-delete-roommate]").forEach((button) => {
       button.addEventListener("click", async () => {
         const listingId = button.dataset.deleteRoommate;
@@ -122,11 +139,44 @@
           (listing) => currentUser?.id && String(listing.userId) === String(currentUser.id)
         );
         renderListings(container, remainingListings);
+        bindListingActions(container, currentUser);
+      });
+    });
+
+    container.querySelectorAll("[data-boost-roommate]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const listingId = button.dataset.boostRoommate;
+        const period = button.dataset.boostPeriod;
+        if (!listingId || !period) return;
+
+        button.disabled = true;
+        button.textContent = "Đang đẩy...";
+        const result = await Core.apiFetch(
+          `/api/roommates/${encodeURIComponent(listingId)}/boost`,
+          { method: "POST", body: { period } }
+        );
+        if (!result?.ok || !Array.isArray(result.roommates)) {
+          button.disabled = false;
+          button.textContent = period === "24h" ? "Đẩy 24 giờ" : "Đẩy 7 ngày";
+          Core.showToast(result?.error || "Không thể đẩy tin lúc này. Vui lòng thử lại.", "error");
+          return;
+        }
+
+        const ownedListings = result.roommates.filter(
+          (listing) => currentUser?.id && String(listing.userId) === String(currentUser.id)
+        );
+        Core.showToast("Đã đẩy bài đăng của bạn.", "success");
+        renderListings(container, ownedListings);
+        bindListingActions(container, currentUser);
       });
     });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (document.body.dataset.page === "tin-da-dang") loadMyListings();
+    if (document.body.dataset.page === "tin-da-dang") {
+      loadMyListings();
+      window.addEventListener("roomie:backend-synced", loadMyListings);
+      window.addEventListener("roomie:plan-updated", loadMyListings);
+    }
   });
 })();

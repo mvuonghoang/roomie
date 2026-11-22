@@ -8,5 +8,9 @@
     "dev": "node server.js",
     "db:seed": "node backend/database/seed.js",
     "db:reset": "node backend/database/seed.js --reset"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "qrcode": "^1.5.4"
   }
 }

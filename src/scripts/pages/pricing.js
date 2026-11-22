@@ -26,10 +26,10 @@
         ],
         inactiveToggleClasses: ["text-[#c7c4d8]", "hover:text-white", "font-medium"],
         formatCtaLabel: (isActive, pkg, defLabel) => (isActive ? `✓ Đã kích hoạt • ${pkg?.name || ""}` : defLabel),
-        onStateSync: ({ anyPaidActive, latestPlan }) => {
+        onStateSync: ({ hasPredictionAccess, latestPlan }) => {
           if (!activeBanner) return;
-          activeBanner.classList.toggle("hidden", !anyPaidActive);
-          if (anyPaidActive && activeBannerTitle && latestPlan) {
+          activeBanner.classList.toggle("hidden", !hasPredictionAccess);
+          if (hasPredictionAccess && activeBannerTitle && latestPlan) {
             activeBannerTitle.textContent = `Đang kích hoạt gói ${latestPlan.name}`;
           }
         }

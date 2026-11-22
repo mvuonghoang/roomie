@@ -35,7 +35,6 @@
 
     let selectedPurpose = "has-room";
     let selectedType = "Phòng Studio";
-    let isBoosted = false;
     const defaultCover = pvCoverImg?.src || "";
 
     function updatePreview() {
@@ -62,7 +61,7 @@
       if (pvSecondaryLabel) {
         pvSecondaryLabel.textContent = hasRoom ? "Thông tin người đăng là sinh viên" : "Ưu tiên khu vực & ngân sách";
       }
-      if (pvBoostBadge) pvBoostBadge.classList.toggle("hidden", !isBoosted);
+      if (pvBoostBadge) pvBoostBadge.classList.add("hidden");
       if (pvPurposeBadge) pvPurposeBadge.textContent = hasRoom ? "Đã có phòng" : "Cùng tìm phòng";
       if (addressLabel) {
         addressLabel.textContent = hasRoom ? "Khu vực / địa chỉ gần phòng hiện có" : "Khu vực mong muốn tìm phòng";
@@ -175,17 +174,6 @@
       Core.showToast("Đã lưu bản nháp tin đăng trên trình duyệt!");
     });
 
-    document.getElementById("post-boost-btn")?.addEventListener("click", (e) => {
-      isBoosted = !isBoosted;
-      e.currentTarget.classList.toggle("ring-2", isBoosted);
-      e.currentTarget.classList.toggle("ring-tertiary", isBoosted);
-      updatePreview();
-      Core.showToast(
-        isBoosted ? "Đã bật Boost Listing (5.000đ/ngày) trong bản xem trước!" : "Đã tắt Boost Listing.",
-        isBoosted ? "success" : "info"
-      );
-    });
-
     document.getElementById("post-submit-btn")?.addEventListener("click", async () => {
       if (Core.isLoggedIn && !Core.isLoggedIn()) {
         Core.showToast("Vui lòng đăng nhập hoặc đăng ký tài khoản sinh viên trước khi đăng tin.", "info");
@@ -250,7 +238,7 @@
             <p class="text-sm text-on-surface-variant">Tin <strong>"${Core.escapeHTML(result.roommate.roomStatusTitle)}"</strong> đã xuất hiện trong danh sách tìm roommate.</p>
             <div class="flex flex-col sm:flex-row gap-2.5 w-full pt-2">
               <a href="/roomie/tim-roommate" class="flex-1 py-3 px-4 rounded-xl bg-primary text-on-primary font-semibold text-sm">Xem danh sách roommate</a>
-              <a href="/roomie/dang-tin" class="flex-1 py-3 px-4 rounded-xl bg-surface-container-high text-on-surface font-semibold text-sm">Đăng tin khác</a>
+              <a href="/roomie/tin-da-dang" class="flex-1 py-3 px-4 rounded-xl bg-surface-container-high text-on-surface font-semibold text-sm">Quản lý tin của tôi</a>
             </div>
           </div>
         `
@@ -263,9 +251,9 @@
     });
     document.getElementById("post-support-cta-btn")?.addEventListener("click", () => {
       Core.openSupportContactModal(
-        "Tư vấn viên Boost Listing",
-        "Hỗ trợ sinh viên qua Zalo & Hotline",
-        "Mình cần tư vấn gói Boost tin để tìm roommate trong 48h."
+        "Hỗ trợ sinh viên Roomie",
+        "Liên hệ hỗ trợ qua các kênh Roomie hiện có",
+        "Mình cần hỗ trợ về bài đăng tìm roommate."
       );
     });
     (document.getElementById("pv-connect-btn") || document.getElementById("pv-chat-btn"))?.addEventListener("click", () => {

@@ -7,7 +7,7 @@
   const Core = window.RoomieCore || {};
 
   /**
-   * Bind billing toggle (Theo gói lẻ / Thẻ Sinh viên -20%), price display sync, and CTA buttons.
+   * Bind billing toggle, price display sync, and available plan buttons.
    */
   function initBillingWidget({
     toggleContainer,
@@ -58,26 +58,31 @@
     });
 
     const syncPlanButtons = () => {
-      const anyPaidActive = Core.hasUnlockedPrediction();
+      const hasPredictionAccess = Core.hasUnlockedPrediction();
       const latestPlan = Core.getLatestPurchasedPlan();
 
       ctaButtons.forEach((btn) => {
         if (!btn.dataset.defaultLabel) btn.dataset.defaultLabel = btn.textContent.trim();
         const pkgId = btn.dataset[pkgAttr];
         if (pkgId === "basic") {
-          btn.textContent = anyPaidActive ? "Gói miễn phí" : btn.dataset.defaultLabel;
+          btn.disabled = false;
+          btn.removeAttribute("aria-disabled");
+          btn.textContent = hasPredictionAccess ? "Gói miễn phí" : btn.dataset.defaultLabel;
           return;
         }
         const pkg = packages.find((p) => p.id === pkgId);
+        const unavailable = !pkg || pkg.available !== true;
         const isActive = Core.hasPurchasedPlan(pkgId);
-        btn.textContent = formatCtaLabel(isActive, pkg, btn.dataset.defaultLabel);
+        btn.disabled = unavailable;
+        btn.setAttribute("aria-disabled", unavailable ? "true" : "false");
+        btn.textContent = unavailable ? "Sắp ra mắt" : formatCtaLabel(isActive, pkg, btn.dataset.defaultLabel);
         if (btn.classList.contains("pricing-cta-btn")) {
           btn.classList.toggle("ring-2", isActive);
           btn.classList.toggle("ring-tertiary-fixed", isActive);
         }
       });
 
-      onStateSync?.({ anyPaidActive, latestPlan });
+      onStateSync?.({ hasPredictionAccess, latestPlan });
     };
 
     ctaButtons.forEach((btn) => {
@@ -89,10 +94,9 @@
           Core.showToast("Bạn đang sử dụng Gói Cơ bản (0đ) miễn phí!");
           return;
         }
+        if (pkg.available !== true) return;
         const activePrice = billingMode === "student" && pkg.studentPrice ? pkg.studentPrice : pkg.price;
-        const activePeriod =
-          billingMode === "student" ? `${pkg.period} (Ưu đãi Sinh viên -20%)` : pkg.period;
-        Core.openPaymentModal({ ...pkg, price: activePrice, period: activePeriod });
+        Core.openPaymentModal({ ...pkg, price: activePrice, period: pkg.period });
       });
     });
 

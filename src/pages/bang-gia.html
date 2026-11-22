@@ -39,21 +39,9 @@
 
             <!-- Concise Subtitle -->
             <p class="font-body-md sm:font-body-lg text-[14px] sm:text-[16px] text-[#c7c4d8] max-w-2xl mt-2.5 leading-relaxed">
-              Minh bạch 100% chi phí, không ràng buộc dài hạn
+              Chọn gói, quét mã VietQR chuyển khoản rồi xác nhận để kích hoạt quyền lợi.
             </p>
 
-            <!-- Segmented Billing Toggle (Synced with Homepage #services-preview) -->
-            <div id="pricing-billing-toggle" class="relative inline-flex items-center p-1 rounded-full bg-[#110f30]/95 border border-[#c3c0ff]/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] mt-6">
-              <button type="button" data-billing="standard" aria-pressed="true" class="px-4 sm:px-6 py-2 rounded-full text-[13px] sm:text-[13.5px] font-semibold bg-gradient-to-b from-primary-container to-primary text-white shadow-[0_0_24px_rgba(99,91,255,0.55)] transition-all whitespace-nowrap">
-                Theo gói lẻ
-              </button>
-              <button type="button" data-billing="student" aria-pressed="false" class="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 rounded-full text-[13px] sm:text-[13.5px] font-medium text-[#c7c4d8] hover:text-white transition-all whitespace-nowrap">
-                <span>Thẻ Sinh viên</span>
-                <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed text-[11px] font-extrabold leading-none">
-                  -20%
-                </span>
-              </button>
-            </div>
           </div>
 
           <!-- Active Purchased Plan Banner (Shown dynamically when a paid plan is activated) -->
@@ -73,7 +61,7 @@
             </a>
           </div>
 
-          <!-- UNIFIED 6-CARD GRID (Exact Homepage Order: Cơ bản -> Boost -> Match Plus -> Sinh viên Pro -> Combo Thần Tốc -> Chủ trọ & Nhượng) -->
+          <!-- Free plan and five upcoming student packages -->
           <div class="mt-9 sm:mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 xl:gap-6 items-stretch">
             <!-- CARD 1: Gói Cơ bản -->
             <article class="rm-halftone-card relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
@@ -88,7 +76,7 @@
                   </span>
                 </div>
                 <p class="text-[13.5px] text-[#c7c4d8] mt-1.5 leading-snug lg:min-h-[38px]">
-                  Trải nghiệm đầy đủ tính năng nền tảng
+                  Dùng các tính năng miễn phí hiện có
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
@@ -108,7 +96,7 @@
                 <ul class="mt-6 pt-5 border-t border-white/10 flex flex-col gap-3 text-[13.5px] text-[#eef0fa]/90">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Đăng 01 tin tìm phòng hoặc ở ghép</span>
+                    <span class="font-medium text-white">Đăng tối đa 01 tin roommate mỗi ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
@@ -116,7 +104,7 @@
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim shrink-0 mt-0.5">check_circle</span>
-                    <span>Xem tối đa 5 hồ sơ roommate mỗi ngày</span>
+                    <span>Xem danh sách bài đăng tìm roommate</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
@@ -130,277 +118,277 @@
               </div>
             </article>
 
-            <!-- CARD 2: Boost Listing -->
+            <!-- CARD 2: Thêm 3 tin trong ngày -->
             <article class="rm-halftone-card-mint-soft relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-mint pointer-events-none absolute inset-0 opacity-45"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#93f5d3]/55 to-transparent"></div>
 
               <div class="relative z-10 flex flex-col">
                 <div class="flex items-center justify-between gap-2">
-                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Boost Listing</h2>
+                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Gói 1 • Thêm 3 tin/ngày</h2>
                   <span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed text-[11px] font-bold whitespace-nowrap shrink-0">
-                    Đẩy tin nhanh
+                    Gói 1
                   </span>
                 </div>
                 <p class="text-[13.5px] text-[#c7c4d8] mt-1.5 leading-snug lg:min-h-[38px]">
-                  Ưu tiên hiển thị ngay đầu trang tìm kiếm
+                  Thêm tối đa 3 lượt đăng ngoài tin miễn phí mỗi ngày
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
-                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="5.000đ" data-price-sv="4.000đ">
-                    5.000đ
+                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="49.000đ" data-price-sv="49.000đ">
+                    49.000đ
                   </span>
                   <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-tertiary-fixed/85 mt-1.5 min-h-[18px]" data-note-std="Hiệu lực 24 giờ • Phù hợp khi cần ghép gấp" data-note-sv="Đã áp dụng Thẻ Sinh viên -20% • Chỉ 4.000đ/ngày">
-                  Hiệu lực 24 giờ • Phù hợp khi cần ghép gấp
+                <p class="pricing-subnote text-[12px] text-tertiary-fixed/85 mt-1.5 min-h-[18px]" data-note-std="Tối đa 4 tin trong ngày, gồm 1 tin miễn phí" data-note-sv="Tối đa 4 tin trong ngày, gồm 1 tin miễn phí">
+                  Tối đa 4 tin trong ngày, gồm 1 tin miễn phí
                 </p>
 
-                <button data-pkg="boost" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white/95 hover:bg-secondary-container text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
-                  Chọn gói Boost Listing
+                <button data-pkg="extra-posts-day" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white/95 text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
+                  Mua gói
                 </button>
 
                 <ul class="mt-6 pt-5 border-t border-white/10 flex flex-col gap-3 text-[13.5px] text-[#eef0fa]/90">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Tiếp cận gấp 5 lần lượt xem thực tế</span>
+                    <span class="font-medium text-white">Thêm tối đa 03 lượt đăng mỗi ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Gắn nhãn "Cần gấp" nổi bật trên danh sách</span>
+                    <span class="font-medium text-white">Tổng cộng tối đa 04 tin trong ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Đưa tin lên top đầu chuyên mục khu vực</span>
+                    <span class="text-[#c7c4d8]">Mỗi ngày tính theo giờ Việt Nam</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Thống kê số lượt xem &amp; lưu tin theo ngày</span>
+                    <span class="text-[#c7c4d8]">Không bao gồm quyền lợi đẩy tin</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Tách biệt slot khỏi tin quảng cáo chủ trọ</span>
+                    <span class="text-[#c7c4d8]">Tổng cộng tối đa 04 tin trong ngày</span>
                   </li>
                 </ul>
               </div>
             </article>
 
-            <!-- CARD 3: Match Plus -->
+            <!-- CARD 3: Đẩy tin 24 giờ -->
             <article class="rm-halftone-card-violet-soft relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-top pointer-events-none absolute inset-0 opacity-65"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c3c0ff]/65 to-transparent"></div>
 
               <div class="relative z-10 flex flex-col">
                 <div class="flex items-center justify-between gap-2">
-                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Match Plus</h2>
+                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Gói 2 • Đẩy tin 24 giờ</h2>
                   <span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-primary text-[11px] font-extrabold whitespace-nowrap shrink-0">
-                    Ghép nâng cao
+                    Gói 2
                   </span>
                 </div>
                 <p class="text-[13.5px] text-[#c7c4d8] mt-1.5 leading-snug lg:min-h-[38px]">
-                  Phân tích độ hợp gu đa chiều chuyên sâu
+                  Đẩy một bài đăng bạn chọn lên đầu danh sách
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
-                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="9.000đ" data-price-sv="7.000đ">
-                    9.000đ
+                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="19.000đ" data-price-sv="19.000đ">
+                    19.000đ
                   </span>
-                  <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ lượt match</span>
+                  <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ 24 giờ</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Mở khóa đối chiếu sâu &gt;85% theo phiên tìm" data-note-sv="Đã áp dụng Thẻ Sinh viên -20% • Chỉ 7.000đ/lượt">
-                  Mở khóa đối chiếu sâu &gt;85% theo phiên tìm
+                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Đẩy một tin bạn chọn trong đúng 24 giờ" data-note-sv="Đẩy một tin bạn chọn trong đúng 24 giờ">
+                  Đẩy một tin bạn chọn trong đúng 24 giờ
                 </p>
 
-                <button data-pkg="match-plus" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white/95 hover:bg-primary-fixed text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
-                  Chọn gói Match Plus
+                <button data-pkg="boost-24h" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white/95 text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
+                  Mua gói
                 </button>
 
                 <ul class="mt-6 pt-5 border-t border-white/10 flex flex-col gap-3 text-[13.5px] text-[#eef0fa]/90">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Đối chiếu thói quen ngủ, học &amp; mức sạch sẽ</span>
+                    <span class="font-medium text-white">Chọn bài đăng cần đẩy</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Bật bộ lọc ưu tiên cùng trường đại học</span>
+                    <span class="font-medium text-white">Thời hạn hiển thị: 24 giờ</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim shrink-0 mt-0.5">check_circle</span>
-                    <span>Mở khóa Dự đoán gợi ý &amp; đề xuất hợp gu &gt;85%</span>
+                    <span>Không cam kết số lượt xem hay kết quả ghép</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Kết nối Double Opt-in mở Zalo / SĐT an toàn</span>
+                    <span class="text-[#c7c4d8]">Thời hạn đẩy tin là 24 giờ</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Tặng kèm mẫu Hợp đồng thỏa thuận ở ghép</span>
+                    <span class="text-[#c7c4d8]">Không bao gồm quyền lợi đẩy tin 7 ngày</span>
                   </li>
                 </ul>
               </div>
             </article>
 
-            <!-- CARD 4: Sinh viên Pro (Deep Emerald-Mint Halftone) -->
+            <!-- CARD 4: Đẩy tin 7 ngày -->
             <article class="rm-halftone-card-mint relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-mint pointer-events-none absolute inset-0"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-tertiary-fixed to-transparent"></div>
 
               <div class="relative z-10 flex flex-col">
                 <div class="flex items-center justify-between gap-2">
-                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Sinh viên Pro</h2>
+                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Gói 3 • Đẩy tin 7 ngày</h2>
                   <span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed text-[11px] font-extrabold shadow-sm whitespace-nowrap shrink-0">
-                    Uy tín cao
+                    Gói 3
                   </span>
                 </div>
                 <p class="text-[13.5px] text-white/90 mt-1.5 leading-snug lg:min-h-[38px]">
-                  Xác thực thẻ sinh viên tăng tin cậy hồ sơ
+                  Đẩy một bài đăng bạn chọn lên đầu danh sách
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
-                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="15.000đ" data-price-sv="12.000đ">
-                    15.000đ
+                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="69.000đ" data-price-sv="69.000đ">
+                    69.000đ
                   </span>
-                  <span class="text-[13.5px] text-white/85 font-medium">/ 6 tháng</span>
+                  <span class="text-[13.5px] text-white/85 font-medium">/ 7 ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-tertiary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Chỉ 2.500đ/tháng trọn học kỳ" data-note-sv="Đã áp dụng Thẻ Sinh viên -20% • Chỉ 2.000đ/tháng">
-                  Chỉ 2.500đ/tháng trọn học kỳ
+                <p class="pricing-subnote text-[12px] text-tertiary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Đẩy một tin bạn chọn trong 07 ngày" data-note-sv="Đẩy một tin bạn chọn trong 07 ngày">
+                  Đẩy một tin bạn chọn trong 07 ngày
                 </p>
 
-                <button data-pkg="verified-pro" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white hover:bg-secondary-container text-on-tertiary-fixed-variant font-bold text-[14px] shadow-[0_0_22px_rgba(147,245,211,0.38)] transition-all">
-                  Chọn gói Sinh viên Pro
+                <button data-pkg="boost-7d" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white text-on-tertiary-fixed-variant font-bold text-[14px] shadow-[0_0_22px_rgba(147,245,211,0.38)] transition-all">
+                  Mua gói
                 </button>
 
                 <ul class="mt-6 pt-5 border-t border-white/20 flex flex-col gap-3 text-[13.5px] text-white">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-semibold">Cấp huy hiệu tích xanh Đã xác thực SV</span>
+                    <span class="font-semibold">Chọn bài đăng cần đẩy</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-semibold">Tăng đến 90% tỉ lệ đồng ý kết nối 2 chiều</span>
+                    <span class="font-semibold">Thời hạn hiển thị: 07 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Ưu tiên duyệt tin và hỗ trợ tranh chấp</span>
+                    <span class="text-white/95">Không cam kết số lượt xem hay kết quả ghép</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Ưu tiên xuất hiện trong bộ lọc an toàn</span>
+                    <span class="text-white/95">Thời hạn đẩy tin là 07 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Hỗ trợ đổi thông tin trường miễn phí 1 lần</span>
+                    <span class="text-white/95">Không cam kết số lượt xem hay kết quả ghép</span>
                   </li>
                 </ul>
               </div>
             </article>
 
-            <!-- CARD 5: Combo Thần Tốc (Center Row 2 — Featured Brand Violet Halftone Glow) -->
+            <!-- CARD 5: Match không giới hạn trong ngày -->
             <article class="rm-halftone-card-featured relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-hero pointer-events-none absolute inset-0"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"></div>
 
               <div class="relative z-10 flex flex-col">
                 <div class="flex items-center justify-between gap-2">
-                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight drop-shadow-sm whitespace-nowrap">Combo Thần Tốc</h2>
+                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight drop-shadow-sm whitespace-nowrap">Gói 4 • Match không giới hạn</h2>
                   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white text-primary text-[11px] font-extrabold shadow-sm whitespace-nowrap shrink-0">
                     <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
-                    Phổ biến nhất
+                    Gói 4
                   </span>
                 </div>
                 <p class="text-[13.5px] text-white/90 mt-1.5 leading-snug lg:min-h-[38px]">
-                  Giải pháp trọn gói tìm phòng &amp; bạn ở ghép nhanh
+                  Không giới hạn lượt xem kết quả ghép roommate trong ngày
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
-                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none drop-shadow-sm" data-price-std="29.000đ" data-price-sv="23.000đ">
-                    29.000đ
+                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none drop-shadow-sm" data-price-std="35.000đ" data-price-sv="35.000đ">
+                    35.000đ
                   </span>
-                  <span class="text-[13.5px] text-white/85 font-medium">/ tuần</span>
+                  <span class="text-[13.5px] text-white/85 font-medium">/ ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-primary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Tiết kiệm 40% so với mua lẻ từng dịch vụ" data-note-sv="Đã áp dụng Thẻ Sinh viên -20% • Chỉ ~3.300đ/ngày">
-                  Tiết kiệm 40% so với mua lẻ từng dịch vụ
+                <p class="pricing-subnote text-[12px] text-primary-fixed mt-1.5 min-h-[18px] font-medium" data-note-std="Không giới hạn lượt xem kết quả ghép trong ngày" data-note-sv="Không giới hạn lượt xem kết quả ghép trong ngày">
+                  Không giới hạn lượt xem kết quả ghép trong ngày
                 </p>
 
-                <button data-pkg="combo" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white hover:bg-primary-fixed text-on-primary-fixed font-extrabold text-[14px] shadow-[0_0_28px_rgba(226,223,255,0.55)] transition-all">
-                  Chọn gói Combo Thần Tốc
+                <button data-pkg="unlimited-matches-day" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white text-on-primary-fixed font-extrabold text-[14px] shadow-[0_0_28px_rgba(226,223,255,0.55)] transition-all">
+                  Mua gói
                 </button>
 
                 <ul class="mt-6 pt-5 border-t border-white/20 flex flex-col gap-3 text-[13.5px] text-white">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-semibold">Tặng 3 lượt Boost Listing đầu trang</span>
+                    <span class="font-semibold">Không giới hạn lượt xem kết quả ghép mỗi ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-semibold">Mở khóa không giới hạn Match Plus &amp; Dự đoán gợi ý</span>
+                    <span class="font-semibold">Dùng trong ngày, không cộng dồn sang ngày tiếp theo</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-secondary-container shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium">Thông báo Zalo / Email khi có phòng hợp gu</span>
+                    <span class="font-medium">Kết quả tùy thuộc dữ liệu hồ sơ hiện có</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Bật bộ lọc ưu tiên cùng trường đại học</span>
+                    <span class="text-white/95">Không bao gồm lượt đăng thêm hay đẩy tin</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-white/95">Tặng kèm mẫu Hợp đồng thỏa thuận ở ghép</span>
+                    <span class="text-white/95">Quyền lợi có thời hạn trong ngày</span>
                   </li>
                 </ul>
               </div>
             </article>
 
-            <!-- CARD 6: Chủ trọ & Nhượng (Royal Indigo Halftone) -->
+            <!-- CARD 6: Gói trọn bộ 30 ngày -->
             <article class="rm-halftone-card-indigo relative overflow-hidden rounded-[22px] p-6 xl:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
               <div class="rm-halftone-dots-top pointer-events-none absolute inset-0 opacity-60"></div>
               <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-fixed-dim/65 to-transparent"></div>
 
               <div class="relative z-10 flex flex-col">
                 <div class="flex items-center justify-between gap-2">
-                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Chủ trọ &amp; Nhượng</h2>
+                  <h2 class="text-[18.5px] xl:text-[20px] font-bold text-white tracking-tight whitespace-nowrap">Gói 5 • Trọn bộ 30 ngày</h2>
                   <span class="px-2.5 py-0.5 rounded-full bg-primary/40 border border-primary-fixed-dim/40 text-primary-fixed text-[11px] font-semibold whitespace-nowrap shrink-0">
-                    Không giới hạn
+                    30 ngày
                   </span>
                 </div>
                 <p class="text-[13.5px] text-[#c7c4d8] mt-1.5 leading-snug lg:min-h-[38px]">
-                  Dành cho chủ nhà &amp; sinh viên cần sang phòng
+                  Gồm toàn bộ quyền lợi của gói 1–4 trong 30 ngày
                 </p>
 
                 <div class="mt-5 flex items-baseline gap-1.5">
-                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="49.000đ" data-price-sv="39.000đ">
-                    49.000đ
+                  <span class="pricing-plan-price text-[34px] xl:text-[38px] font-extrabold text-white tracking-tight tabular-nums leading-none" data-price-std="149.000đ" data-price-sv="149.000đ">
+                    149.000đ
                   </span>
-                  <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ tháng</span>
+                  <span class="text-[13.5px] text-[#c7c4d8]/80 font-medium">/ 30 ngày</span>
                 </div>
-                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Đăng tin trọn vẹn 30 ngày • Không qua môi giới" data-note-sv="Đã áp dụng Thẻ Sinh viên -20% khi sang phòng">
-                  Đăng tin trọn vẹn 30 ngày • Không qua môi giới
+                <p class="pricing-subnote text-[12px] text-primary-fixed-dim mt-1.5 min-h-[18px]" data-note-std="Gồm toàn bộ quyền lợi các gói 1–4" data-note-sv="Gồm toàn bộ quyền lợi các gói 1–4">
+                  Gồm toàn bộ quyền lợi các gói 1–4
                 </p>
 
-                <button data-pkg="host" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white hover:bg-primary-fixed text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
-                  Chọn gói Chủ trọ
+                <button data-pkg="all-in-one" type="button" class="pricing-cta-btn mt-5 w-full py-3 px-4 rounded-xl bg-white text-on-primary-fixed font-bold text-[14px] shadow-sm transition-all">
+                  Mua gói
                 </button>
 
                 <ul class="mt-6 pt-5 border-t border-white/15 flex flex-col gap-3 text-[13.5px] text-[#eef0fa]/90">
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Đăng không giới hạn ảnh &amp; video thực tế</span>
+                    <span class="font-medium text-white">Thêm tối đa 3 tin mỗi ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-primary-fixed-dim shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                    <span class="font-medium text-white">Hiển thị SĐT &amp; Zalo liên hệ trực tiếp</span>
+                    <span class="font-medium text-white">Đẩy tin trong 24 giờ và 7 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim shrink-0 mt-0.5">check_circle</span>
-                    <span>Ghim top đầu chuyên mục khu vực 30 ngày</span>
+                    <span>Match không giới hạn mỗi ngày trong 30 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Bảng tách bạch điện, nước, wifi &amp; gửi xe</span>
+                    <span class="text-[#c7c4d8]">Thời hạn gói: 30 ngày</span>
                   </li>
                   <li class="flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[18px] text-[#c7c4d8]/65 shrink-0 mt-0.5">check_circle</span>
-                    <span class="text-[#c7c4d8]">Huy hiệu Tin Xác Thực &amp; cập nhật còn phòng</span>
+                    <span class="text-[#c7c4d8]">Quét mã VietQR và xác nhận sau khi chuyển khoản</span>
                   </li>
                 </ul>
               </div>
@@ -417,10 +405,10 @@
               Minh bạch &amp; Rõ ràng
             </span>
             <h2 class="font-headline-lg text-headline-lg text-on-surface mt-space-sm tracking-tight">
-              So sánh chi tiết 6 gói dịch vụ
+              So sánh gói miễn phí và 5 gói roommate
             </h2>
             <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-              Bảng giá tự động cập nhật theo chế độ Theo gói lẻ hoặc Thẻ Sinh viên (-20%) bạn đã chọn.
+              Giá hiển thị đã gồm mức thanh toán cho từng gói.
             </p>
           </div>
           <div class="overflow-x-auto rounded-3xl shadow-sm bg-surface-container-lowest border border-outline-variant/25">
@@ -438,38 +426,38 @@
                     </span>
                   </th>
                   <th class="p-4 sm:p-space-md font-label-md text-label-md text-center">
-                    Boost Listing
+                    Thêm 3 tin/ngày
                     <br />
-                    <span class="table-plan-price font-body-sm text-body-sm font-semibold text-tertiary" data-price-std="5k/ngày" data-price-sv="4k/ngày">
-                      5k/ngày
+                    <span class="table-plan-price font-body-sm text-body-sm font-semibold text-tertiary" data-price-std="49.000đ" data-price-sv="49.000đ">
+                      49.000đ
                     </span>
                   </th>
                   <th class="p-4 sm:p-space-md font-label-md text-label-md text-center bg-secondary-container/30 text-on-secondary-fixed">
-                    Match Plus
+                    Đẩy tin 24 giờ
                     <br />
-                    <span class="table-plan-price font-body-sm text-body-sm font-bold text-tertiary" data-price-std="9k/lượt" data-price-sv="7k/lượt">
-                      9k/lượt
+                    <span class="table-plan-price font-body-sm text-body-sm font-bold text-tertiary" data-price-std="19.000đ" data-price-sv="19.000đ">
+                      19.000đ
                     </span>
                   </th>
                   <th class="p-4 sm:p-space-md font-label-md text-label-md text-center">
-                    Sinh viên Pro
+                    Đẩy tin 7 ngày
                     <br />
-                    <span class="table-plan-price font-body-sm text-body-sm font-semibold text-on-surface-variant" data-price-std="15k/6th" data-price-sv="12k/6th">
-                      15k/6th
+                    <span class="table-plan-price font-body-sm text-body-sm font-semibold text-on-surface-variant" data-price-std="69.000đ" data-price-sv="69.000đ">
+                      69.000đ
                     </span>
                   </th>
                   <th class="p-4 sm:p-space-md font-label-md text-label-md text-center bg-primary text-on-primary">
-                    Combo Thần Tốc
+                    Match không giới hạn
                     <br />
-                    <span class="table-plan-price font-body-sm text-body-sm font-bold text-secondary-container" data-price-std="29k/tuần" data-price-sv="23k/tuần">
-                      29k/tuần
+                    <span class="table-plan-price font-body-sm text-body-sm font-bold text-secondary-container" data-price-std="35.000đ" data-price-sv="35.000đ">
+                      35.000đ
                     </span>
                   </th>
                   <th class="p-4 sm:p-space-md font-label-md text-label-md text-center">
-                    Chủ trọ &amp; Nhượng
+                    Trọn bộ 30 ngày
                     <br />
-                    <span class="table-plan-price font-body-sm text-body-sm font-semibold text-on-surface-variant" data-price-std="49k/tháng" data-price-sv="39k/tháng">
-                      49k/tháng
+                    <span class="table-plan-price font-body-sm text-body-sm font-semibold text-on-surface-variant" data-price-std="149.000đ" data-price-sv="149.000đ">
+                      149.000đ
                     </span>
                   </th>
                 </tr>
@@ -477,109 +465,47 @@
               <tbody class="divide-y divide-outline-variant/20 text-on-surface font-body-md text-[13.5px] sm:text-body-md">
                 <tr class="hover:bg-surface-container-low/45 transition-colors">
                   <td class="p-4 sm:p-space-md font-medium">
-                    Đăng tin minh bạch tổng chi phí
+                    Lượt đăng roommate mỗi ngày
                   </td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">01 tin</td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Ưu tiên top</td>
-                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 text-on-surface-variant">Tiêu chuẩn</td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Duyệt ưu tiên</td>
-                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 font-semibold text-primary">Tặng 3 lượt Boost</td>
-                  <td class="p-4 sm:p-space-md text-center font-semibold text-on-surface">Không giới hạn ảnh/video</td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Tối đa 1 tin</td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Thêm 3 tin</td>
+                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 text-on-surface-variant">Không thêm</td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Không thêm</td>
+                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 text-on-surface-variant">Không thêm</td>
+                  <td class="p-4 sm:p-space-md text-center font-semibold text-on-surface">Thêm 3 tin/ngày</td>
                 </tr>
                 <tr class="hover:bg-surface-container-low/45 transition-colors">
                   <td class="p-4 sm:p-space-md font-medium">
-                    Xem hồ sơ &amp; Kết nối 2 chiều (Double Opt-in)
+                    Đẩy một bài đăng bạn chọn lên đầu
                   </td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">5 hồ sơ/ngày</td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Tiêu chuẩn</td>
-                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 font-semibold text-tertiary">Mở rộng &gt;85%</td>
-                  <td class="p-4 sm:p-space-md text-center font-semibold text-tertiary">+90% đồng ý</td>
-                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 font-semibold text-primary">Không giới hạn</td>
-                  <td class="p-4 sm:p-space-md text-center font-semibold text-on-surface">Hiện Zalo / SĐT công khai</td>
+                  <td class="p-4 sm:p-space-md text-center text-outline">—</td>
+                  <td class="p-4 sm:p-space-md text-center text-outline">—</td>
+                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 font-semibold text-tertiary">24 giờ</td>
+                  <td class="p-4 sm:p-space-md text-center font-semibold text-tertiary">7 ngày</td>
+                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 text-outline">—</td>
+                  <td class="p-4 sm:p-space-md text-center font-semibold text-on-surface">Gồm gói 2 và 3</td>
                 </tr>
                 <tr class="hover:bg-surface-container-low/45 transition-colors">
                   <td class="p-4 sm:p-space-md font-medium">
-                    Dự đoán gợi ý bạn cùng phòng &amp; lọc cùng trường ĐH
+                    Lượt xem kết quả ghép roommate
                   </td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Cơ bản</td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15">
-                    <span class="material-symbols-outlined text-tertiary text-title-md">check_circle</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35">
-                    <span class="material-symbols-outlined text-primary text-title-md">check_circle</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Theo quyền lợi hiện có</td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Không đổi</td>
+                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 text-on-surface-variant">Không đổi</td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Không đổi</td>
+                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 font-semibold text-primary">Không giới hạn/ngày</td>
+                  <td class="p-4 sm:p-space-md text-center font-semibold text-on-surface">Không giới hạn/ngày</td>
                 </tr>
                 <tr class="hover:bg-surface-container-low/45 transition-colors">
                   <td class="p-4 sm:p-space-md font-medium">
-                    Nhãn "Cần gấp" / Ghim đầu danh mục
+                    Thời hạn
                   </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center font-semibold text-tertiary">24 giờ</td>
-                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 font-semibold text-primary">3 lượt giờ vàng</td>
-                  <td class="p-4 sm:p-space-md text-center font-semibold text-tertiary">Ghim top 30 ngày</td>
-                </tr>
-                <tr class="hover:bg-surface-container-low/45 transition-colors">
-                  <td class="p-4 sm:p-space-md font-medium">
-                    Huy hiệu Tích xanh SV &amp; Hỗ trợ tranh chấp
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center">
-                    <span class="material-symbols-outlined text-tertiary text-title-md">check_circle</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 text-on-surface-variant text-xs font-medium">
-                    Ưu tiên duyệt tin
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant text-xs font-medium">
-                    Huy hiệu Tin Xác Thực
-                  </td>
-                </tr>
-                <tr class="hover:bg-surface-container-low/45 transition-colors">
-                  <td class="p-4 sm:p-space-md font-medium">
-                    Mẫu Hợp đồng thỏa thuận ở ghép an toàn
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15">
-                    <span class="material-symbols-outlined text-tertiary text-title-md">check_circle</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center text-outline">
-                    <span class="material-symbols-outlined text-body-md">remove</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35">
-                    <span class="material-symbols-outlined text-primary text-title-md">check_circle</span>
-                  </td>
-                  <td class="p-4 sm:p-space-md text-center">
-                    <span class="material-symbols-outlined text-tertiary text-title-md">check_circle</span>
-                  </td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Hằng ngày</td>
+                  <td class="p-4 sm:p-space-md text-center text-on-surface-variant">Trong ngày</td>
+                  <td class="p-4 sm:p-space-md text-center bg-secondary-container/15 font-semibold text-tertiary">24 giờ</td>
+                  <td class="p-4 sm:p-space-md text-center font-semibold text-tertiary">7 ngày</td>
+                  <td class="p-4 sm:p-space-md text-center bg-primary-fixed/35 font-semibold text-primary">Trong ngày</td>
+                  <td class="p-4 sm:p-space-md text-center font-semibold text-on-surface">30 ngày</td>
                 </tr>
               </tbody>
             </table>
@@ -612,7 +538,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Hoàn toàn có! Gói Cơ bản 0đ cho phép bạn làm bài trắc nghiệm hợp gu, đăng 01 tin tìm phòng/ở ghép, xem tối đa 5 hồ sơ/ngày và gửi lời mời kết nối 2 chiều (Double Opt-in) mở Zalo/SĐT miễn phí. Các gói trả phí chỉ hỗ trợ khi bạn cần ghép thật gấp hoặc đối chiếu sâu &gt;85% cùng trường.
+                Có. Tài khoản miễn phí được đăng tối đa 01 tin roommate mỗi ngày và có 01 lượt làm mới kết quả trắc nghiệm mỗi ngày. Các gói trả phí mở thêm lượt đăng, đẩy tin hoặc lượt xem kết quả ghép.
               </p>
             </details>
 
@@ -621,12 +547,12 @@
               <summary class="flex items-center justify-between gap-3 font-title-md text-[16px] sm:text-title-md text-on-surface list-none">
                 <span class="flex items-center gap-space-sm">
                   <span class="material-symbols-outlined text-tertiary">school</span>
-                  Làm sao để nhận ưu đãi giảm 20% với Thẻ Sinh viên?
+                  Làm thế nào để mua và kích hoạt gói?
                 </span>
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Bạn chỉ cần chuyển sang chế độ <strong>Thẻ Sinh viên (-20%)</strong> ngay phía trên bảng giá và xác thực email <code class="px-1.5 py-0.5 rounded bg-surface-container text-xs font-semibold">.edu.vn</code>. Toàn bộ gói lẻ và Combo sẽ được giảm trực tiếp 20%.
+                Chọn gói, quét mã VietQR và chuyển đúng số tiền kèm nội dung. Sau đó bấm xác nhận để mở gói.
               </p>
             </details>
             <!-- FAQ Item 3 -->
@@ -639,7 +565,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Roomie hỗ trợ quét mã <strong>VietQR</strong> chuyển khoản ngân hàng tự động, <strong>MoMo</strong> và <strong>ZaloPay</strong>. Giao dịch được đối soát và kích hoạt gói tức thì trong 5–10 giây mà không cần chờ duyệt thủ công.
+                Mã VietQR hiển thị số tiền và nội dung chuyển khoản. Sau khi chuyển, bấm xác nhận để kích hoạt ngay; hệ thống chưa tự đối soát với ngân hàng.
               </p>
             </details>
 
@@ -648,12 +574,12 @@
               <summary class="flex items-center justify-between gap-3 font-title-md text-[16px] sm:text-title-md text-on-surface list-none">
                 <span class="flex items-center gap-space-sm">
                   <span class="material-symbols-outlined text-tertiary">verified_user</span>
-                  Cơ chế Double Opt-in và Xác minh Sinh viên Pro hoạt động thế nào?
+                  Kết nối hai chiều hoạt động thế nào?
                 </span>
                 <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">expand_more</span>
               </summary>
               <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm pt-space-sm pl-8 leading-relaxed border-t border-surface-container">
-                Để chống spam và bảo vệ quyền riêng tư, SĐT và Zalo chỉ mở khóa khi cả hai bên đồng ý kết nối (tối đa 3 slot liên hệ song song). Khi kích hoạt <strong>Sinh viên Pro</strong>, thẻ SV hoặc ảnh cổng thông tin trường của bạn được đội ngũ HCMUS xác minh trong 20 phút, giúp tăng đến 90% tỉ lệ đồng ý kết nối.
+                Lời mời kết nối chỉ được thiết lập khi hai người đồng ý. Các gói mới không thay đổi quy trình kết nối này.
               </p>
             </details>
           </div>

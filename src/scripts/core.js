@@ -121,7 +121,9 @@
 
   function getPurchasedPlans() {
     const raw = readJSON(STORAGE_KEYS.ACTIVE_PLANS, []);
-    return Array.isArray(raw) ? raw.filter((p) => p && p.id && p.id !== "basic") : [];
+    return Array.isArray(raw)
+      ? raw.filter((p) => p && p.id && p.id !== "basic" && Number(p.expiresAt) > Date.now())
+      : [];
   }
 
   function hasPurchasedPlan(pkgId) {
@@ -129,26 +131,16 @@
   }
 
   function hasUnlockedPrediction() {
-    return getPurchasedPlans().length > 0;
+    return hasPurchasedPlan("unlimited-matches-day") || hasPurchasedPlan("all-in-one");
+  }
+
+  function hasCompletedQuiz() {
+    const result = readJSON(STORAGE_KEYS.QUIZ_RESULT, null);
+    return Boolean(result && Number(result.answeredCount) >= 9);
   }
 
   function getLatestPurchasedPlan() {
     return getPurchasedPlans()[0] || null;
-  }
-
-  function activatePurchasedPlan(pkg) {
-    if (!pkg || !pkg.id || pkg.id === "basic") return;
-    const current = getPurchasedPlans().filter((p) => p.id !== pkg.id);
-    const nextRecord = {
-      id: pkg.id,
-      name: pkg.name || pkg.id,
-      price: pkg.price || "",
-      period: pkg.period || "",
-      purchasedAt: Date.now()
-    };
-    writeJSON(STORAGE_KEYS.ACTIVE_PLANS, [nextRecord, ...current]);
-    window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: nextRecord } }));
-    apiFetch("/api/plans/purchase", { method: "POST", body: nextRecord });
   }
 
   function resetPurchasedPlans() {
@@ -1252,49 +1244,180 @@
   }
 
   function openPaymentModal(pkg) {
-    const modal = openModal({
-      title: `Kích hoạt ${pkg.name}`,
-      subtitle: `${pkg.price} ${pkg.period} • Thanh toán nhanh qua VietQR / Ví điện tử`,
-      maxWidth: "max-w-md",
-      bodyHtml: `
-        <div class="flex flex-col gap-4">
-          <div class="p-4 rounded-2xl bg-surface-container-low flex items-center justify-between">
-            <div>
-              <div class="font-bold text-on-surface">${escapeHTML(pkg.name)}</div>
-              <div class="text-xs text-on-surface-variant mt-0.5">${escapeHTML(pkg.desc)}</div>
-            </div>
-            <div class="text-right shrink-0 ml-3">
-              <div class="text-xl font-bold text-primary">${escapeHTML(pkg.price)}</div>
-              <div class="text-[11px] text-on-surface-variant">${escapeHTML(pkg.period)}</div>
-            </div>
-          </div>
+    const packageId = String(pkg?.id || "").trim();
+    const packageName = String(pkg?.name || "Gói dịch vụ");
+    if (!packageId || packageId === "basic") {
+      showToast("Gói dịch vụ không hợp lệ.", "error");
+      return;
+    }
+    if (!isLoggedIn()) {
+      openAuthModal("login", { subtitle: "Đăng nhập để mua và kích hoạt gói Roomie" });
+      return;
+    }
 
-          <div class="flex flex-col items-center p-5 rounded-2xl bg-surface border border-surface-container text-center">
-            <div class="w-36 h-36 rounded-2xl bg-white p-3 shadow-sm border border-surface-container flex flex-col items-center justify-center mb-3">
-              <span class="material-symbols-outlined text-primary text-[72px]">qr_code_2</span>
-              <span class="text-[10px] font-semibold text-tertiary mt-1">VietQR · MoMo · ZaloPay</span>
-            </div>
-            <p class="text-xs text-on-surface-variant">Nội dung chuyển khoản: <strong class="text-on-surface">RM-${escapeHTML(pkg.id.toUpperCase())}</strong></p>
-          </div>
+    const isBoostPlan = packageId === "boost-24h" || packageId === "boost-7d";
+    let listings = [];
+    let selectedTargetId = "";
 
-          <div class="flex gap-2.5">
-            <button type="button" id="rm-confirm-pay" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-semibold text-sm transition-colors">
-              Xác nhận đã thanh toán
+    const renderCheckoutForm = (errorMessage = "") => {
+      const listingOptions = listings
+        .map(
+          (listing) =>
+            `<option value="${escapeHTML(listing.id)}">${escapeHTML(
+              listing.roomStatusTitle || listing.roomStatusDetail || listing.name
+            )}</option>`
+        )
+        .join("");
+      const modal = openModal({
+        title: `Mua ${packageName}`,
+        subtitle: `${pkg.price || ""} ${pkg.period || ""}`.trim(),
+        maxWidth: "max-w-md",
+        bodyHtml: `
+          <div class="flex flex-col gap-4">
+            ${
+              isBoostPlan
+                ? listings.length
+                  ? `<label class="flex flex-col gap-1.5 text-sm font-semibold text-on-surface">
+                      Chọn bài đăng cần đẩy
+                      <select id="rm-plan-target" class="w-full rounded-xl border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm">
+                        ${listingOptions}
+                      </select>
+                    </label>`
+                  : `<div class="rounded-xl bg-surface-container-low p-4 text-sm text-on-surface-variant">
+                      Bạn cần có bài đăng roommate của mình trước khi mua gói đẩy tin.
+                      <a href="/roomie/dang-tin" class="ml-1 font-semibold text-primary underline">Đăng tin</a>
+                    </div>`
+                : ""
+            }
+            ${
+              errorMessage
+                ? `<p role="alert" class="rounded-xl bg-error-container px-3.5 py-3 text-sm text-on-error-container">${escapeHTML(
+                    errorMessage
+                  )}</p>`
+                : ""
+            }
+            <button type="button" id="rm-plan-create-order" ${
+              isBoostPlan && !listings.length ? "disabled" : ""
+            } class="w-full rounded-xl bg-primary px-4 py-3 font-semibold text-on-primary disabled:cursor-not-allowed disabled:opacity-50">
+              Tạo mã QR
             </button>
-            <button type="button" id="rm-cancel-pay" class="px-4 py-3 rounded-xl bg-surface-container text-on-surface text-sm font-medium hover:bg-surface-container-high">
-              Đóng
+            <p class="text-xs leading-relaxed text-on-surface-variant">
+              Nếu chưa cấu hình ngân hàng, hệ thống sẽ tạo QR demo không thể thanh toán. Xác nhận trong cửa sổ tiếp theo sẽ kích hoạt gói.
+            </p>
+          </div>
+        `
+      });
+
+      const targetSelect = modal.querySelector("#rm-plan-target");
+      selectedTargetId = targetSelect?.value || "";
+      targetSelect?.addEventListener("change", () => {
+        selectedTargetId = targetSelect.value;
+      });
+      modal.querySelector("#rm-plan-create-order")?.addEventListener("click", async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        button.textContent = "Đang tạo mã QR...";
+        const result = await apiFetch("/api/plans/checkout", {
+          method: "POST",
+          body: { packageId, targetId: selectedTargetId || undefined }
+        });
+        if (!result?.ok || !result.order || !result.payment?.qrDataUrl) {
+          renderCheckoutForm(result?.error || "Không thể tạo mã QR. Vui lòng thử lại.");
+          return;
+        }
+        renderPaymentQr(result.order, result.payment);
+      });
+    };
+
+    const renderPaymentQr = (order, payment, errorMessage = "") => {
+      const expiresAt = new Date(Number(order.expiresAt));
+      const isDemo = payment.isDemo === true;
+      const modal = openModal({
+        title: isDemo ? "Mã QR demo — không thanh toán" : "Quét mã VietQR để chuyển khoản",
+        subtitle: `${packageName} • ${formatVND(order.amountVnd)}`,
+        maxWidth: "max-w-md",
+        bodyHtml: `
+          <div class="flex flex-col items-center gap-3">
+            <img src="${escapeHTML(payment.qrDataUrl)}" alt="${
+              isDemo ? "Mã QR demo, không dùng để thanh toán" : "Mã QR thanh toán Roomie"
+            }" class="w-64 h-64 rounded-xl border border-outline-variant/30 bg-white p-2" />
+            <div class="w-full rounded-xl bg-surface-container-low p-3.5 text-sm">
+              <p><strong>Ngân hàng:</strong> ${escapeHTML(payment.bank)}</p>
+              <p><strong>Số tài khoản:</strong> ${escapeHTML(payment.accountNumber)}</p>
+              <p><strong>Chủ tài khoản:</strong> ${escapeHTML(payment.accountName)}</p>
+              <p><strong>Số tiền:</strong> ${formatVND(order.amountVnd)}</p>
+              <p><strong>Nội dung:</strong> <code class="font-bold">${escapeHTML(order.transferCode)}</code></p>
+            </div>
+            <p class="text-center text-xs text-on-surface-variant">Mã QR hết hạn lúc ${expiresAt.toLocaleTimeString(
+              "vi-VN"
+            )}.</p>
+            <p class="w-full rounded-xl ${
+              isDemo ? "bg-error-container text-on-error-container" : "bg-tertiary-container/40 text-on-surface"
+            } p-3 text-xs leading-relaxed">
+              ${
+                isDemo
+                  ? "Đây là mã QR giả để demo, không chứa thông tin ngân hàng và không thể dùng để chuyển tiền. Bấm xác nhận bên dưới chỉ để kiểm thử kích hoạt gói."
+                  : "Khi bấm xác nhận, gói sẽ được mở ngay. Roomie chưa tự kiểm tra khoản tiền đã vào tài khoản hay chưa."
+              }
+            </p>
+            ${
+              errorMessage
+                ? `<p role="alert" class="w-full rounded-xl bg-error-container px-3.5 py-3 text-sm text-on-error-container">${escapeHTML(
+                    errorMessage
+                  )}</p>`
+                : ""
+            }
+            <button type="button" id="rm-plan-confirm-payment" class="w-full rounded-xl bg-primary px-4 py-3 font-semibold text-on-primary">
+              ${isDemo ? "Xác nhận demo — mở gói" : "Tôi đã chuyển khoản — mở gói"}
             </button>
           </div>
-        </div>
-      `
-    });
+        `
+      });
 
-    modal.querySelector("#rm-cancel-pay").addEventListener("click", closeModal);
-    modal.querySelector("#rm-confirm-pay").addEventListener("click", () => {
-      activatePurchasedPlan(pkg);
-      closeModal();
-      showToast(`Đã kích hoạt gói ${pkg.name} thành công! Dự đoán gợi ý bạn cùng phòng đã được mở khóa.`);
-    });
+      modal.querySelector("#rm-plan-confirm-payment")?.addEventListener("click", async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        button.textContent = "Đang kích hoạt...";
+        const result = await apiFetch("/api/plans/confirm", {
+          method: "POST",
+          body: { orderId: order.id }
+        });
+        if (!result?.ok || !Array.isArray(result.plans)) {
+          renderPaymentQr(order, payment, result?.error || "Không thể kích hoạt gói. Vui lòng thử lại.");
+          return;
+        }
+
+        writeJSON(STORAGE_KEYS.ACTIVE_PLANS, result.plans);
+        window.dispatchEvent(
+          new CustomEvent("roomie:plan-updated", { detail: { pkg: result.plans[0] || null } })
+        );
+        if (Array.isArray(result.roommates)) {
+          Data.ROOMMATES = result.roommates;
+          window.dispatchEvent(new CustomEvent("roomie:roommates-updated"));
+        }
+        closeModal();
+        showToast(`Đã kích hoạt ${packageName}.`);
+      });
+    };
+
+    const loadListings = async () => {
+      if (!isBoostPlan) {
+        renderCheckoutForm();
+        return;
+      }
+      const result = await apiFetch("/api/roommates?mine=1");
+      if (!result?.ok || !Array.isArray(result.roommates)) {
+        renderCheckoutForm(result?.error || "Không thể tải bài đăng của bạn. Vui lòng thử lại.");
+        return;
+      }
+      const userId = getCurrentUser()?.id;
+      listings = result.roommates.filter(
+        (listing) => userId && String(listing.userId) === String(userId)
+      );
+      renderCheckoutForm();
+    };
+
+    loadListings();
   }
 
   function openContractModal() {
@@ -2101,9 +2224,11 @@ Chữ ký Bên A                                                    Chữ ký B�
     if (Array.isArray(data.connections) && data.connections.length) {
       saveConnections(data.connections);
     }
-    if (Array.isArray(data.activePlans) && data.activePlans.length) {
+    if (Array.isArray(data.activePlans)) {
       writeJSON(STORAGE_KEYS.ACTIVE_PLANS, data.activePlans);
-      window.dispatchEvent(new CustomEvent("roomie:plan-updated", { detail: { pkg: data.activePlans[0] } }));
+      window.dispatchEvent(
+        new CustomEvent("roomie:plan-updated", { detail: { pkg: data.activePlans[0] || null } })
+      );
     }
     if (data.quizResult && data.quizResult.archetype) {
       writeJSON(STORAGE_KEYS.QUIZ_RESULT, data.quizResult);
@@ -2153,17 +2278,16 @@ Chữ ký Bên A                                                    Chữ ký B�
   }
 
   async function submitQuizResult(answers, result) {
-    writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers);
-    writeJSON(STORAGE_KEYS.QUIZ_RESULT, result);
     const res = await apiFetch("/api/quiz/submit", {
       method: "POST",
       body: { answers, result }
     });
-    if (res && res.ok) {
-      if (res.quizResult) writeJSON(STORAGE_KEYS.QUIZ_RESULT, res.quizResult);
-      if (Array.isArray(res.roommates)) {
-        Data.ROOMMATES = markPersonalizedRoommateScores(res.roommates, answers);
-      }
+    if (!res?.ok) return res;
+
+    writeJSON(STORAGE_KEYS.QUIZ_ANSWERS, answers);
+    if (res.quizResult) writeJSON(STORAGE_KEYS.QUIZ_RESULT, res.quizResult);
+    if (Array.isArray(res.roommates)) {
+      Data.ROOMMATES = markPersonalizedRoommateScores(res.roommates, answers);
     }
     return res;
   }
@@ -2243,8 +2367,8 @@ Chữ ký Bên A                                                    Chữ ký B�
     getPurchasedPlans,
     hasPurchasedPlan,
     hasUnlockedPrediction,
+    hasCompletedQuiz,
     getLatestPurchasedPlan,
-    activatePurchasedPlan,
     resetPurchasedPlans,
     onPlanStateChange,
     isLoggedIn,

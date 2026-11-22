@@ -8,7 +8,7 @@ Nền tảng tìm phòng trọ minh bạch chi phí và ghép đôi bạn cùng 
 
 ## 1. Yêu cầu môi trường
 
-- **Node.js** (bản v22.5+ / v24 LTS trở lên — dự án sử dụng server HTTP thuần của Node.js kết hợp engine cơ sở dữ liệu **`node:sqlite` (SQLite3 WAL)** tích hợp sẵn trong Node.js, **không cần cài thêm bất kỳ package npm ngoài nào**).
+- **Node.js** (bản v22.5+ / v24 LTS trở lên — dự án dùng HTTP thuần, SQLite `node:sqlite`, `dotenv` để nạp cấu hình local và `qrcode` để tạo mã thanh toán VietQR ngay trên server).
 
 ## 2. Cách chạy website & database ở local
 
@@ -19,6 +19,10 @@ git clone https://github.com/mvuonghoang/roomie.git
 cd roomie
 npm start
 ```
+
+Chạy website bằng `npm start` tại `http://localhost:3000/roomie` để dùng được các API; không mở bằng Live Server hoặc preview tĩnh vì các cách đó không có endpoint `/api/*`. Nếu chưa cấu hình ngân hàng, checkout tự tạo **QR demo không thể thanh toán** để thử giao diện và luồng kích hoạt. Muốn tạo VietQR nhận tiền thật, sao chép `.env.example` thành `.env` rồi điền mã BIN, tên ngân hàng, số tài khoản và tên chủ tài khoản. `.env` đã được gitignore; không commit thông tin tài khoản thật.
+
+Các gói hiện có giá 49.000đ (thêm 3 tin/ngày), 19.000đ (đẩy 24 giờ), 69.000đ (đẩy 7 ngày), 35.000đ (match không giới hạn trong ngày Việt Nam) và 149.000đ (trọn bộ 30 ngày). Gói theo ngày hết hạn lúc 00:00 giờ Việt Nam; gói đẩy và trọn bộ dùng thời hạn ghi trên gói. Nút xác nhận thanh toán kích hoạt gói ngay nhưng **không tự đối soát với ngân hàng**; người dùng có thể xác nhận dù chưa chuyển tiền.
 
 Các lệnh quản trị cơ sở dữ liệu SQLite (`backend/database/roomie.sqlite`):
 
@@ -44,7 +48,7 @@ Sau đó mở trình duyệt tại:
 │   └── index.js               # Serverless entry point cho Vercel (/api/*)
 ├── backend/                   # Toàn bộ mã nguồn Backend & Cơ sở dữ liệu
 │   ├── database/
-│   │   ├── schema.sql         # Định nghĩa 11 bảng quan hệ SQLite (users, rooms, roommates, connections...)
+│   │   ├── schema.sql         # Định nghĩa 14 bảng quan hệ SQLite (users, rooms, roommates, connections...)
 │   │   ├── seed-data.js       # Bộ dữ liệu mẫu chuẩn (phòng trọ, ứng viên, gói dịch vụ, thông báo)
 │   │   ├── db.js              # SQLite Database Engine (node:sqlite) & Repository Layer
 │   │   ├── seed.js            # CLI script khởi tạo, reset và thống kê bản ghi CSDL
@@ -96,25 +100,28 @@ Sau đó mở trình duyệt tại:
 2. **`sessions`**: Quản lý phiên đăng nhập (`Bearer token` & cookie `rm_token`).
 3. **`rooms`**: Danh sách phòng trọ & tin đăng tìm bạn ở ghép (tách bạch chi phí điện, nước, dịch vụ, gửi xe, trạng thái `active`/`filled`/`paused`, `last_ping_at` chống "phòng ma").
 4. **`roommates`**: Hồ sơ ứng viên tìm bạn cùng phòng & vector thói quen sinh hoạt (`quiz_profile_json`).
-5. **`saved_rooms`**: Danh sách phòng yêu thích đã lưu theo từng người dùng.
-6. **`quiz_submissions`**: Lưu đáp án 9 câu hỏi trắc nghiệm, cá tính ở trọ (`archetype`) và điểm 4 trụ cột lối sống.
-7. **`connections`**: Quản lý kết nối 2 chiều **Double Opt-in** (`incoming`, `pending`, `accepted`, `matched`, `released`), giới hạn tối đa **3 slot liên hệ song song** và hỗ trợ **bảo hành hủy kèo 48h**.
-8. **`user_plans`**: Lịch sử kích hoạt các gói dịch vụ (`boost`, `match-plus`, `verified-pro`, `combo`, `host`).
-9. **`notifications`**: Thông báo hệ thống theo người dùng.
-10. **`reports`**: Báo cáo tin giả, phòng ma, đòi cọc trước từ trang An toàn & chi tiết phòng.
-11. **`contacts`**: Yêu cầu liên hệ & đặt lịch gọi lại Zalo hỗ trợ trong 15 phút (kèm mã phiếu `#RM-xxxx`).
+5. **`roommate_daily_post_usage`**: Theo dõi quota đăng roommate theo ngày Việt Nam, kể cả khi bài đăng bị xóa.
+6. **`roommate_match_daily_usage`**: Giới hạn một lần làm mới kết quả/ngày cho tài khoản chưa có gói match không giới hạn.
+7. **`saved_rooms`**: Danh sách phòng yêu thích đã lưu theo từng người dùng.
+8. **`quiz_submissions`**: Lưu đáp án trắc nghiệm, cá tính ở trọ (`archetype`) và điểm các trụ cột lối sống.
+9. **`connections`**: Quản lý kết nối 2 chiều **Double Opt-in** (`incoming`, `pending`, `accepted`, `matched`, `released`), giới hạn tối đa **3 slot liên hệ song song**.
+10. **`user_plans`**: Các quyền lợi đã kích hoạt, thời điểm hết hạn và tin được đẩy.
+11. **`plan_purchase_orders`**: Đơn VietQR, mã chuyển khoản, trạng thái và xác nhận kích hoạt.
+12. **`notifications`**: Thông báo hệ thống theo người dùng.
+13. **`reports`**: Báo cáo tin giả, phòng ma, đòi cọc trước từ trang An toàn & chi tiết phòng.
+14. **`contacts`**: Yêu cầu liên hệ & đặt lịch gọi lại Zalo hỗ trợ (kèm mã phiếu `#RM-xxxx`).
 
 ### 4.2. Danh sách REST API Endpoints (`backend/routes/api.js`)
-- `GET /api/health` — Kiểm tra trạng thái server & số lượng bản ghi của 10 bảng CSDL.
+- `GET /api/health` — Kiểm tra trạng thái server & số lượng bản ghi của 14 bảng CSDL.
 - `GET /api/bootstrap` — Đồng bộ toàn bộ dữ liệu khởi tạo cho Frontend trong 1 request.
 - `POST /api/auth/register` | `POST /api/auth/login` | `POST /api/auth/logout` | `GET /api/auth/me` — Xác thực tài khoản sinh viên.
 - `GET /api/rooms` | `GET /api/rooms/:id` | `POST /api/rooms` | `DELETE /api/rooms/:id` — Tìm kiếm, lọc, xem chi tiết và đăng tin phòng trọ mới vào CSDL.
 - `POST /api/rooms/:id/save` — Lưu / bỏ lưu phòng yêu thích.
 - `PATCH /api/rooms/:id/ping` — Chủ trọ xác nhận phòng còn trống định kỳ (chống phòng ma).
-- `GET /api/roommates` | `GET /api/roommates/:id` — Danh sách roommate kèm điểm tương thích tính theo thời gian thực.
-- `GET /api/quiz` | `POST /api/quiz/submit` — Chấm điểm thuật toán Match 2 lớp (>85%) & lưu kết quả trắc nghiệm.
+- `GET /api/roommates` | `GET /api/roommates/:id` | `POST /api/roommates` | `POST /api/roommates/:id/boost` — Danh sách, quota đăng mỗi ngày và đẩy tin có thời hạn.
+- `GET /api/quiz` | `POST /api/quiz/submit` — Chấm điểm Match 2 lớp; Free được làm mới kết quả một lần/ngày, gói 4/5 không giới hạn trong ngày Việt Nam khi còn hạn.
 - `GET /api/connections` | `POST /api/connections/invite` | `PATCH /api/connections/:id` — Luồng kết nối 2 chiều Double Opt-in & giải phóng Slot (tối đa 3 slot).
-- `GET /api/plans` | `POST /api/plans/purchase` | `POST /api/plans/reset` — Kích hoạt & quản lý gói dịch vụ.
+- `GET /api/plans` | `POST /api/plans/checkout` | `POST /api/plans/confirm` | `POST /api/plans/reset` — Tạo đơn VietQR, xác nhận và kích hoạt quyền lợi có thời hạn.
 - `GET /api/notifications` | `POST /api/notifications/read-all` — Quản lý thông báo.
 - `GET /api/reports` | `POST /api/reports` — Gửi báo cáo tin giả / lừa cọc.
 - `GET /api/contacts` | `POST /api/contacts` — Gửi form liên hệ & yêu cầu tư vấn Zalo.

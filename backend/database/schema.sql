@@ -104,11 +104,27 @@ CREATE TABLE IF NOT EXISTS roommates (
   contact_json TEXT DEFAULT '{}',
   quiz_profile_json TEXT DEFAULT '{}',
   is_boosted INTEGER DEFAULT 0,
+  boost_expires_at INTEGER,
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL
 );
 
--- 5. Bảng Phòng đã lưu (Saved / Bookmarked Rooms)
+-- 5. Daily roommate posting quota by Vietnam calendar day
+CREATE TABLE IF NOT EXISTS roommate_daily_post_usage (
+  user_id TEXT NOT NULL,
+  day_start INTEGER NOT NULL,
+  post_count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, day_start)
+);
+
+CREATE TABLE IF NOT EXISTS roommate_match_daily_usage (
+  user_id TEXT NOT NULL,
+  day_start INTEGER NOT NULL,
+  match_count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, day_start)
+);
+
+-- 6. Bảng Phòng đã lưu (Saved / Bookmarked Rooms)
 CREATE TABLE IF NOT EXISTS saved_rooms (
   user_id TEXT NOT NULL,
   room_id TEXT NOT NULL,
@@ -116,7 +132,7 @@ CREATE TABLE IF NOT EXISTS saved_rooms (
   PRIMARY KEY (user_id, room_id)
 );
 
--- 6. Bảng Kết quả Trắc nghiệm Tính cách & Lối sống (Quiz Submissions)
+-- 7. Bảng Kết quả Trắc nghiệm Tính cách & Lối sống (Quiz Submissions)
 CREATE TABLE IF NOT EXISTS quiz_submissions (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL UNIQUE,
@@ -132,7 +148,7 @@ CREATE TABLE IF NOT EXISTS quiz_submissions (
   updated_at INTEGER NOT NULL
 );
 
--- 7. Bảng Kết nối 2 chiều Double Opt-in & Quản lý Slot (Tối đa 3 slot song song)
+-- 8. Bảng Kết nối 2 chiều Double Opt-in & Quản lý Slot (Tối đa 3 slot song song)
 CREATE TABLE IF NOT EXISTS connections (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
@@ -153,7 +169,7 @@ CREATE TABLE IF NOT EXISTS connections (
   UNIQUE(user_id, partner_id)
 );
 
--- 8. Bảng Gói Dịch vụ & Thanh toán (Active Plans / Subscriptions)
+-- 9. Bảng Gói Dịch vụ & Thanh toán (Active Plans / Subscriptions)
 CREATE TABLE IF NOT EXISTS user_plans (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
@@ -163,10 +179,25 @@ CREATE TABLE IF NOT EXISTS user_plans (
   period TEXT,
   payment_code TEXT,
   status TEXT DEFAULT 'active',
-  purchased_at INTEGER NOT NULL
+  purchased_at INTEGER NOT NULL,
+  expires_at INTEGER,
+  target_id TEXT
 );
 
--- 9. Bảng Thông báo người dùng (Notifications)
+CREATE TABLE IF NOT EXISTS plan_purchase_orders (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  package_id TEXT NOT NULL,
+  amount_vnd INTEGER NOT NULL,
+  transfer_code TEXT NOT NULL UNIQUE,
+  target_id TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  created_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL,
+  confirmed_at INTEGER
+);
+
+-- 10. Bảng Thông báo người dùng (Notifications)
 CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
@@ -177,7 +208,7 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at INTEGER NOT NULL
 );
 
--- 10. Bảng Báo cáo Tin giả / Phòng ma / Lừa đảo (Trust & Safety Reports)
+-- 11. Bảng Báo cáo Tin giả / Phòng ma / Lừa đảo (Trust & Safety Reports)
 CREATE TABLE IF NOT EXISTS reports (
   id TEXT PRIMARY KEY,
   user_id TEXT,
@@ -190,7 +221,7 @@ CREATE TABLE IF NOT EXISTS reports (
   created_at INTEGER NOT NULL
 );
 
--- 11. Bảng Liên hệ & Yêu cầu Tư vấn / Hỗ trợ (Contact & Support Tickets)
+-- 12. Bảng Liên hệ & Yêu cầu Tư vấn / Hỗ trợ (Contact & Support Tickets)
 CREATE TABLE IF NOT EXISTS contacts (
   id TEXT PRIMARY KEY,
   ticket_id TEXT NOT NULL UNIQUE,
@@ -214,3 +245,4 @@ CREATE INDEX IF NOT EXISTS idx_roommates_area_key ON roommates(area_key);
 CREATE INDEX IF NOT EXISTS idx_roommates_gender ON roommates(gender);
 CREATE INDEX IF NOT EXISTS idx_connections_user_id ON connections(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_plans_user_id ON user_plans(user_id);
+CREATE INDEX IF NOT EXISTS idx_plan_purchase_orders_user_id ON plan_purchase_orders(user_id, created_at);
